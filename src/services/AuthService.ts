@@ -14,8 +14,7 @@ export async function apiSignIn(data: SignInCredential) {
         url: endpointConfig.signIn,
         method: 'post',
         data,
-    })
-}
+    })}
 
 export async function apiSignUp(data: SignUpCredential) {
     return ApiService.fetchDataWithAxios<SignUpResponse>({
