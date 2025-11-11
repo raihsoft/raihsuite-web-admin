@@ -5,12 +5,12 @@ import { ORDER_EDIT_PREFIX_PATH, ORDER_PREFIX_PATH} from "@/constants/route.cons
 
 const orderRoute: Routes = [
 
-    {
-        key: "employeeCreate",   
-        path: `${ORDER_PREFIX_PATH}/order-create`,
-        component: lazy(() => import("@/views/order/orders/CustomerCreate")),
-        authority: [ADMIN, USER],
-    },
+    // {
+    //     key: "employeeCreate",   
+    //     path: `${ORDER_PREFIX_PATH}/order-create`,
+    //     component: lazy(() => import("@/views/order/orders/CustomerCreate")),
+    //     authority: [ADMIN, USER],
+    // },
 
     {
         key: "employeeEdit",
