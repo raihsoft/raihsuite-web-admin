@@ -25,20 +25,20 @@ const zoneRoute: Routes = [
         //         footer: false,
         //     },
         // },
-            {
-                key: "employeeDeatails",
-                path: `${ZONE_DEATILS_PREFIX_PATH}/:id`,
-                component: lazy(() => import("@/views/order/zone/CustomerDetails")),
-                authority: [ADMIN, USER],
-                meta: {
-                    header: {
-                        title: "Zone Details ",
-                        description: "Manage ZONE details, profile, and preferences.",
-                        contained: true,
-                    },
-                    footer: false,
-                },
-            },
+            // {
+            //     key: "employeeDeatails",
+            //     path: `${ZONE_DEATILS_PREFIX_PATH}/:id`,
+            //     component: lazy(() => import("@/views/order/zone/CustomerDetails")),
+            //     authority: [ADMIN, USER],
+            //     meta: {
+            //         header: {
+            //             title: "Zone Details ",
+            //             description: "Manage ZONE details, profile, and preferences.",
+            //             contained: true,
+            //         },
+            //         footer: false,
+            //     },
+            // },
 
 
 
