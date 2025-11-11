@@ -5,12 +5,12 @@ import {  ZONE_DEATILS_PREFIX_PATH, ZONE_EDIT_PREFIX_PATH, ZONE_PREFIX_PATH} fro
 
 const zoneRoute: Routes = [
 
-    {
-        key: "employeeCreate",   
-        path: `${ZONE_PREFIX_PATH}/zone-create`,
-        component: lazy(() => import("@/views/order/zone/CustomerCreate")),
-        authority: [ADMIN, USER],
-    },
+    // {
+    //     key: "employeeCreate",   
+    //     path: `${ZONE_PREFIX_PATH}/zone-create`,
+    //     component: lazy(() => import("@/views/order/zone/CustomerCreate")),
+    //     authority: [ADMIN, USER],
+    // },
         {
             key: "zoneEdit",
             path: `${ZONE_EDIT_PREFIX_PATH}/:id`,           // /employee-edit/:id
