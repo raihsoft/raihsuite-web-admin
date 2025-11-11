@@ -7,6 +7,7 @@ import orderRoute from './orderRoute'
 import organizationRoute from './organizationRoute'
 import zoneRoute from './zoneRoute'
 
+
 export const publicRoutes: Routes = [...authRoute]
 
 export const protectedRoutes: Routes = [

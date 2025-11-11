@@ -5,12 +5,14 @@ export type SignInCredential = {
 
 export type SignInResponse = {
     access: string
+    refresh: string
     user: {
         userId: string
         userName: string
         authority: string[]
         avatar: string
         email: string
+
     }
 }
 
