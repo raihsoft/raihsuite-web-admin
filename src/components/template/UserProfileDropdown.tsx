@@ -43,11 +43,14 @@ const _UserDropdown = () => {
                 <div className="py-2 px-3 flex items-center gap-3">
                     <Avatar {...avatarProps} />
                     <div>
-                        <div className="font-bold text-gray-900 dark:text-gray-100">
+                        {/* <div className="font-bold text-gray-900 dark:text-gray-100">
                             {userName || 'Anonymous'}
                         </div>
                         <div className="text-xs">
                             {email || 'No email available'}
+                        </div> */}
+                         <div className="font-bold text-gray-900 dark:text-gray-100">
+                           {email || 'No email available'}
                         </div>
                     </div>
                 </div>
@@ -75,7 +78,7 @@ const _UserDropdown = () => {
                 <span className="text-xl">
                     <PiSignOutDuotone />
                 </span>
-                <span>Sign Out</span>
+                <span>Sigdn Out</span>
             </Dropdown.Item>
         </Dropdown>
     )
