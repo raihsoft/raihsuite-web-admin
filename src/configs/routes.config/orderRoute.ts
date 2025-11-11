@@ -12,20 +12,20 @@ const orderRoute: Routes = [
     //     authority: [ADMIN, USER],
     // },
 
-    {
-        key: "employeeEdit",
-        path: `${ORDER_EDIT_PREFIX_PATH}/:id`,           
-        component: lazy(() => import("@/views/order/orders/CustomerEdit")),
-        authority: [ADMIN, USER],
-        meta: {
-            header: {
-                title: "Edit Order",
-                description: "Manage employee details, profile, and preferences.",
-                contained: true,
-            },
-            footer: false,
-        },
-    },
+    // {
+    //     key: "employeeEdit",
+    //     path: `${ORDER_EDIT_PREFIX_PATH}/:id`,           
+    //     component: lazy(() => import("@/views/order/orders/CustomerEdit")),
+    //     authority: [ADMIN, USER],
+    //     meta: {
+    //         header: {
+    //             title: "Edit Order",
+    //             description: "Manage employee details, profile, and preferences.",
+    //             contained: true,
+    //         },
+    //         footer: false,
+    //     },
+    // },
 
 
     
