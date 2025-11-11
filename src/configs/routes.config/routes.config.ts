@@ -34,7 +34,7 @@ export const protectedRoutes: Routes = [
     {
         key: 'contentasset',
         path: '/contentasset',
-        component: lazy(() => import('@/views/contentasset/ContentAssetList')),
+        component: lazy(() => import('@/views/contentasset/ContentassetList')),
         authority: [],
     },
     // {
