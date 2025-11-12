@@ -1,4 +1,3 @@
-
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import { apiGetAssetsType } from '@/services/CustomersService'
@@ -22,17 +21,17 @@ export default function useCustomerList() {
         { revalidateOnFocus: false }
     )
 
-const customerList = data?.map((customer: any, index: number) => ({
-    id: customer.id ?? index,
-    name: customer.name,
-    code: customer.code,
-    file_extension: customer.file_extension,
-    asset_category: customer.asset_category,
-    description: customer.description,
-    status: 'active',
-    totalSpending: 0,
-})) ?? []
-
+    const customerList =
+        data?.results?.map((customer: any, index: number) => ({
+            id: customer.id ?? index,
+            name: customer.name,
+            code: customer.code,
+            file_extension: customer.file_extension,
+            asset_category: customer.asset_category,
+            description: customer.description,
+            status: 'active',
+            totalSpending: 0,
+        })) ?? []
 
     const customerListTotal = data?.count ?? 0
 

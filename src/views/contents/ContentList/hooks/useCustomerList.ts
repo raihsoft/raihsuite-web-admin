@@ -1,4 +1,3 @@
-
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import { apiGetContent } from '@/services/CustomersService'
@@ -16,29 +15,32 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
+    // ✅ Use SWR for fetching data
     const { data, error, isLoading } = useSWR(
         ['/api/contents', { ...tableData, ...filterData }] as const,
-        ([, params]) => apiGetContent<GetCustomersListResponse, TableQueries>(params),
+        async ([, params]) => {
+            const response = await apiGetContent<GetCustomersListResponse, TableQueries>(params)
+            return response // ensure this returns parsed data
+        },
         { revalidateOnFocus: false }
     )
 
-const customerList = data?.map((customer: any, index: number) => ({
-    id: customer.id ?? index,
-    category: customer.category,
-    title: customer.title,
-    slug: customer.slug,
-    body: customer.body,
+    // ✅ Map the response correctly
+    const contentList = data?.results?.map((item: any, index: number) => ({
+        id: item.id ?? index,
+        category: item.category,
+        title: item.title,
+        slug: item.slug,
+        body: item.body,
+        status: 'active',
+        totalSpending: 0,
+    })) ?? []
 
-    status: 'active',
-    totalSpending: 0,
-})) ?? []
-
-
-    const customerListTotal = data?.count ?? 0
+    const totalCount = data?.count ?? 0
 
     return {
-        customerList,
-        customerListTotal,
+        customerList: contentList,
+        customerListTotal: totalCount,
         error,
         isLoading,
         tableData,
