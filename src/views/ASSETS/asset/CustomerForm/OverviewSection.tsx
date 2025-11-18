@@ -1,17 +1,19 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Card from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
-import Select, { Option as DefaultOption } from '@/components/ui/Select'
-import Avatar from '@/components/ui/Avatar'
 import { FormItem } from '@/components/ui/Form'
-import NumericInput from '@/components/shared/NumericInput'
-import { countryList } from '@/constants/countries.constant'
 import { Controller } from 'react-hook-form'
-import { components } from 'react-select'
+import ReactSelect from 'react-select'
+import { apiAssetType, apiGetAssetCategories } from '@/services/CustomersService'
+import { countryList } from '@/constants/countries.constant'
 import type { FormSectionBaseProps } from './types'
-import type { ControlProps, OptionProps } from 'react-select'
 
 type OverviewSectionProps = FormSectionBaseProps
+
+type AssetTypeOption = {
+    label: string
+    value: string
+}
 
 type CountryOption = {
     label: string
@@ -19,49 +21,49 @@ type CountryOption = {
     value: string
 }
 
-const { Control } = components
-
-const CustomSelectOption = (props: OptionProps<CountryOption>) => {
-    return (
-        <DefaultOption<CountryOption>
-            {...props}
-            customLabel={(data) => (
-                <span className="flex items-center gap-2">
-                    <Avatar
-                        shape="circle"
-                        size={20}
-                        src={`/img/countries/${data.value}.png`}
-                    />
-                    <span>{data.dialCode}</span>
-                </span>
-            )}
-        />
-    )
-}
-
-const CustomControl = ({ children, ...props }: ControlProps<CountryOption>) => {
-    const selected = props.getValue()[0]
-    return (
-        <Control {...props}>
-            {selected && (
-                <Avatar
-                    className="ltr:ml-4 rtl:mr-4"
-                    shape="circle"
-                    size={20}
-                    src={`/img/countries/${selected.value}.png`}
-                />
-            )}
-            {children}
-        </Control>
-    )
-}
-
 const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
-    const dialCodeList = useMemo(() => {
-        const newCountryList: Array<CountryOption> = JSON.parse(
-            JSON.stringify(countryList),
-        )
+    const [assetTypeOptions, setAssetTypeOptions] = useState<AssetTypeOption[]>([])
+    const [assetCategoryOptions, setAssetCategoryOptions] = useState<AssetTypeOption[]>([])
 
+    // ✅ Fetch Asset Types
+    useEffect(() => {
+        const fetchAssetTypes = async () => {
+            try {
+                const response = await apiAssetType<any, any>({})
+                const results = response?.results || []
+                const options = results.map((item: any) => ({
+                    label: item.name,
+                    value: item.id,
+                }))
+                setAssetTypeOptions(options)
+            } catch (error) {
+                console.error('❌ Error fetching asset types:', error)
+            }
+        }
+        fetchAssetTypes()
+    }, [])
+
+    // ✅ Fetch Asset Categories
+    useEffect(() => {
+        const fetchAssetCategories = async () => {
+            try {
+                const response = await apiGetAssetCategories<any, any>({})
+                const results = response?.results || []
+                const options = results.map((item: any) => ({
+                    label: item.name,
+                    value: item.id,
+                }))
+                setAssetCategoryOptions(options)
+            } catch (error) {
+                console.error('❌ Error fetching asset categories:', error)
+            }
+        }
+        fetchAssetCategories()
+    }, [])
+
+    // 🌍 Country Dial Codes (optional / reference)
+    const dialCodeList = useMemo(() => {
+        const newCountryList: Array<CountryOption> = JSON.parse(JSON.stringify(countryList))
         return newCountryList.map((country) => {
             country.label = country.dialCode
             return country
@@ -70,115 +72,151 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
     return (
         <Card>
-            <h4 className="mb-6">Overview</h4>
+            <h4 className="mb-6 font-semibold text-lg">Overview</h4>
+
+            {/* 🔹 Title & File Type */}
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
-                    label="First Name"
-                    invalid={Boolean(errors.firstName)}
-                    errorMessage={errors.firstName?.message}
+                    label="Title"
+                    invalid={Boolean(errors.title)}
+                    errorMessage={errors.title?.message}
                 >
                     <Controller
-                        name="firstName"
+                        name="title"
                         control={control}
                         render={({ field }) => (
-                            <Input
-                                type="text"
-                                autoComplete="off"
-                                placeholder="First Name"
-                                {...field}
-                            />
+                            <Input type="text" autoComplete="off" placeholder="Title" {...field} />
                         )}
                     />
                 </FormItem>
+
                 <FormItem
-                    label="User Name"
-                    invalid={Boolean(errors.lastName)}
-                    errorMessage={errors.lastName?.message}
+                    label="File Type"
+                    invalid={Boolean(errors.file_type)}
+                    errorMessage={errors.file_type?.message}
                 >
                     <Controller
-                        name="lastName"
+                        name="file_type"
                         control={control}
                         render={({ field }) => (
                             <Input
                                 type="text"
                                 autoComplete="off"
-                                placeholder="Last Name"
+                                placeholder="File Type"
                                 {...field}
                             />
                         )}
                     />
                 </FormItem>
             </div>
+
+            {/* 🔹 File Upload */}
             <FormItem
-                label="Email"
-                invalid={Boolean(errors.email)}
-                errorMessage={errors.email?.message}
+                label="Upload File"
+                invalid={Boolean(errors.file)}
+                errorMessage={errors.file?.message}
             >
                 <Controller
-                    name="email"
+                    name="file"
                     control={control}
                     render={({ field }) => (
                         <Input
-                            type="email"
+                            type="file"
+                            accept="image/*,application/pdf"
+                            onChange={(e) => field.onChange(e.target.files?.[0])}
+                        />
+                    )}
+                />
+            </FormItem>
+
+            {/* 🔹 Asset Type */}
+            <FormItem
+                label="Asset Type"
+                invalid={Boolean(errors.asset_type_ref)}
+                errorMessage={errors.asset_type_ref?.message}
+            >
+                <Controller
+                    name="asset_type_ref"
+                    control={control}
+                    render={({ field }) => (
+                        <ReactSelect
+                            {...field}
+                            options={assetTypeOptions}
+                            placeholder="Select Asset Type"
+                            value={assetTypeOptions.find((opt) => opt.value === field.value)}
+                            onChange={(option) => field.onChange(option?.value)}
+                            styles={{
+                                menu: (provided) => ({
+                                    ...provided,
+                                    zIndex: 9999,
+                                }),
+                            }}
+                        />
+                    )}
+                />
+            </FormItem>
+
+            {/* 🔹 Asset Category */}
+            <FormItem
+                label="Asset Category"
+                invalid={Boolean(errors.asset_category)}
+                errorMessage={errors.asset_category?.message}
+            >
+                <Controller
+                    name="asset_category"
+                    control={control}
+                    render={({ field }) => (
+                        <ReactSelect
+                            {...field}
+                            options={assetCategoryOptions}
+                            placeholder="Select Asset Category"
+                            value={assetCategoryOptions.find((opt) => opt.value === field.value)}
+                            onChange={(option) => field.onChange(option?.value)}
+                            styles={{
+                                menu: (provided) => ({
+                                    ...provided,
+                                    zIndex: 9999,
+                                }),
+                            }}
+                        />
+                    )}
+                />
+            </FormItem>
+
+            {/* 🔹 Tags */}
+            <FormItem
+                label="Tags"
+                invalid={Boolean(errors.tags)}
+                errorMessage={errors.tags?.message}
+            >
+                <Controller
+                    name="tags"
+                    control={control}
+                    render={({ field }) => (
+                        <Input type="text" autoComplete="off" placeholder="Tags" {...field} />
+                    )}
+                />
+            </FormItem>
+
+            {/* 🔹 Description */}
+            <FormItem
+                label="Description"
+                invalid={Boolean(errors.description)}
+                errorMessage={errors.description?.message}
+            >
+                <Controller
+                    name="description"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            type="text"
                             autoComplete="off"
-                            placeholder="Email"
+                            placeholder="Description"
                             {...field}
                         />
                     )}
                 />
             </FormItem>
-            <div className="flex items-end gap-4 w-full">
-                <FormItem
-                    invalid={
-                        Boolean(errors.phoneNumber) || Boolean(errors.dialCode)
-                    }
-                >
-                    <label className="form-label mb-2">Phone number</label>
-                    <Controller
-                        name="dialCode"
-                        control={control}
-                        render={({ field }) => (
-                            <Select<CountryOption>
-                                options={dialCodeList}
-                                {...field}
-                                className="w-[150px]"
-                                components={{
-                                    Option: CustomSelectOption,
-                                    Control: CustomControl,
-                                }}
-                                placeholder=""
-                                value={dialCodeList.filter(
-                                    (option) => option.dialCode === field.value,
-                                )}
-                                onChange={(option) =>
-                                    field.onChange(option?.dialCode)
-                                }
-                            />
-                        )}
-                    />
-                </FormItem>
-                <FormItem
-                    className="w-full"
-                    invalid={
-                        Boolean(errors.phoneNumber) || Boolean(errors.dialCode)
-                    }
-                    errorMessage={errors.phoneNumber?.message}
-                >
-                    <Controller
-                        name="phoneNumber"
-                        control={control}
-                        render={({ field }) => (
-                            <NumericInput
-                                autoComplete="off"
-                                placeholder="Phone Number"
-                                value={field.value}
-                                onChange={field.onChange}
-                                onBlur={field.onBlur}
-                            />
-                        )}
-                    />
-                </FormItem>
-            </div>
         </Card>
     )
 }

@@ -4,7 +4,9 @@ export type SignInCredential = {
 }
 
 export type SignInResponse = {
-    access: string
+     access: string
+  refresh: string  
+    tenant?: string
     user: {
         userId: string
         userName: string

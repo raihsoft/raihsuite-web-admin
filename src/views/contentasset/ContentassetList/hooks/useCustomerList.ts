@@ -1,7 +1,7 @@
 
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
-import { apiGetContent } from '@/services/CustomersService'
+import { apiGetContent, apiGetOrganizations } from '@/services/CustomersService'
 import type { TableQueries } from '@/@types/common'
 import type { GetCustomersListResponse } from '../types'
 
@@ -18,7 +18,7 @@ export default function useCustomerList() {
 
     const { data, error, isLoading } = useSWR(
         ['/api/contents', { ...tableData, ...filterData }] as const,
-        ([, params]) => apiGetContent<GetCustomersListResponse, TableQueries>(params),
+        ([, params]) => apiGetOrganizations<GetCustomersListResponse, TableQueries>(params),
         { revalidateOnFocus: false }
     )
 

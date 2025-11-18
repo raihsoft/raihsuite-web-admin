@@ -1,7 +1,10 @@
+import { types } from 'util'
 import ApiService from './ApiService'
 
 // Get employee list
-export async function apiGetEmployees<T, U extends Record<string, unknown>>(params: U) {
+export async function apiGetEmployees<T, U extends Record<string, unknown>>(
+    params: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/hrms/employees/',
         method: 'get',
@@ -10,7 +13,9 @@ export async function apiGetEmployees<T, U extends Record<string, unknown>>(para
 }
 
 // Create new employee
-export async function apiCreateEmployee<T, U extends Record<string, unknown>>(data: U) {
+export async function apiCreateEmployee<T, U extends Record<string, unknown>>(
+    data: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/hrms/employees/',
         method: 'post',
@@ -27,7 +32,10 @@ export async function apiGetEmployeeById<T>(id: string) {
 }
 
 // Update employee by UUID
-export async function apiUpdateEmployee<T, U extends Record<string, unknown>>(id: string, data: U) {
+export async function apiUpdateEmployee<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: `/hrms/employees/${id}/`,
         method: 'patch',
@@ -43,11 +51,11 @@ export async function apiDeleteEmployee(id: string) {
     })
 }
 
-
-
 // orders
 
-export async function apiGetOrderList<T, U extends Record<string, unknown>>(params: U) {
+export async function apiGetOrderList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/order/orders/',
         method: 'get',
@@ -55,8 +63,9 @@ export async function apiGetOrderList<T, U extends Record<string, unknown>>(para
     })
 }
 
-
-export async function apiCreateOrders<T, U extends Record<string, unknown>>(data: U) {
+export async function apiCreateOrders<T, U extends Record<string, unknown>>(
+    data: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/order/orders/',
         method: 'post',
@@ -71,7 +80,10 @@ export async function apiGetOrderById<T>(id: string) {
     })
 }
 
-export async function apiUpdateOrder<T, U extends Record<string, unknown>>(id: string, data: U) {
+export async function apiUpdateOrder<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: `/order/orders/${id}/`,
         method: 'patch',
@@ -79,11 +91,11 @@ export async function apiUpdateOrder<T, U extends Record<string, unknown>>(id: s
     })
 }
 
-
-
 // zone
 
-export async function apiGetZones<T, U extends Record<string, unknown>>(params: U) {
+export async function apiGetZones<T, U extends Record<string, unknown>>(
+    params: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/order/zones/',
         method: 'get',
@@ -91,9 +103,9 @@ export async function apiGetZones<T, U extends Record<string, unknown>>(params: 
     })
 }
 
-
-
-export async function apiCreateZone<T, U extends Record<string, unknown>>(data: U) {
+export async function apiCreateZone<T, U extends Record<string, unknown>>(
+    data: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/order/zones/',
         method: 'post',
@@ -101,7 +113,10 @@ export async function apiCreateZone<T, U extends Record<string, unknown>>(data: 
     })
 }
 
-export async function apiUpdateZone<T, U extends Record<string, unknown>>(id: string, data: U) {
+export async function apiUpdateZone<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: `/order/zones/${id}/`,
         method: 'patch',
@@ -118,7 +133,9 @@ export async function apiGetZoneById<T>(id: string) {
 
 // organization
 
-export async function apiGetOrganizations<T, U extends Record<string, unknown>>(params: U) {
+export async function apiGetOrganizations<T, U extends Record<string, unknown>>(
+    params: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/order/organizations/',
         method: 'get',
@@ -126,8 +143,10 @@ export async function apiGetOrganizations<T, U extends Record<string, unknown>>(
     })
 }
 
-
-export async function apiCreateOrganizations<T, U extends Record<string, unknown>>(data: U) {
+export async function apiCreateOrganizations<
+    T,
+    U extends Record<string, unknown>,
+>(data: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/order/organizations/',
         method: 'post',
@@ -135,14 +154,72 @@ export async function apiCreateOrganizations<T, U extends Record<string, unknown
     })
 }
 
-
 // crm
 
-
-export async function apiGetEnquiries<T, U extends Record<string, unknown>>(params: U) {
+export async function apiGetEnquiries<T, U extends Record<string, unknown>>(
+    params: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/crm/enquiries/',
         method: 'get',
         params,
+    })
+}
+
+// asset
+
+
+export async function apiGetAssets<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/assets/',
+        method: 'get',
+        params,
+    })
+}
+
+export async function apiCreateAssets<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/assets/',
+        method: 'post',
+        data,
+    })
+}
+
+// asset-types
+
+export async function apiAssetType<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_types/',
+        method: 'get',
+        params,
+    })
+}
+
+
+// asset-types-asset_categories
+
+export async function apiGetAssetCategories<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_categories/',
+        method: 'get',
+        params,
+    })
+}
+
+export async function apiCreateAssetCategories<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_categories/',
+        method: 'post',
+        data,
     })
 }
