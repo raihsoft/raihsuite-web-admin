@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
-import { apiGetContent } from '@/services/CustomersService'
+import {  apiGetOrganizations } from '@/services/CustomersService'
 import type { TableQueries } from '@/@types/common'
 import type { GetCustomersListResponse } from '../types'
 

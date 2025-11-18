@@ -1,7 +1,10 @@
-import { lazy } from "react"
-import type { Routes } from "@/@types/routes"   
-import { ADMIN, USER } from "@/constants/roles.constant"
-import { ORDER_EDIT_PREFIX_PATH, ORDER_PREFIX_PATH} from "@/constants/route.constant"
+import { lazy } from 'react'
+import type { Routes } from '@/@types/routes'
+import { ADMIN, USER } from '@/constants/roles.constant'
+import {
+    ORDER_EDIT_PREFIX_PATH,
+    ORDER_PREFIX_PATH,
+} from '@/constants/route.constant'
 
 const orderRoute: Routes = [
 
@@ -32,5 +35,5 @@ const orderRoute: Routes = [
 
     
 ]
-    
+
 export default orderRoute

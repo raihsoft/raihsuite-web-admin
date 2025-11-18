@@ -6,6 +6,8 @@ import employeeRoute from './employeeRoute'
 import orderRoute from './orderRoute'
 import organizationRoute from './organizationRoute'
 import zoneRoute from './zoneRoute'
+import assetsRoute from './assetsRoute'
+import assetsCategoryRoute from './AssetCategoryRoute'
 
 
 export const publicRoutes: Routes = [...authRoute]
@@ -34,15 +36,15 @@ export const protectedRoutes: Routes = [
     // {
     //     key: 'contentasset',
     //     path: '/contentasset',
-    //     component: lazy(() => import('@/views/contentasset/ContentassetList')),
+    //     component: lazy(() => import('@/views/contentasset/ContentAssetList')),
     //     authority: [],
     // },
-    // {
-    //     key: 'contact',
-    //     path: '/contact',
-    //     component: lazy(() => import('@/views/CRM/contacts/ContactList')),
-    //     authority: [],
-    // },
+    {
+        key: 'contact',
+        path: '/contact',
+        component: lazy(() => import('@/views/CRM/contacts/ContactList')),
+        authority: [],
+    },
     {
         key: 'enquiries',
         path: '/enquiries',
@@ -117,6 +119,7 @@ export const protectedRoutes: Routes = [
     
     
 
-    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute
+    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute
+
 ]
 

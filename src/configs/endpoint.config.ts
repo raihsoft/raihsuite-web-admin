@@ -12,7 +12,7 @@
 
 
 
-export const apiPrefix = '/auth'; // frontend `/api` path, proxy handle cheyyum
+export const apiPrefix = '/accounts'
 
 const endpointConfig = {
     signIn: `${apiPrefix}/login/`,
@@ -22,4 +22,4 @@ const endpointConfig = {
     resetPassword: `${apiPrefix}/reset-password/`,
 }
 
-export default endpointConfig;
+export default endpointConfig
