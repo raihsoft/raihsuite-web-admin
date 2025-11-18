@@ -176,13 +176,6 @@ export const apiGetContentCategories = () => {
 }
 
 
-export async function apiGetAssetsType<T, U extends Record<string, unknown>>(params: U) {
-    return ApiService.fetchDataWithAxios<T>({
-        url: '/asset_types/',
-        method: 'get',
-        params,
-    })
-}
 export async function apiGetAssets<T, U extends Record<string, unknown>>(params: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/assets/',
@@ -201,7 +194,7 @@ export async function apiGetAssetCategory<T, U extends Record<string, unknown>>(
 // ✅ Asset Type Categories
 export async function apiGetAssetTypeCategory<T, U extends Record<string, unknown>>(params: U) {
     return ApiService.fetchDataWithAxios<T>({
-        url: '/asset_type_categories/',
+        url: '/asset/asset_type_categories/',
         method: 'get',
         params,
     })
@@ -215,3 +208,18 @@ export async function apiGetCustomersList<T, U extends Record<string, unknown>>(
         params,
     })
 }
+
+
+
+// ✅ Asset Type
+export async function apiGetAssetType<T, U extends Record<string, unknown>>(params: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_types/',
+        method: 'get',
+        params,
+    })
+}
+
+
+
+
