@@ -5,8 +5,8 @@ export type SignInCredential = {
 
 export type SignInResponse = {
      access: string
-  refresh: string  
-    tenant?: string
+    refresh: string  
+    tenant_id?: string
     user: {
         userId: string
         userName: string
