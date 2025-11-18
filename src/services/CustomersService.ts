@@ -221,3 +221,18 @@ export async function apiCreateAssetCategories<T, U extends Record<string, unkno
         data,
     })
 }
+
+
+
+// ✅ Asset Type
+export async function apiGetAssetType<T, U extends Record<string, unknown>>(params: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_types/',
+        method: 'get',
+        params,
+    })
+}
+
+
+
+
