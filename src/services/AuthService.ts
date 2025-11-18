@@ -11,19 +11,33 @@ import type {
 
 export async function apiSignIn(data: SignInCredential) {
   const res = await ApiService.fetchDataWithAxios<SignInResponse>({
-    url: endpointConfig.signIn, // e.g. '/token/' or '/auth/login/'
+    url: endpointConfig.signIn,
     method: 'post',
     data,
-  })
+  });
 
-  // ✅ Store both tokens safely
-  if (res.access && res.refresh) {
-    localStorage.setItem('access_token', res.access)
-    localStorage.setItem('refresh_token', res.refresh)
+  // 🔹 Save tokens
+  if (res.access) {
+    localStorage.setItem("access_token", res.access);
+  }
+  if (res.refresh) {
+    localStorage.setItem("refresh_token", res.refresh);
+  }
+  if (res.tenant) {
+    localStorage.setItem("tenant", res.tenant);
   }
 
-  return res
+  // 🔥 Save tenant — DON'T depend on access/refresh
+  if (res.tenant) {
+    localStorage.setItem("tenant", res.tenant);
+  } else {
+    console.warn("⚠️ API did not return tenant");
+  }
+
+  return res;
 }
+
+
 
 export async function apiSignUp(data: SignUpCredential) {
   return ApiService.fetchDataWithAxios<SignUpResponse>({

@@ -13,55 +13,51 @@ import type { CustomerFormSchema } from '../CustomerForm'
 const CustomerEdit = () => {
     const navigate = useNavigate()
 
-    const [discardConfirmationOpen, setDiscardConfirmationOpen] =
-        useState(false)
-    const [isSubmiting, setIsSubmiting] = useState(false)
+    const [discardConfirmationOpen, setDiscardConfirmationOpen] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
+    // ✅ Form Submit
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        console.log('Submitted values', values)
-        setIsSubmiting(true)
+        console.log('🟢 Submitted values:', values)
+        setIsSubmitting(true)
         await sleep(800)
-        setIsSubmiting(false)
+
+        // example success toast
         toast.push(
-            <Notification type="success">Customer created!</Notification>,
-            { placement: 'top-center' },
+            <Notification type="success">Asset Created Successfully!</Notification>,
+            { placement: 'top-center' }
         )
-        navigate('/concepts/customers/customer-list')
+
+        setIsSubmitting(false)
+        navigate('/assets/assets-create')
     }
 
+    // ✅ Confirm discard
     const handleConfirmDiscard = () => {
-        setDiscardConfirmationOpen(true)
-        toast.push(
-            <Notification type="success">Customer discardd!</Notification>,
-            { placement: 'top-center' },
-        )
-        navigate('/concepts/customers/customer-list')
-    }
-
-    const handleDiscard = () => {
-        setDiscardConfirmationOpen(true)
-    }
-
-    const handleCancel = () => {
         setDiscardConfirmationOpen(false)
+        toast.push(
+            <Notification type="warning">Changes discarded!</Notification>,
+            { placement: 'top-center' }
+        )
+        navigate('/assets/assets-create')
     }
+
+    // ✅ Discard / Cancel handlers
+    const handleDiscard = () => setDiscardConfirmationOpen(true)
+    const handleCancel = () => setDiscardConfirmationOpen(false)
 
     return (
         <>
             <CustomerForm
                 newCustomer
                 defaultValues={{
-                    firstName: '',
-                    lastName: '',
-                    email: '',
+                    title: '',
+                    description: '',
+                    file_type: '',
+                    asset_type_ref: '',
+                    asset_category: '',
+                    tags: '',        
                     img: '',
-                    phoneNumber: '',
-                    dialCode: '',
-                    country: '',
-                    address: '',
-                    city: '',
-                    postcode: '',
-                    tags: [],
                 }}
                 onFormSubmit={handleFormSubmit}
             >
@@ -83,7 +79,7 @@ const CustomerEdit = () => {
                             <Button
                                 variant="solid"
                                 type="submit"
-                                loading={isSubmiting}
+                                loading={isSubmitting}
                             >
                                 Create
                             </Button>
@@ -91,6 +87,7 @@ const CustomerEdit = () => {
                     </div>
                 </Container>
             </CustomerForm>
+
             <ConfirmDialog
                 isOpen={discardConfirmationOpen}
                 type="danger"
@@ -101,8 +98,7 @@ const CustomerEdit = () => {
                 onConfirm={handleConfirmDiscard}
             >
                 <p>
-                    Are you sure you want discard this? This action can&apos;t
-                    be undo.{' '}
+                    Are you sure you want to discard this? This action can’t be undone.
                 </p>
             </ConfirmDialog>
         </>

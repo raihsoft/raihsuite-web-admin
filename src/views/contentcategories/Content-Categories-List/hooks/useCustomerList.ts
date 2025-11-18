@@ -1,7 +1,9 @@
-
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
-// import { apiGetContentCategories } from '@/services/CustomersService'
+import {
+    apiGetContentCategories,
+    apiGetOrganizations,
+} from '@/services/CustomersService'
 import type { TableQueries } from '@/@types/common'
 import type { GetCustomersListResponse } from '../types'
 
@@ -18,22 +20,23 @@ export default function useCustomerList() {
 
     const { data, error, isLoading } = useSWR(
         ['/api/content_categories', { ...tableData, ...filterData }] as const,
-        // ([, params]) => apiGetContentCategories<GetCustomersListResponse, TableQueries>(params),
-        { revalidateOnFocus: false }
+        ([, params]) =>
+            apiGetOrganizations<GetCustomersListResponse, TableQueries>(params),
+        { revalidateOnFocus: false },
     )
 
-const customerList = data?.map((customer: any, index: number) => ({
-    id: customer.id ?? index,
-    name: customer.name,
-    slug: customer.slug,
-    title: customer.title,
-    code: customer.code,
-    description: customer.description,
+    const customerList =
+        data?.map((customer: any, index: number) => ({
+            id: customer.id ?? index,
+            name: customer.name,
+            slug: customer.slug,
+            title: customer.title,
+            code: customer.code,
+            description: customer.description,
 
-    status: 'active',
-    totalSpending: 0,
-})) ?? []
-
+            status: 'active',
+            totalSpending: 0,
+        })) ?? []
 
     const customerListTotal = data?.count ?? 0
 
