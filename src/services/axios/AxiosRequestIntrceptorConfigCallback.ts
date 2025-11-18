@@ -11,23 +11,23 @@ const AxiosRequestIntrceptorConfigCallback = (
 ) => {
     const storage = appConfig.accessTokenPersistStrategy
 
-    if (storage === 'localStorage' || storage === 'sessionStorage') {
-        let accessToken = ''
+    let accessToken = ''
 
-        if (storage === 'localStorage') {
-            accessToken = localStorage.getItem(TOKEN_NAME_IN_STORAGE) || ''
-        }
+    // 🔹 Correct token fetch logic
+    if (storage === 'localStorage') {
+        accessToken = localStorage.getItem(TOKEN_NAME_IN_STORAGE) || ''
+    } else if (storage === 'sessionStorage') {
+        accessToken = sessionStorage.getItem(TOKEN_NAME_IN_STORAGE) || ''
+    }
 
-        if (storage === 'sessionStorage') {
-            accessToken = sessionStorage.getItem(TOKEN_NAME_IN_STORAGE) || ''
-        }
-        console.log("accessToken", accessToken);
-        console.log("TOKEN_TYPE", TOKEN_TYPE);
-        console.log("REQUEST_HEADER_AUTH_KEY", REQUEST_HEADER_AUTH_KEY);
-        if (accessToken) {
-            config.headers[REQUEST_HEADER_AUTH_KEY] =
-                `${TOKEN_TYPE}${accessToken}`
-        }
+    console.log('📌 Access Token:', accessToken)
+    console.log('📌 TOKEN_TYPE:', TOKEN_TYPE)
+    console.log('📌 REQUEST_HEADER_AUTH_KEY:', REQUEST_HEADER_AUTH_KEY)
+
+    // ⭐ MAIN FIX → Add space after Bearer
+    if (accessToken) {
+        config.headers[REQUEST_HEADER_AUTH_KEY] =
+            `${TOKEN_TYPE} ${accessToken}`  // ✅ Correct -> "Bearer <token>"
     }
 
     return config

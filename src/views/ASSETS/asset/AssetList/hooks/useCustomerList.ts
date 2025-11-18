@@ -1,7 +1,7 @@
 
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
-import { apiGetAssets } from '@/services/CustomersService'
+import { apiGetAssets, apiGetOrganizations } from '@/services/CustomersService'
 import type { TableQueries } from '@/@types/common'
 import type { GetCustomersListResponse } from '../types'
 
@@ -22,7 +22,7 @@ export default function useCustomerList() {
         { revalidateOnFocus: false }
     )
 
-const customerList = data?.map((customer: any, index: number) => ({
+const customerList = data?.results?.map((customer: any, index: number) => ({
     id: customer.id ?? index,
     title: customer.title,
     file: customer.file,
