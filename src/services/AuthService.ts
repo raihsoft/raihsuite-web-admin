@@ -14,30 +14,32 @@ export async function apiSignIn(data: SignInCredential) {
     url: endpointConfig.signIn,
     method: 'post',
     data,
-  });
+  })
 
-  // 🔹 Save tokens
+  // 🔹 Save access token
   if (res.access) {
-    localStorage.setItem("access_token", res.access);
+    localStorage.setItem('access_token', res.access)
   }
+
+  // 🔹 Save refresh token
   if (res.refresh) {
-    localStorage.setItem("refresh_token", res.refresh);
-  }
-  if (res.tenant) {
-    localStorage.setItem("tenant", res.tenant);
+    localStorage.setItem('refresh_token', res.refresh)
   }
 
-  // 🔥 Save tenant — DON'T depend on access/refresh
-  if (res.tenant) {
-    localStorage.setItem("tenant", res.tenant);
+  // 🔥 Save TENANT from user.tenant_id (backend returns here)
+  if (res.user && res.user.tenant_id) {
+    localStorage.setItem('tenant', res.user.tenant_id.toString())
   } else {
-    console.warn("⚠️ API did not return tenant");
+    console.warn('⚠️ Tenant ID missing in response')
   }
 
-  return res;
+  // 🔹 Store session user if needed
+  if (res.user) {
+    localStorage.setItem('sessionUser', JSON.stringify(res.user))
+  }
+
+  return res
 }
-
-
 
 export async function apiSignUp(data: SignUpCredential) {
   return ApiService.fetchDataWithAxios<SignUpResponse>({
@@ -48,9 +50,11 @@ export async function apiSignUp(data: SignUpCredential) {
 }
 
 export async function apiSignOut() {
-  // 🧹 Clear tokens from storage when signing out
+  // 🔹 Clear tokens
   localStorage.removeItem('access_token')
   localStorage.removeItem('refresh_token')
+  localStorage.removeItem('tenant_id')
+  localStorage.removeItem('sessionUser')
 
   return ApiService.fetchDataWithAxios({
     url: endpointConfig.signOut,
