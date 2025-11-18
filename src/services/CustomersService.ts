@@ -167,19 +167,7 @@ export async function apiGetEnquiries<T, U extends Record<string, unknown>>(
 // asset
 
 
-export async function apiGetAssets<T, U extends Record<string, unknown>>(
-    params: U,
-) {
-    return ApiService.fetchDataWithAxios<T>({
-        url: '/asset/assets/',
-        method: 'get',
-        params,
-    })
-}
-
-export async function apiCreateAssets<T, U extends Record<string, unknown>>(
-    data: U,
-) {
+export async function apiGetAssets<T, U extends Record<string, unknown>>(params: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/asset/assets/',
         method: 'post',
@@ -221,3 +209,18 @@ export async function apiCreateAssetCategories<T, U extends Record<string, unkno
         data,
     })
 }
+
+
+
+// ✅ Asset Type
+export async function apiGetAssetType<T, U extends Record<string, unknown>>(params: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_types/',
+        method: 'get',
+        params,
+    })
+}
+
+
+
+

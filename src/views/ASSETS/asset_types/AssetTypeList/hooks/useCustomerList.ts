@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
-import { apiGetAssetsType } from '@/services/CustomersService'
+import { apiGetAssetType } from '@/services/CustomersService'
 import type { TableQueries } from '@/@types/common'
 import type { GetCustomersListResponse } from '../types'
 
@@ -17,12 +17,11 @@ export default function useCustomerList() {
 
     const { data, error, isLoading } = useSWR(
         ['/api/asset_types', { ...tableData, ...filterData }] as const,
-        ([, params]) => apiGetAssetsType<GetCustomersListResponse, TableQueries>(params),
+        ([, params]) => apiGetAssetType<GetCustomersListResponse, TableQueries>(params),
         { revalidateOnFocus: false }
     )
 
-    const customerList =
-        data?.results?.map((customer: any, index: number) => ({
+    const customerList = data?.results?.map((customer: any, index: number) => ({
             id: customer.id ?? index,
             name: customer.name,
             code: customer.code,
