@@ -1,10 +1,13 @@
 import type { Control, FieldErrors } from 'react-hook-form'
 
 export type OverviewFields = {
-    firstName: string
-    lastName: string
-    email: string
+    title: string
+    file_type: string
+    asset_type_ref: string
+    asset_category: string
+    tags: string
     dialCode: string
+    description: string
     phoneNumber: string
     img: string
 }
@@ -17,7 +20,7 @@ export type AddressFields = {
 }
 
 export type ProfileImageFields = {
-    img: string
+    file: string
 }
 
 export type TagsFields = {

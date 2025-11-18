@@ -1,18 +1,20 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { useSessionUser, useToken } from "@/store/authStore";
-import appConfig from "@/configs/app.config";
+import AxiosBase from "./AxiosBase";
 
 type FailedRequest = {
   resolve: (token: string) => void;
   reject: (error: any) => void;
 };
 
+// All status codes that mean "unauthorized"
 const unauthorizedCodes = [401, 419, 440];
+
 let isRefreshing = false;
 let failedQueue: FailedRequest[] = [];
 
-// 🔁 Process queued requests once refresh completes
-const processQueue = (error: any, token: string | null = null): void => {
+// 🔁 Retry all queued requests after refresh finishes
+const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
     else prom.resolve(token as string);
@@ -20,36 +22,45 @@ const processQueue = (error: any, token: string | null = null): void => {
   failedQueue = [];
 };
 
-const AxiosResponseIntrceptorErrorCallback = async (
-  error: AxiosError
-): Promise<any> => {
+const AxiosResponseIntrceptorErrorCallback = async (error: AxiosError) => {
   const { response, config } = error;
+
+  if (!response || !config) return Promise.reject(error);
+
+  const originalRequest = config as InternalAxiosRequestConfig & {
+    _retry?: boolean;
+  };
+
   const { setToken } = useToken();
 
-  if (!response || !config) {
-    return Promise.reject(error);
-  }
-
-  // 🔐 Handle unauthorized or expired access token
-  if (unauthorizedCodes.includes(response.status)) {
-    const originalRequest = config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
-
+  // =========================================================
+  // 🔥 TOKEN EXPIRED / UNAUTHORIZED
+  // =========================================================
+  if (
+    (response.data as any)?.code === "token_not_valid" ||
+    unauthorizedCodes.includes(response.status)
+  ) {
     if (originalRequest._retry) {
-      // Already retried once, avoid infinite loop
       return Promise.reject(error);
     }
 
+    const refreshToken = localStorage.getItem("refresh_token");
+    if (!refreshToken) {
+      console.log("❌ No refresh token → force logout.");
+      logoutUser();
+      return Promise.reject(error);
+    }
+
+    // 🔁 If another refresh request is already in progress → queue
     if (isRefreshing) {
-      // Queue multiple failed requests until refresh finishes
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       })
         .then((token) => {
           if (originalRequest.headers)
             originalRequest.headers.Authorization = `Bearer ${token}`;
-          return axios(originalRequest);
+
+          return AxiosBase(originalRequest);
         })
         .catch((err) => Promise.reject(err));
     }
@@ -58,48 +69,61 @@ const AxiosResponseIntrceptorErrorCallback = async (
     isRefreshing = true;
 
     try {
-      const refreshToken = localStorage.getItem("refresh_token");
-      if (!refreshToken) throw new Error("No refresh token found");
+      // =========================================================
+      // 🔄 CALL REFRESH TOKEN API
+      // (Django SimpleJWT default endpoint)
+      // =========================================================
+      const res = await AxiosBase.post("/auth/token/refresh/", {
+        refresh: refreshToken,
+      });
 
-      // 🔄 Call Django's refresh endpoint
-      const res = await axios.post(
-        `${appConfig.apiPrefix}/token/refresh/`,
-        { refresh: refreshToken }
-      );
+      const newAccess = (res.data as any).access;
 
-      const newAccess = res.data.access;
+      // Save new access token
       localStorage.setItem("access_token", newAccess);
-
-      // Update global state
       setToken(newAccess);
+
       useSessionUser.getState().setSessionSignedIn(true);
 
       // Retry queued requests
       processQueue(null, newAccess);
       isRefreshing = false;
 
-      // Retry the original request with new access token
+      // Retry the failed request
       if (originalRequest.headers)
         originalRequest.headers.Authorization = `Bearer ${newAccess}`;
 
-      return axios(originalRequest);
+      return AxiosBase(originalRequest);
     } catch (refreshError) {
-      console.error("Token refresh failed:", refreshError);
+      console.error("❌ Refresh failed → logging out...", refreshError);
 
       processQueue(refreshError, null);
       isRefreshing = false;
 
-      // Force logout
-      setToken("");
-      useSessionUser.getState().setUser({});
-      useSessionUser.getState().setSessionSignedIn(false);
+      logoutUser();
 
       return Promise.reject(refreshError);
     }
   }
 
-  // If not unauthorized, return the error normally
+  // not token issue → forward error
   return Promise.reject(error);
+};
+
+// =========================================================
+// 🔴 Common logout handler
+// =========================================================
+const logoutUser = () => {
+  const { setToken } = useToken();
+
+  setToken("");
+  useSessionUser.getState().setUser({});
+  useSessionUser.getState().setSessionSignedIn(false);
+
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+
+  window.location.href = "/login";
 };
 
 export default AxiosResponseIntrceptorErrorCallback;

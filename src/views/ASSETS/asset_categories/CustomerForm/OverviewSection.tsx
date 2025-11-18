@@ -73,36 +73,36 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
             <h4 className="mb-6">Overview</h4>
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
-                    label="First Name"
-                    invalid={Boolean(errors.firstName)}
-                    errorMessage={errors.firstName?.message}
+                    label="Name"
+                    invalid={Boolean(errors.name)}
+                    errorMessage={errors.name?.message}
                 >
                     <Controller
-                        name="firstName"
+                        name="name"
                         control={control}
                         render={({ field }) => (
                             <Input
                                 type="text"
                                 autoComplete="off"
-                                placeholder="First Name"
+                                placeholder="Name"
                                 {...field}
                             />
                         )}
                     />
                 </FormItem>
                 <FormItem
-                    label="User Name"
-                    invalid={Boolean(errors.lastName)}
-                    errorMessage={errors.lastName?.message}
+                    label="Code"
+                    invalid={Boolean(errors.code)}
+                    errorMessage={errors.code?.message}
                 >
                     <Controller
-                        name="lastName"
+                        name="code"
                         control={control}
                         render={({ field }) => (
                             <Input
                                 type="text"
                                 autoComplete="off"
-                                placeholder="Last Name"
+                                placeholder="Code"
                                 {...field}
                             />
                         )}
@@ -110,75 +110,41 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                 </FormItem>
             </div>
             <FormItem
-                label="Email"
-                invalid={Boolean(errors.email)}
-                errorMessage={errors.email?.message}
+                label="Title"
+                invalid={Boolean(errors.title)}
+                errorMessage={errors.title?.message}
             >
                 <Controller
-                    name="email"
+                    name="title"
                     control={control}
                     render={({ field }) => (
                         <Input
-                            type="email"
+                            type="text"
                             autoComplete="off"
-                            placeholder="Email"
+                            placeholder="Title"
                             {...field}
                         />
                     )}
                 />
             </FormItem>
-            <div className="flex items-end gap-4 w-full">
-                <FormItem
-                    invalid={
-                        Boolean(errors.phoneNumber) || Boolean(errors.dialCode)
-                    }
-                >
-                    <label className="form-label mb-2">Phone number</label>
-                    <Controller
-                        name="dialCode"
-                        control={control}
-                        render={({ field }) => (
-                            <Select<CountryOption>
-                                options={dialCodeList}
-                                {...field}
-                                className="w-[150px]"
-                                components={{
-                                    Option: CustomSelectOption,
-                                    Control: CustomControl,
-                                }}
-                                placeholder=""
-                                value={dialCodeList.filter(
-                                    (option) => option.dialCode === field.value,
-                                )}
-                                onChange={(option) =>
-                                    field.onChange(option?.dialCode)
-                                }
-                            />
-                        )}
-                    />
-                </FormItem>
-                <FormItem
-                    className="w-full"
-                    invalid={
-                        Boolean(errors.phoneNumber) || Boolean(errors.dialCode)
-                    }
-                    errorMessage={errors.phoneNumber?.message}
-                >
-                    <Controller
-                        name="phoneNumber"
-                        control={control}
-                        render={({ field }) => (
-                            <NumericInput
-                                autoComplete="off"
-                                placeholder="Phone Number"
-                                value={field.value}
-                                onChange={field.onChange}
-                                onBlur={field.onBlur}
-                            />
-                        )}
-                    />
-                </FormItem>
-            </div>
+            <FormItem
+                label="Description"
+                invalid={Boolean(errors.description)}
+                errorMessage={errors.description?.message}
+            >
+                <Controller
+                    name="description"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            type="text"
+                            autoComplete="off"
+                            placeholder="Description"
+                            {...field}
+                        />
+                    )}
+                />
+            </FormItem>
         </Card>
     )
 }

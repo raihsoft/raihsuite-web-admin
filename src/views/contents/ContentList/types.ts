@@ -42,6 +42,8 @@ type Subscription = {
 export type GetCustomersListResponse = {
     list: Customer[]
     total: number
+    results: any[]
+    count: number
 }
 
 export type Filter = {

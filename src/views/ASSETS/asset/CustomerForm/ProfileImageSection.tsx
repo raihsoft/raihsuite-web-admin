@@ -31,7 +31,7 @@ const ProfileImage = ({ control }: ProfileImageSectionProps) => {
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg text-center p-4">
                 <div className="text-center">
                     <Controller
-                        name="img"
+                        name="file"
                         control={control}
                         render={({ field }) => (
                             <>
