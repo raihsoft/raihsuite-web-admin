@@ -15,9 +15,11 @@ const AxiosRequestIntrceptorConfigCallback = (
 
     // 🔹 Correct token fetch logic
     if (storage === 'localStorage') {
-        accessToken = localStorage.getItem(TOKEN_NAME_IN_STORAGE) || ''
+        // accessToken = localStorage.getItem(TOKEN_NAME_IN_STORAGE) || ''
+        accessToken = localStorage.getItem('access_token') || ''
+
     } else if (storage === 'sessionStorage') {
-        accessToken = sessionStorage.getItem(TOKEN_NAME_IN_STORAGE) || ''
+        accessToken = sessionStorage.getItem(access_token) || ''
     }
 
     console.log('📌 Access Token:', accessToken)
