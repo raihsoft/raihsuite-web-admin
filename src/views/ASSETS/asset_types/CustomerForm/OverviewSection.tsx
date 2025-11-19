@@ -70,39 +70,39 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
     return (
         <Card>
-            <h4 className="mb-6">Overview</h4>
+            <h4 className="mb-6">Create New Asset Type</h4>
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
-                    label="First Name"
-                    invalid={Boolean(errors.firstName)}
-                    errorMessage={errors.firstName?.message}
+                    label="Name"
+                    invalid={Boolean(errors.name)}
+                    errorMessage={errors.name?.message}
                 >
                     <Controller
-                        name="firstName"
+                        name="name"
                         control={control}
                         render={({ field }) => (
                             <Input
                                 type="text"
                                 autoComplete="off"
-                                placeholder="First Name"
+                                placeholder="Name"
                                 {...field}
                             />
                         )}
                     />
                 </FormItem>
                 <FormItem
-                    label="User Name"
-                    invalid={Boolean(errors.lastName)}
-                    errorMessage={errors.lastName?.message}
+                    label="Code"
+                    invalid={Boolean(errors.code)}
+                    errorMessage={errors.code?.message}
                 >
                     <Controller
-                        name="lastName"
+                        name="code"
                         control={control}
                         render={({ field }) => (
                             <Input
                                 type="text"
                                 autoComplete="off"
-                                placeholder="Last Name"
+                                placeholder="Code"
                                 {...field}
                             />
                         )}
@@ -110,24 +110,42 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                 </FormItem>
             </div>
             <FormItem
-                label="Email"
-                invalid={Boolean(errors.email)}
-                errorMessage={errors.email?.message}
+                label="File Extension"
+                invalid={Boolean(errors.file_extension)}
+                errorMessage={errors.file_extension?.message}
             >
                 <Controller
-                    name="email"
+                    name="file_extension"
                     control={control}
                     render={({ field }) => (
                         <Input
-                            type="email"
+                            type="text"
                             autoComplete="off"
-                            placeholder="Email"
+                            placeholder="File Extension"
                             {...field}
                         />
                     )}
                 />
             </FormItem>
-            <div className="flex items-end gap-4 w-full">
+            <FormItem
+                label="Description"
+                invalid={Boolean(errors.description)}
+                errorMessage={errors.description?.message}
+            >
+                <Controller
+                    name="description"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            type="text"
+                            autoComplete="off"
+                            placeholder="Description"
+                            {...field}
+                        />
+                    )}
+                />
+            </FormItem>
+            {/* <div className="flex items-end gap-4 w-full">
                 <FormItem
                     invalid={
                         Boolean(errors.phoneNumber) || Boolean(errors.dialCode)
@@ -178,7 +196,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                         )}
                     />
                 </FormItem>
-            </div>
+            </div> */}
         </Card>
     )
 }

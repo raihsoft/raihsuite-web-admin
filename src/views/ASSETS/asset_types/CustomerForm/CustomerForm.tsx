@@ -3,10 +3,6 @@ import { Form } from '@/components/ui/Form'
 import Container from '@/components/shared/Container'
 import BottomStickyBar from '@/components/template/BottomStickyBar'
 import OverviewSection from './OverviewSection'
-import AddressSection from './AddressSection'
-import TagsSection from './TagsSection'
-import ProfileImageSection from './ProfileImageSection'
-import AccountSection from './AccountSection'
 import isEmpty from 'lodash/isEmpty'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -14,39 +10,25 @@ import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import type { CustomerFormSchema } from './types'
+import { apiCreateAssets } from '@/services/CustomersService'
+import { apiCreateAssetType } from '@/services/CustomersService'
 
 type CustomerFormProps = {
-    onFormSubmit: (values: CustomerFormSchema) => void
     defaultValues?: CustomerFormSchema
     newCustomer?: boolean
 } & CommonProps
 
+// VALIDATION SCHEMA
 const validationSchema: ZodType<CustomerFormSchema> = z.object({
-    firstName: z.string().min(1, { message: 'First name required' }),
-    lastName: z.string().min(1, { message: 'Last name required' }),
-    email: z
-        .string()
-        .min(1, { message: 'Email required' })
-        .email({ message: 'Invalid email' }),
-    dialCode: z.string().min(1, { message: 'Please select your country code' }),
-    phoneNumber: z
-        .string()
-        .min(1, { message: 'Please input your mobile number' }),
-    country: z.string().min(1, { message: 'Please select a country' }),
-    address: z.string().min(1, { message: 'Addrress required' }),
-    postcode: z.string().min(1, { message: 'Postcode required' }),
-    city: z.string().min(1, { message: 'City required' }),
-    img: z.string(),
-    tags: z.array(z.object({ value: z.string(), label: z.string() })),
+    name: z.string().min(1, { message: 'Name is required' }),
+    code: z.string().min(1, { message: 'Code is required' }),
+    file_extension: z.string().min(1, { message: 'File extension required' }),
+    description: z.string().optional(),
+
 })
 
 const CustomerForm = (props: CustomerFormProps) => {
-    const {
-        onFormSubmit,
-        defaultValues = {},
-        newCustomer = false,
-        children,
-    } = props
+    const { defaultValues = {}, newCustomer = false, children } = props
 
     const {
         handleSubmit,
@@ -55,24 +37,46 @@ const CustomerForm = (props: CustomerFormProps) => {
         control,
     } = useForm<CustomerFormSchema>({
         defaultValues: {
-            ...{
-                banAccount: false,
-                accountVerified: true,
-            },
+            banAccount: false,
+            accountVerified: true,
             ...defaultValues,
         },
         resolver: zodResolver(validationSchema),
     })
 
+    // RESET WHEN EDITING
     useEffect(() => {
         if (!isEmpty(defaultValues)) {
             reset(defaultValues)
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [JSON.stringify(defaultValues)])
 
-    const onSubmit = (values: CustomerFormSchema) => {
-        onFormSubmit?.(values)
+    // SUBMIT LOGIC LIKE FIRST FORM
+    const onSubmit = async (values: CustomerFormSchema) => {
+        try {
+            const tenant = localStorage.getItem('tenant')
+            if (!tenant) {
+                alert('Tenant not found — Please login again.')
+                return
+            }
+
+            const formData = new FormData()
+            formData.append('name', values.name)
+            formData.append('code', values.code)
+            formData.append('file_extension', values.file_extension)
+            formData.append('description', values.description || '')
+
+
+
+            formData.append('tenant', tenant)
+
+            const res = await apiCreateAssetType(formData)
+            console.log('SUCCESS:', res)
+            alert('Created Successfully!')
+        } catch (err) {
+            console.error('ERROR:', err)
+            alert('Failed to create item.')
+        }
     }
 
     return (
@@ -82,23 +86,11 @@ const CustomerForm = (props: CustomerFormProps) => {
             onSubmit={handleSubmit(onSubmit)}
         >
             <Container>
-                <div className="flex flex-col md:flex-row gap-4">
-                    <div className="gap-4 flex flex-col flex-auto">
-                        <OverviewSection control={control} errors={errors} />
-                        <AddressSection control={control} errors={errors} />
-                    </div>
-                    <div className="md:w-[370px] gap-4 flex flex-col">
-                        <ProfileImageSection
-                            control={control}
-                            errors={errors}
-                        />
-                        <TagsSection control={control} errors={errors} />
-                        {!newCustomer && (
-                            <AccountSection control={control} errors={errors} />
-                        )}
-                    </div>
+                <div className="flex flex-col gap-4">
+                    <OverviewSection control={control} errors={errors} />
                 </div>
             </Container>
+
             <BottomStickyBar>{children}</BottomStickyBar>
         </Form>
     )

@@ -26,7 +26,7 @@ const CustomerEdit = () => {
             <Notification type="success">Customer created!</Notification>,
             { placement: 'top-center' },
         )
-        navigate('/concepts/customers/customer-list')
+        navigate('/assets-types/assets-type-create')
     }
 
     const handleConfirmDiscard = () => {
@@ -35,7 +35,7 @@ const CustomerEdit = () => {
             <Notification type="success">Customer discardd!</Notification>,
             { placement: 'top-center' },
         )
-        navigate('/concepts/customers/customer-list')
+        navigate('/assets-types/assets-type-create')
     }
 
     const handleDiscard = () => {
@@ -51,16 +51,10 @@ const CustomerEdit = () => {
             <CustomerForm
                 newCustomer
                 defaultValues={{
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    img: '',
-                    phoneNumber: '',
-                    dialCode: '',
-                    country: '',
-                    address: '',
-                    city: '',
-                    postcode: '',
+                    name: '',
+                    code: '',
+                    file_extension: '',
+                    description: '',
                     tags: [],
                 }}
                 onFormSubmit={handleFormSubmit}

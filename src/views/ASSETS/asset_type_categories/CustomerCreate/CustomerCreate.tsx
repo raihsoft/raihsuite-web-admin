@@ -51,17 +51,8 @@ const CustomerEdit = () => {
             <CustomerForm
                 newCustomer
                 defaultValues={{
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    img: '',
-                    phoneNumber: '',
-                    dialCode: '',
-                    country: '',
-                    address: '',
-                    city: '',
-                    postcode: '',
-                    tags: [],
+                    name: '',
+                    description: '',
                 }}
                 onFormSubmit={handleFormSubmit}
             >
