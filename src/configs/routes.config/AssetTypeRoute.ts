@@ -7,7 +7,7 @@ const assettypes: Routes = [
     {
         key: "employeeCreate",
         path: `${ASSET_TYPE_PREFIX_PATH}/assets-type-create`,   
-        component: lazy(() => import("@/views/assets/asset_types/CustomerCreate")),
+        component: lazy(() => import("@/views/assets/asset_types/CustomerCreate/index")),
         authority: [ADMIN, USER],
     },
 ]
