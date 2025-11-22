@@ -7,7 +7,7 @@ const assetsCategoryRoute: Routes = [
     {
         key: "employeeCreate",
         path: `${ASSET_CATEGORY_PREFIX_PATH}/assets-category-create`,   // /employees/employee-create
-        component: lazy(() => import("@/views/ASSETS/asset_categories/CustomerCreate/index")),
+        component: lazy(() => import("@/views/ASSETS/asset_categories/CustomerCreate")),
         authority: [ADMIN, USER],
     },
     // {

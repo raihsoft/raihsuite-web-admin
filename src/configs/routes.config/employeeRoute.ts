@@ -7,13 +7,13 @@ const employeeRoute: Routes = [
     {
         key: "employeeCreate",
         path: `${HRM_EEMPLOYEES_PREFIX_PATH}/employee-create`,   // /employees/employee-create
-        component: lazy(() => import("@/views/HRMS/employees/CustomerCreate/index")),
+        component: lazy(() => import("@/views/HRMS/employees/CustomerCreate")),
         authority: [ADMIN, USER],
     },
     {
         key: "employeeEdit",
         path: `${HRM_EMPLOYEES_EDIT_PREFIX_PATH}/:id`,           // /employee-edit/:id
-        component: lazy(() => import("@/views/HRMS/employees/CustomerEdit/index")),
+        component: lazy(() => import("@/views/HRMS/employees/CustomerEdit")),
         authority: [ADMIN, USER],
         meta: {
             header: {
@@ -27,7 +27,7 @@ const employeeRoute: Routes = [
     {
         key: "employeeDeatails",
         path: `${HRM_EMPLOYEES_DEATILS_PREFIX_PATH}/:id`,
-        component: lazy(() => import("@/views/HRMS/employees/CustomerDetails/index")),
+        component: lazy(() => import("@/views/HRMS/employees/CustomerDetails")),
         authority: [ADMIN, USER],
         meta: {
             header: {
