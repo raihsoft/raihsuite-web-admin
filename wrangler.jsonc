@@ -1,0 +1,7 @@
+{
+  "name": "raihsuite-web-admin",
+  "compatibility_date": "2025-11-22",
+  "assets": {
+    "directory": "./build"
+  }
+}
