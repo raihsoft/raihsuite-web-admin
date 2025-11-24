@@ -15,4 +15,9 @@ export const ZONE_PREFIX_PATH = '/zone'
 export const ZONE_EDIT_PREFIX_PATH = '/zone-edit'
 export const ZONE_DEATILS_PREFIX_PATH = '/zone-details'
 export const ASSET_PREFIX_PATH = '/assets'
+export const ASSET_EDIT_PREFIX_PATH = '/assets-edit'
+export const ASSET_DEATILS_PREFIX_PATH = '/assets-details'
+
+
 export const ASSET_CATEGORY_PREFIX_PATH = '/assets-category'
+export const ASSET_CATEGORY_DEATILS_PREFIX_PATH = '/assets-category-details'

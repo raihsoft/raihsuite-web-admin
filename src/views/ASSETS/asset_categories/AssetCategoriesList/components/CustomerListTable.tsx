@@ -80,7 +80,7 @@ const CustomerListTable = () => {
     }
 
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-details/${customer.id}`)
+        navigate(`/assets-category-details/${customer.id}`)
     }
 
     const columns: ColumnDef<Customer>[] = useMemo(
@@ -101,6 +101,20 @@ const CustomerListTable = () => {
                 header: 'Description',
                 accessorKey: 'description',
             },
+             {
+                header: 'Actions',
+                id: 'actions',
+                cell: ({ row }) => (
+                    <ActionColumn
+                        onEdit={() => handleEdit(row.original)}
+                        onViewDetail={() => handleViewDetails(row.original)}
+                    />
+                ),
+                enableSorting: false,
+                size: 120,
+            },
+            
+            
         ],
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [],

@@ -4,9 +4,8 @@ import Button from '@/components/ui/Button'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import { apiGetCustomer } from '@/services/CustomersService'
+import { apiGetAssets, apiUpdateAssets } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
-import sleep from '@/utils/sleep'
 import NoUserFound from '@/assets/svg/NoUserFound'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -16,52 +15,67 @@ import type { Customer } from '../AssetList/types'
 
 const CustomerEdit = () => {
     const { id } = useParams()
-
     const navigate = useNavigate()
 
-    const { data, isLoading } = useSWR(
-        [`/api/customers${id}`, { id: id as string }],
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) => apiGetCustomer<Customer, { id: string }>(params),
+    const { data, isLoading, mutate } = useSWR(
+        [`/asset/assets/${id}`, { id: id as string }],
+        ([_, params]) => apiGetAssets<Customer, { id: string }>(params),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
-        },
+        },concepts/customers/customer-details
     )
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
-    const [isSubmiting, setIsSubmiting] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
+    // 👉 REPLACED WITH YOUR VERSION (correct placement)
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        console.log('Submitted values', values)
-        setIsSubmiting(true)
-        await sleep(800)
-        setIsSubmiting(false)
-        toast.push(<Notification type="success">Changes Saved!</Notification>, {
-            placement: 'top-center',
-        })
-        // navigate('/concepts/customers/customer-list')
+        try {
+            setIsSubmitting(true)
+            await apiUpdateAssets(id as string, values)
+
+            toast.push(
+                <Notification type="success">Changes Saved!</Notification>,
+                { placement: 'top-center' },
+            )
+
+            mutate() // refresh SWR
+            navigate('/employees')
+        } catch (error) {
+            toast.push(
+                <Notification type="danger">Update failed!</Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     const getDefaultValues = () => {
         if (data) {
-            const { firstName, lastName, email, personalInfo, img } = data
+            const {
+                title,
+                file_extension,
+                file_type,
+                asset_type_ref,
+                img,
+                tags,
+                description,
+                asset_category,
+            } = data
 
             return {
-                firstName,
-                lastName,
-                email,
+                title,
+                file_type,
+                file_extension,
+                asset_type_ref,
                 img,
-                phoneNumber: personalInfo.phoneNumber,
-                dialCode: personalInfo.dialCode,
-                country: personalInfo.country,
-                address: personalInfo.address,
-                city: personalInfo.city,
-                postcode: personalInfo.postcode,
-                tags: [],
+                tags,
+                description,
+                asset_category,
             }
         }
-
         return {}
     }
 
@@ -71,20 +85,13 @@ const CustomerEdit = () => {
             <Notification type="success">Customer deleted!</Notification>,
             { placement: 'top-center' },
         )
-        // navigate('/concepts/customers/customer-list')
     }
 
-    const handleDelete = () => {
-        setDeleteConfirmationOpen(true)
-    }
+    const handleDelete = () => setDeleteConfirmationOpen(true)
 
-    const handleCancel = () => {
-        setDeleteConfirmationOpen(false)
-    }
+    const handleCancel = () => setDeleteConfirmationOpen(false)
 
-    const handleBack = () => {
-        history.back()
-    }
+    const handleBack = () => history.back()
 
     return (
         <>
@@ -94,6 +101,7 @@ const CustomerEdit = () => {
                     <h3 className="mt-8">No user found!</h3>
                 </div>
             )}
+
             {!isLoading && data && (
                 <>
                     <CustomerForm
@@ -104,7 +112,6 @@ const CustomerEdit = () => {
                         <Container>
                             <div className="flex items-center justify-between px-8">
                                 <Button
-                                    className="ltr:mr-3 rtl:ml-3"
                                     type="button"
                                     variant="plain"
                                     icon={<TbArrowNarrowLeft />}
@@ -112,9 +119,9 @@ const CustomerEdit = () => {
                                 >
                                     Back
                                 </Button>
+
                                 <div className="flex items-center">
                                     <Button
-                                        className="ltr:mr-3 rtl:ml-3"
                                         type="button"
                                         customColorClass={() =>
                                             'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error bg-transparent'
@@ -124,10 +131,11 @@ const CustomerEdit = () => {
                                     >
                                         Delete
                                     </Button>
+
                                     <Button
                                         variant="solid"
                                         type="submit"
-                                        loading={isSubmiting}
+                                        loading={isSubmitting}
                                     >
                                         Save
                                     </Button>
@@ -135,6 +143,7 @@ const CustomerEdit = () => {
                             </div>
                         </Container>
                     </CustomerForm>
+
                     <ConfirmDialog
                         isOpen={deleteConfirmationOpen}
                         type="danger"
@@ -144,10 +153,7 @@ const CustomerEdit = () => {
                         onCancel={handleCancel}
                         onConfirm={handleConfirmDelete}
                     >
-                        <p>
-                            Are you sure you want to remove this customer? This
-                            action can&apos;t be undo.{' '}
-                        </p>
+                        Are you sure you want to delete this customer?
                     </ConfirmDialog>
                 </>
             )}

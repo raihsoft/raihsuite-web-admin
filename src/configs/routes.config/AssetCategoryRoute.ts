@@ -1,7 +1,7 @@
 import { lazy } from "react"
 import type { Routes } from "@/@types/routes"
 import { ADMIN, USER } from "@/constants/roles.constant"
-import {  ASSET_CATEGORY_PREFIX_PATH, ASSET_PREFIX_PATH } from "@/constants/route.constant"
+import {  ASSET_CATEGORY_DEATILS_PREFIX_PATH, ASSET_CATEGORY_PREFIX_PATH, ASSET_PREFIX_PATH } from "@/constants/route.constant"
 
 const assetsCategoryRoute: Routes = [
     {
@@ -24,20 +24,20 @@ const assetsCategoryRoute: Routes = [
     //         footer: false,
     //     },
     // },
-    // {
-    //     key: "employeeDeatails",
-    //     path: `${HRM_EMPLOYEES_DEATILS_PREFIX_PATH}/:id`,
-    //     component: lazy(() => import("@/views/HRMS/employees/CustomerDetails")),
-    //     authority: [ADMIN, USER],
-    //     meta: {
-    //         header: {
-    //             title: "Employees Details ",
-    //             description: "Manage employee details, profile, and preferences.",
-    //             contained: true,
-    //         },
-    //         footer: false,
-    //     },
-    // },
+    {
+        key: "employeeDeatails",
+        path: `${ASSET_CATEGORY_DEATILS_PREFIX_PATH}/:id`,
+        component: lazy(() => import("@/views/ASSETS/asset_categories/CustomerDetails")),
+        authority: [ADMIN, USER],
+        meta: {
+            header: {
+                title: "Asset Category Details ",
+                description: "Manage employee details, profile, and preferences.",
+                contained: true,
+            },
+            footer: false,
+        },
+    },
 ]
 
 export default assetsCategoryRoute

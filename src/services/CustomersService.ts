@@ -187,6 +187,25 @@ export async function apiCreateAssets<T, U extends Record<string, unknown>>(
     })
 }
 
+
+export async function apiUpdateAssets<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/assets/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+export async function apiGetAssetById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/assets/${id}/`,
+        method: 'get',
+    })
+}
+
 // asset-types
 
 export async function apiAssetType<T, U extends Record<string, unknown>>(
@@ -212,6 +231,8 @@ export async function apiGetAssetCategories<T, U extends Record<string, unknown>
     })
 }
 
+// category
+
 export async function apiCreateAssetCategories<T, U extends Record<string, unknown>>(
     data: U,
 ) {
@@ -219,5 +240,12 @@ export async function apiCreateAssetCategories<T, U extends Record<string, unkno
         url: '/asset/asset_categories/',
         method: 'post',
         data,
+    })
+}
+
+export async function apiGetAssetCategoriesById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_categories/${id}/`,
+        method: 'get',
     })
 }

@@ -52,9 +52,14 @@ export type Filter = {
 
 export type Customer = {
     id: string
-    name: string
-    firstName: string
-    lastName: string
+    title: string
+    file_extension: string
+    file_type: string
+    asset_type_ref: string
+    asset_category: string
+    
+    tags: string[]
+    description: string
     email: string
     img: string
     role: string

@@ -4,11 +4,12 @@ import Loading from '@/components/shared/Loading'
 import ProfileSection from './ProfileSection'
 import BillingSection from './BillingSection'
 import ActivitySection from './ActivitySection'
-import { apiGetAssetCategories } from '@/services/CustomersService'
+import { apiGetAssetById, apiGetAssetCategoriesById, apiGetEmployeeById } from '@/services/CustomersService'
 import useSWR from 'swr'
 import { useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
-import type { Customer } from '../AssetCategoriesList/types'
+import { Customer } from '../AssetCategoriesList/types'
+// import type { Customer } from '../CustomerList/types'
 
 const { TabNav, TabList, TabContent } = Tabs
 
@@ -16,13 +17,11 @@ const CustomerDetails = () => {
     const { id } = useParams()
 
     const { data, isLoading } = useSWR(
-        ['/api/asset_categories', { id: id as string }],
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) => apiGetAssetCategories<Customer, { id: string }>(params),
+        id ? [`/api/asset/asset_categories/${id}`] : null,
+        () => apiGetAssetCategoriesById<Customer>(id as string),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
-            evalidateOnFocus: false,
         },
     )
 
@@ -33,25 +32,7 @@ const CustomerDetails = () => {
                     <div className="min-w-[330px] 2xl:min-w-[400px]">
                         <ProfileSection data={data} />
                     </div>
-                    <Card className="w-full">
-                        <Tabs defaultValue="billing">
-                            <TabList>
-                                <TabNav value="billing">Billing</TabNav>
-                                <TabNav value="activity">Activity</TabNav>
-                            </TabList>
-                            <div className="p-4">
-                                <TabContent value="billing">
-                                    <BillingSection data={data} />
-                                </TabContent>
-                                <TabContent value="activity">
-                                    <ActivitySection
-                                        customerName={data.name}
-                                        id={id as string}
-                                    />
-                                </TabContent>
-                            </div>
-                        </Tabs>
-                    </Card>
+
                 </div>
             )}
         </Loading>
