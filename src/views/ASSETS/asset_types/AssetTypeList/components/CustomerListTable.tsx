@@ -76,7 +76,7 @@ const CustomerListTable = () => {
     } = useCustomerList()
 
 const handleEdit = (customer: Customer) => {
-    navigate(`/employee-edit/${customer.id}`)
+    navigate(`/assettypes-edit/${customer.id}`)
 }
 
 
