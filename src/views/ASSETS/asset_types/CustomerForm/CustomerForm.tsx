@@ -16,6 +16,7 @@ import { apiCreateAssetType } from '@/services/CustomersService'
 type CustomerFormProps = {
     defaultValues?: CustomerFormSchema
     newCustomer?: boolean
+    onFormSubmit?: (values: CustomerFormSchema) => Promise<void> | void
 } & CommonProps
 
 // VALIDATION SCHEMA
@@ -53,6 +54,13 @@ const CustomerForm = (props: CustomerFormProps) => {
 
     // SUBMIT LOGIC LIKE FIRST FORM
     const onSubmit = async (values: CustomerFormSchema) => {
+        // If parent provided an onFormSubmit (edit page), use it.
+        if (props.onFormSubmit) {
+            await props.onFormSubmit(values)
+            return
+        }
+
+        // Otherwise handle create locally
         try {
             const tenant = localStorage.getItem('tenant')
             if (!tenant) {
@@ -65,9 +73,6 @@ const CustomerForm = (props: CustomerFormProps) => {
             formData.append('code', values.code)
             formData.append('file_extension', values.file_extension)
             formData.append('description', values.description || '')
-
-
-
             formData.append('tenant', tenant)
 
             const res = await apiCreateAssetType(formData)

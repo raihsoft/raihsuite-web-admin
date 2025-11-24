@@ -22,7 +22,7 @@ const NameColumn = ({ row }: { row: Customer }) => {
             <Avatar size={40} shape="circle" src={row.img} />
             <Link
                 className={`hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100`}
-                to={`/concepts/customers/customer-details/${row.id}`}
+                to={`/asset-types/${row.id}`}
             >
                 {row.name}
             </Link>
@@ -75,13 +75,13 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
-const handleEdit = (customer: Customer) => {
-    navigate(`/assettypes-edit/${customer.id}`)
-}
+    const handleEdit = (customer: Customer) => {
+        navigate(`/assettypes-edit/${customer.id}`)
+    }
 
 
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/employee-details/${customer.id}`)
+        navigate(`/asset-types/${customer.id}`)
     }
 
     

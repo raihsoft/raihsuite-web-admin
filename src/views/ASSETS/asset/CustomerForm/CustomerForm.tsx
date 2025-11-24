@@ -19,6 +19,11 @@ type CustomerFormProps = {
     newCustomer?: boolean
 } & CommonProps
 
+// add optional onFormSubmit prop to allow edit pages to override submission
+type CustomerFormPropsWithSubmit = CustomerFormProps & {
+    onFormSubmit?: (values: CustomerFormSchema) => Promise<void> | void
+}
+
 // 🔹 Validation Schema
 const validationSchema: ZodType<CustomerFormSchema> = z.object({
     title: z.string().min(1, { message: 'Title is required' }),
@@ -32,7 +37,7 @@ const validationSchema: ZodType<CustomerFormSchema> = z.object({
     }),
 })
 
-const CustomerForm = (props: CustomerFormProps) => {
+const CustomerForm = (props: CustomerFormPropsWithSubmit) => {
     const { defaultValues = {}, newCustomer = false, children } = props
 
     // 🟢 useForm init
@@ -59,6 +64,12 @@ const CustomerForm = (props: CustomerFormProps) => {
 
     // 🟢 SUBMIT HANDLER — FINAL FIXED VERSION
     const onSubmit = async (values: CustomerFormSchema) => {
+        // If parent provided an onFormSubmit (edit page), use it.
+        if (props.onFormSubmit) {
+            await props.onFormSubmit(values)
+            return
+        }
+
         console.log('🟢 SUBMITTED VALUES:', values)
 
         try {
