@@ -75,14 +75,16 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
-    const handleEdit = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-edit/${customer.id}`)
-    }
+const handleEdit = (customer: Customer) => {
+    navigate(`/asset-type-categories-edit/assettypecategoriesedit/${customer.id}`)
+}
+
 
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-details/${customer.id}`)
+        navigate(`/employee-details/${customer.id}`)
     }
 
+    
     const columns: ColumnDef<Customer>[] = useMemo(
         () => [
             {
@@ -90,12 +92,32 @@ const CustomerListTable = () => {
                 accessorKey: 'name',
 
             },
+            
             {
                 header: 'Description',
                 accessorKey: 'description',
+
             },
-
-
+           
+            {
+                header: '',
+                id: 'action',
+                cell: (props) => (
+                    <ActionColumn
+                        onEdit={() => handleEdit(props.row.original)}
+                        onViewDetail={() =>
+                            handleViewDetails(props.row.original)
+                        }
+                    />
+                ),
+            },
+            
+            
+           
+           
+            
+           
+            
         ],
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [],
@@ -139,7 +161,7 @@ const CustomerListTable = () => {
             setSelectAllCustomer([])
         }
     }
-
+console.log("customerList", customerList)
     return (
         <DataTable
             selectable

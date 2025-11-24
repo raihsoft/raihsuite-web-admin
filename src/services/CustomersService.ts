@@ -2,7 +2,7 @@ import { types } from 'util'
 import ApiService from './ApiService'
 
 // Get employee list
-export async function apiGetEmployees<T, U extends Record<string, unknown>>(
+export async function apiGetEmployeeList<T, U extends Record<string, unknown>>(
     params: U,
 ) {
     return ApiService.fetchDataWithAxios<T>({
@@ -220,6 +220,15 @@ export async function apiCreateAssetType<T, U extends Record<string, unknown>>(
         params,
     })
 }
+export async function apiEditAssetType<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_types/',
+        method: 'edit',
+        params,
+    })
+}
 
 // asset_categories
 
@@ -272,4 +281,12 @@ export async function  apiCreateAssetTypeCategory<T, U extends Record<string, un
         params,
     })
 }
+export async function  apiEditAssetTypeCategory<T, U extends Record<string, unknown>>(params: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_type_categories/',
+        method: 'edit',
+        params,
+    })
+}
+
 

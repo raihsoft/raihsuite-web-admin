@@ -4,7 +4,7 @@ import Button from '@/components/ui/Button'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import { apiGetCustomer } from '@/services/CustomersService'
+import { apiGetAssetTypeCategory } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
 import sleep from '@/utils/sleep'
 import NoUserFound from '@/assets/svg/NoUserFound'
@@ -13,6 +13,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
 import type { CustomerFormSchema } from '../CustomerForm'
 import type { Customer } from '../AssetTypeCategoriesList/types'
+import { dE } from '@fullcalendar/core/internal-common'
 
 const CustomerEdit = () => {
     const { id } = useParams()
@@ -20,9 +21,9 @@ const CustomerEdit = () => {
     const navigate = useNavigate()
 
     const { data, isLoading } = useSWR(
-        [`/api/customers${id}`, { id: id as string }],
+        [`/api/asset_type_categories/${id}`, { id: id as string }],
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) => apiGetCustomer<Customer, { id: string }>(params),
+        ([_, params]) => apiGetAssetTypeCategory<Customer, { id: string }>(params),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
@@ -45,20 +46,11 @@ const CustomerEdit = () => {
 
     const getDefaultValues = () => {
         if (data) {
-            const { firstName, lastName, email, personalInfo, img } = data
+            const { name, description } = data
 
             return {
-                firstName,
-                lastName,
-                email,
-                img,
-                phoneNumber: personalInfo.phoneNumber,
-                dialCode: personalInfo.dialCode,
-                country: personalInfo.country,
-                address: personalInfo.address,
-                city: personalInfo.city,
-                postcode: personalInfo.postcode,
-                tags: [],
+                name,
+                description
             }
         }
 
