@@ -49,6 +49,18 @@ export async function apiDeleteEmployee(id: string) {
     })
 }
 
+// customers
+
+export async function apiGetCustomersList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/order/customers/',
+        method: 'get',
+        params,
+    })
+}
+
 // orders
 
 export async function apiGetOrderList<T, U extends Record<string, unknown>>(

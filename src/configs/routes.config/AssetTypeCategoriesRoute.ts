@@ -6,8 +6,8 @@ import { ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH, HRM_EEMPLOYEES_PREFIX_PATH, HRM
 const employeeRoute: Routes = [
     {
         key: "employeeCreate",
-        path: `${HRM_EEMPLOYEES_PREFIX_PATH}/employee-create`,   // /employees/employee-create
-        component: lazy(() => import("@/views/HRMS/employees/CustomerCreate")),
+        path: `${ASSET_TYPE_CATEGORIES_PREFIX_PATH}/asset-type-categories-create`,   
+        component: lazy(() => import("@/views/ASSETS/asset_type_categories/CustomerCreate/index")),
         authority: [ADMIN, USER],
     },
     {
