@@ -12,7 +12,7 @@ const employeeRoute: Routes = [
     },
     {
         key: "assetTypeCategoriesEdit",
-        path: `/asset-type-categories-edit/:id`,
+        path: `${ASSET_TYPE_CATEGORIES_PREFIX_PATH}/:id/edit`,
         component: lazy(() => import("@/views/ASSETS/asset_type_categories/CustomerEdit")),
         authority: [ADMIN, USER],
         meta: {
