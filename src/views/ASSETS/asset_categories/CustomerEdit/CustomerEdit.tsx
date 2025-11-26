@@ -81,8 +81,8 @@ const CustomerEdit = () => {
             toast.push(<Notification type="success">Category deleted!</Notification>, {
                 placement: 'top-center',
             })
-            const { tableData: t, filterData: f } = useCustomerListStore.getState()
-            await mutate(['/api/asset_categories', { ...t, ...f }])
+            // revalidate list with current table/filter state
+            await mutate(['/api/asset_categories', { ...tableData, ...filterData }])
             navigate('/assets-category')
         } catch (error) {
             toast.push(<Notification type="danger">Delete failed!</Notification>, {
@@ -102,7 +102,7 @@ const CustomerEdit = () => {
     }
 
     const handleBack = () => {
-        navigate(-1)
+        history.back()
     }
 
 

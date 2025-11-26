@@ -5,15 +5,15 @@ import { ASSET_PREFIX_PATH, ASSET_EDIT_PREFIX_PATH, ASSET_DETAILS_PREFIX_PATH } 
 
 const assetsRoute: Routes = [
     {
-        key: "employeeCreate",
-        path: `${ASSET_PREFIX_PATH}/assets-create`,   // /employees/employee-create
-        component: lazy(() => import("@/views/ASSETS/asset/CustomerCreate/index")),
+        key: 'assetCreate',
+        path: `${ASSET_PREFIX_PATH}/create`,
+        component: lazy(() => import('@/views/ASSETS/asset/CustomerCreate/CustomerCreate')),
         authority: [ADMIN, USER],
     },
     {
-        key: "employeeEdit",
-        path: `${ASSET_EDIT_PREFIX_PATH}/:id`,           // /employee-edit/:id
-        component: lazy(() => import("@/views/ASSETS/asset/CustomerEdit/index")),
+        key: 'assetEdit',
+        path: `${ASSET_PREFIX_PATH}/:id/edit`,
+        component: lazy(() => import('@/views/ASSETS/asset/CustomerEdit/CustomerEdit')),
         authority: [ADMIN, USER],
         meta: {
             header: {
@@ -25,9 +25,9 @@ const assetsRoute: Routes = [
         },
     },
     {
-        key: "employeeDeatails",
-        path: `${ASSET_DETAILS_PREFIX_PATH}/:id`,
-        component: lazy(() => import("@/views/HRMS/employees/CustomerDetails/index")),
+        key: 'assetDetails',
+        path: `${ASSET_PREFIX_PATH}/:id`,
+        component: lazy(() => import('@/views/ASSETS/asset/CustomerDetails/CustomerDetails')),
         authority: [ADMIN, USER],
         meta: {
             header: {

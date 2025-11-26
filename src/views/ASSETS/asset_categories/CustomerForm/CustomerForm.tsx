@@ -18,6 +18,10 @@ type CustomerFormProps = {
     newCustomer?: boolean
 } & CommonProps
 
+type CustomerFormPropsWithSubmit = CustomerFormProps & {
+    onFormSubmit?: (values: CustomerFormSchema) => Promise<void> | void
+}
+
 // 🔹 Validation Schema
 const validationSchema: ZodType<CustomerFormSchema> = z.object({
     name: z.string().min(1, { message: 'Name required' }),
@@ -26,7 +30,7 @@ const validationSchema: ZodType<CustomerFormSchema> = z.object({
     description: z.string().min(1, { message: 'Description required' }),
 })
 
-const CustomerForm = (props: CustomerFormProps) => {
+const CustomerForm = (props: CustomerFormPropsWithSubmit) => {
     const { defaultValues = {}, newCustomer = false, children } = props
 
     // 🟢 useForm init
@@ -53,7 +57,11 @@ const CustomerForm = (props: CustomerFormProps) => {
 
     // 🟢 SUBMIT Handler — Copy of your first code logic
     const onSubmit = async (values: CustomerFormSchema) => {
-        // console.log('🟢 SUBMITTED VALUES:', values)
+        // If parent provided an onFormSubmit (edit page), use it.
+        if (props.onFormSubmit) {
+            await props.onFormSubmit(values)
+            return
+        }
 
         try {
             // 🧩 Get tenant
@@ -70,7 +78,6 @@ const CustomerForm = (props: CustomerFormProps) => {
             formData.append('title', values.title)
             formData.append('description', values.description)
 
- 
             // Attach tenant
             formData.append('tenant', tenant)
 

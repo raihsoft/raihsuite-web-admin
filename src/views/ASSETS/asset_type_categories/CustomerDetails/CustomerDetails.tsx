@@ -1,59 +1,60 @@
+import Container from '@/components/shared/Container'
 import Card from '@/components/ui/Card'
-import Tabs from '@/components/ui/Tabs'
 import Loading from '@/components/shared/Loading'
-import ProfileSection from './ProfileSection'
-import BillingSection from './BillingSection'
-import ActivitySection from './ActivitySection'
-import { apiGetCustomer } from '@/services/CustomersService'
+import { TbArrowNarrowLeft } from 'react-icons/tb'
+import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
-import { useParams } from 'react-router-dom'
+import { apiGetAssetTypeCategoryById } from '@/services/CustomersService'
 import isEmpty from 'lodash/isEmpty'
-import type { Customer } from '../AssetTypeCategoriesList/types'
-
-const { TabNav, TabList, TabContent } = Tabs
 
 const CustomerDetails = () => {
     const { id } = useParams()
+    const navigate = useNavigate()
 
     const { data, isLoading } = useSWR(
-        ['/api/customers', { id: id as string }],
+        ['/api/asset_type_categories', id as string],
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) => apiGetCustomer<Customer, { id: string }>(params),
-        {
-            revalidateOnFocus: false,
-            revalidateIfStale: false,
-            evalidateOnFocus: false,
-        },
+        ([_, idParam]) => apiGetAssetTypeCategoryById<any>(idParam as string),
+        { revalidateOnFocus: false, revalidateIfStale: false },
     )
+
+    const handleBack = () => navigate(-1)
 
     return (
         <Loading loading={isLoading}>
-            {!isEmpty(data) && (
-                <div className="flex flex-col xl:flex-row gap-4">
-                    <div className="min-w-[330px] 2xl:min-w-[400px]">
-                        <ProfileSection data={data} />
-                    </div>
-                    <Card className="w-full">
-                        <Tabs defaultValue="billing">
-                            <TabList>
-                                <TabNav value="billing">Billing</TabNav>
-                                <TabNav value="activity">Activity</TabNav>
-                            </TabList>
-                            <div className="p-4">
-                                <TabContent value="billing">
-                                    <BillingSection data={data} />
-                                </TabContent>
-                                <TabContent value="activity">
-                                    <ActivitySection
-                                        customerName={data.name}
-                                        id={id as string}
-                                    />
-                                </TabContent>
-                            </div>
-                        </Tabs>
-                    </Card>
+            <Container>
+                <div className="flex items-center justify-between px-8">
+                    <button
+                        type="button"
+                        className="btn-plain"
+                        onClick={handleBack}
+                    >
+                        <TbArrowNarrowLeft /> Back
+                    </button>
                 </div>
-            )}
+
+                <div className="p-8">
+                    <h3 className="text-lg font-semibold">Asset Type Category Details</h3>
+                    {data && !isEmpty(data) ? (
+                        <div className="mt-4 grid grid-cols-1 gap-3 max-w-2xl">
+                            <Card>
+                                <div>
+                                    <h4 className="font-semibold">Name</h4>
+                                    <p className="text-gray-700">{data.name}</p>
+                                </div>
+                            </Card>
+                            <Card>
+                                <div>
+                                    <h4 className="font-semibold">Description</h4>
+                                    <p className="text-gray-700">{data.description}</p>
+                                </div>
+                            </Card>
+                        </div>
+                    ) : (
+                        <p className="mt-4 text-sm text-gray-600">No data found.</p>
+                    )}
+                </div>
+            </Container>
         </Loading>
     )
 }

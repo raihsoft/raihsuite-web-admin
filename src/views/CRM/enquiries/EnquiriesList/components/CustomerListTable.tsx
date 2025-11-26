@@ -39,7 +39,7 @@ const ActionColumn = ({
 }) => {
     return (
         <div className="flex items-center gap-3">
-            <Tooltip title="Edit">
+            {/* <Tooltip title="Edit">
                 <div
                     className={`text-xl cursor-pointer select-none font-semibold`}
                     role="button"
@@ -47,7 +47,7 @@ const ActionColumn = ({
                 >
                     <TbPencil />
                 </div>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip title="View">
                 <div
                     className={`text-xl cursor-pointer select-none font-semibold`}
@@ -76,11 +76,11 @@ const CustomerListTable = () => {
     } = useCustomerList()
 
     const handleEdit = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-edit/${customer.id}`)
+        navigate(`/enquiries/${customer.id}/edit`)
     }
 
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-details/${customer.id}`)
+        navigate(`/enquiries/${customer.id}`)
     }
 
     const columns: ColumnDef<Customer>[] = useMemo(
@@ -100,6 +100,23 @@ const CustomerListTable = () => {
             {
                 header: 'Message',
                 accessorKey: 'message',
+            },
+            {
+                header: '',
+                id: 'action',
+                cell: (props) => (
+                    <div className="flex items-center gap-3">
+                        <Tooltip title="View">
+                            <div
+                                className={`text-xl cursor-pointer select-none font-semibold`}
+                                role="button"
+                                onClick={() => handleViewDetails(props.row.original)}
+                            >
+                                <TbEye />
+                            </div>
+                        </Tooltip>
+                    </div>
+                ),
             },
 
         ],

@@ -1,18 +1,18 @@
 import { lazy } from "react"
 import type { Routes } from "@/@types/routes"
 import { ADMIN, USER } from "@/constants/roles.constant"
-import { ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH, HRM_EEMPLOYEES_PREFIX_PATH, HRM_EMPLOYEES_DEATILS_PREFIX_PATH, ASSET_TYPE_CATEGORIES_PREFIX_PATH } from "@/constants/route.constant"
+import { ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH, HRM_EMPLOYEES_DEATILS_PREFIX_PATH, ASSET_TYPE_CATEGORIES_PREFIX_PATH } from "@/constants/route.constant"
 
 const employeeRoute: Routes = [
     {
-        key: "employeeCreate",
-        path: `${ASSET_TYPE_CATEGORIES_PREFIX_PATH}/asset-type-categories-create`,   
-        component: lazy(() => import("@/views/ASSETS/asset_type_categories/CustomerCreate/index")),
+        key: 'assetTypeCategoryCreate',
+        path: `${ASSET_TYPE_CATEGORIES_PREFIX_PATH}/create`,
+        component: lazy(() => import('@/views/ASSETS/asset_type_categories/CustomerCreate/CustomerCreate')),
         authority: [ADMIN, USER],
     },
     {
         key: "assetTypeCategoriesEdit",
-        path: `${ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH}/:id`,
+        path: `/asset-type-categories-edit/:id`,
         component: lazy(() => import("@/views/ASSETS/asset_type_categories/CustomerEdit")),
         authority: [ADMIN, USER],
         meta: {
@@ -27,7 +27,7 @@ const employeeRoute: Routes = [
     {
         key: "assetTypeCategoriesDetails",
         path: `${ASSET_TYPE_CATEGORIES_PREFIX_PATH}/:id`,
-        component: lazy(() => import('@/views/ASSETS/asset_type_categories/AssetTypeCategoriesDetails')),
+        component: lazy(() => import('@/views/ASSETS/asset_type_categories/CustomerDetails/CustomerDetails')),
         authority: [ADMIN, USER],
         meta: {
             header: {

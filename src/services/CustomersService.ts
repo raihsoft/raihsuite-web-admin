@@ -176,6 +176,14 @@ export async function apiGetEnquiries<T, U extends Record<string, unknown>>(
     })
 }
 
+// Get single enquiry by id
+export async function apiGetEnquiryById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/crm/enquiries/${id}/`,
+        method: 'get',
+    })
+}
+
 // customer activity log
 export async function apiGetCustomerLog<T, U extends Record<string, unknown>>(params: U) {
     return ApiService.fetchDataWithAxios<T>({

@@ -54,6 +54,20 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
+        key: 'enquiriesDetails',
+        path: '/enquiries/:id',
+        component: lazy(() => import('@/views/CRM/enquiries/CustomerDetails/CustomerDetails')),
+        authority: [],
+        meta: {
+            header: {
+                title: 'Enquiry Details',
+                description: 'View enquiry details.',
+                contained: true,
+            },
+            footer: false,
+        },
+    },
+    {
         key: 'assettypes',
         path: '/assettypes',
         component: lazy(
