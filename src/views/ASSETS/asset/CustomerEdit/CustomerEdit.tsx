@@ -119,7 +119,7 @@ const CustomerEdit = () => {
             {!isLoading && !data && (
                 <div className="h-full flex flex-col items-center justify-center">
                     <NoUserFound height={280} width={280} />
-                    <h3 className="mt-8">No user found!</h3>
+                    <h3 className="mt-8">No asset found!</h3>
                 </div>
             )}
             {!isLoading && data && (
