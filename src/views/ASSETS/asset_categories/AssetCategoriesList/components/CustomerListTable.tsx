@@ -22,7 +22,7 @@ const NameColumn = ({ row }: { row: Customer }) => {
             <Avatar size={40} shape="circle" src={row.img} />
             <Link
                 className={`hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100`}
-                to={`/concepts/customers/customer-details/${row.id}`}
+                to={`/assets-category/${row.id}`}
             >
                 {row.name}
             </Link>
@@ -76,11 +76,11 @@ const CustomerListTable = () => {
     } = useCustomerList()
 
     const handleEdit = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-edit/${customer.id}`)
+        navigate(`/assets-category/${customer.id}/edit`)
     }
 
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-details/${customer.id}`)
+        navigate(`/assets-category/${customer.id}`)
     }
 
     const columns: ColumnDef<Customer>[] = useMemo(
@@ -100,6 +100,32 @@ const CustomerListTable = () => {
             {
                 header: 'Description',
                 accessorKey: 'description',
+            },
+            {
+                header: '',
+                id: 'action',
+                cell: (props) => (
+                    <div className="flex items-center gap-3">
+                        <Tooltip title="Edit">
+                            <div
+                                className={`text-xl cursor-pointer select-none font-semibold`}
+                                role="button"
+                                onClick={() => handleEdit(props.row.original)}
+                            >
+                                <TbPencil />
+                            </div>
+                        </Tooltip>
+                        <Tooltip title="View">
+                            <div
+                                className={`text-xl cursor-pointer select-none font-semibold`}
+                                role="button"
+                                onClick={() => handleViewDetails(props.row.original)}
+                            >
+                                <TbEye />
+                            </div>
+                        </Tooltip>
+                    </div>
+                ),
             },
         ],
         // eslint-disable-next-line react-hooks/exhaustive-deps

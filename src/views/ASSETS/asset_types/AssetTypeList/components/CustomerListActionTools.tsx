@@ -26,7 +26,7 @@ const CustomerListActionTools = () => {
             <Button
                 variant="solid"
                 icon={<TbUserPlus className="text-xl" />}
-                onClick={() => navigate('/asset-types/assets-type-create')}
+                onClick={() => navigate('/asset-types/create')}
             >
                 Add new
             </Button>

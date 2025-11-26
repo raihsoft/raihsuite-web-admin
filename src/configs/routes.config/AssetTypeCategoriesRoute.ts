@@ -1,7 +1,7 @@
 import { lazy } from "react"
 import type { Routes } from "@/@types/routes"
 import { ADMIN, USER } from "@/constants/roles.constant"
-import { ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH, HRM_EEMPLOYEES_PREFIX_PATH, HRM_EMPLOYEES_DEATILS_PREFIX_PATH } from "@/constants/route.constant"
+import { ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH, HRM_EEMPLOYEES_PREFIX_PATH, HRM_EMPLOYEES_DEATILS_PREFIX_PATH, ASSET_TYPE_CATEGORIES_PREFIX_PATH } from "@/constants/route.constant"
 
 const employeeRoute: Routes = [
     {
@@ -11,28 +11,28 @@ const employeeRoute: Routes = [
         authority: [ADMIN, USER],
     },
     {
-        key: "employeeEdit",
-        path: `${ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH}/:id`,           // /employee-edit/:id
+        key: "assetTypeCategoriesEdit",
+        path: `${ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH}/:id`,
         component: lazy(() => import("@/views/ASSETS/asset_type_categories/CustomerEdit")),
         authority: [ADMIN, USER],
         meta: {
             header: {
-                title: "Edit Employee",
-                description: "Manage employee details, profile, and preferences.",
+                title: "Edit Asset Type Category",
+                description: "Manage asset type category details.",
                 contained: true,
             },
             footer: false,
         },
     },
     {
-        key: "employeeDeatails",
-        path: `${HRM_EMPLOYEES_DEATILS_PREFIX_PATH}/:id`,
-        component: lazy(() => import("@/views/HRMS/employees/CustomerDetails")),
+        key: "assetTypeCategoriesDetails",
+        path: `${ASSET_TYPE_CATEGORIES_PREFIX_PATH}/:id`,
+        component: lazy(() => import('@/views/ASSETS/asset_type_categories/AssetTypeCategoriesDetails')),
         authority: [ADMIN, USER],
         meta: {
             header: {
-                title: "Employees Details ",
-                description: "Manage employee details, profile, and preferences.",
+                title: "Asset Type Category Details",
+                description: "View asset type category details.",
                 contained: true,
             },
             footer: false,

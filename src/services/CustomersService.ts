@@ -176,6 +176,24 @@ export async function apiGetEnquiries<T, U extends Record<string, unknown>>(
     })
 }
 
+// customer activity log
+export async function apiGetCustomerLog<T, U extends Record<string, unknown>>(params: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/customers/log/',
+        method: 'get',
+        params,
+    })
+}
+
+// get customers (list / query)
+export async function apiGetCustomer<T, U extends Record<string, unknown>>(params: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/customers/',
+        method: 'get',
+        params,
+    })
+}
+
 // asset
 
 
@@ -196,6 +214,31 @@ export async function apiCreateAssets<T, U extends Record<string, unknown>>(
         url: '/asset/assets/',
         method: 'post',
         data,
+    })
+}
+
+// Get single asset by id
+export async function apiGetAssetById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/assets/${id}/`,
+        method: 'get',
+    })
+}
+
+// Update single asset by id
+export async function apiUpdateAsset<T, U extends Record<string, unknown>>(id: string, data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/assets/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+// Delete single asset by id
+export async function apiDeleteAsset(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/asset/assets/${id}/`,
+        method: 'delete',
     })
 }
 
@@ -225,8 +268,33 @@ export async function apiEditAssetType<T, U extends Record<string, unknown>>(
 ) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/asset/asset_types/',
-        method: 'edit',
+        method: 'get',
         params,
+    })
+}
+
+// Update asset type by id
+export async function apiUpdateAssetType<T, U extends Record<string, unknown>>(id: string, data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_types/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+// Delete asset type by id
+export async function apiDeleteAssetType(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/asset/asset_types/${id}/`,
+        method: 'delete',
+    })
+}
+
+// Get single asset type by id
+export async function apiGetAssetTypeById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_types/${id}/`,
+        method: 'get',
     })
 }
 
@@ -249,6 +317,31 @@ export async function apiCreateAssetCategories<T, U extends Record<string, unkno
         url: '/asset/asset_categories/',
         method: 'post',
         data,
+    })
+}
+
+// Get single asset category by id
+export async function apiGetAssetCategoryById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_categories/${id}/`,
+        method: 'get',
+    })
+}
+
+// Update asset category by id
+export async function apiUpdateAssetCategory<T, U extends Record<string, unknown>>(id: string, data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_categories/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+// Delete asset category by id
+export async function apiDeleteAssetCategory(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/asset/asset_categories/${id}/`,
+        method: 'delete',
     })
 }
 
@@ -286,6 +379,31 @@ export async function  apiEditAssetTypeCategory<T, U extends Record<string, unkn
         url: '/asset/asset_type_categories/',
         method: 'edit',
         params,
+    })
+}
+
+// Update asset type category by id
+export async function apiUpdateAssetTypeCategory<T, U extends Record<string, unknown>>(id: string, data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_type_categories/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+// Delete asset type category by id
+export async function apiDeleteAssetTypeCategory(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/asset/asset_type_categories/${id}/`,
+        method: 'delete',
+    })
+}
+
+// Get single asset type category by id
+export async function apiGetAssetTypeCategoryById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_type_categories/${id}/`,
+        method: 'get',
     })
 }
 

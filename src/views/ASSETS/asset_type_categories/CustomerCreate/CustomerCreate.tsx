@@ -5,10 +5,12 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import CustomerForm from '../CustomerForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import sleep from '@/utils/sleep'
 import { TbTrash } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 import type { CustomerFormSchema } from '../CustomerForm'
+import { apiCreateAssetTypeCategory } from '@/services/CustomersService'
+import { mutate } from 'swr'
+import { useCustomerListStore } from '../AssetTypeCategoriesList/store/customerListStore'
 
 const CustomerEdit = () => {
     const navigate = useNavigate()
@@ -18,15 +20,36 @@ const CustomerEdit = () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
 
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        console.log('Submitted values', values)
-        setIsSubmiting(true)
-        await sleep(800)
-        setIsSubmiting(false)
-        toast.push(
-            <Notification type="success">Customer created!</Notification>,
-            { placement: 'top-center' },
-        )
-        navigate('/concepts/customers/customer-list')
+        try {
+            setIsSubmiting(true)
+            const tenant = localStorage.getItem('tenant')
+            if (!tenant) throw new Error('Tenant missing')
+
+            const formData = new FormData()
+            formData.append('name', values.name)
+            formData.append('description', values.description || '')
+            formData.append('tenant', tenant)
+
+            await apiCreateAssetTypeCategory(formData)
+
+            // revalidate list
+            const { tableData, filterData } = useCustomerListStore.getState()
+            await mutate(['/api/asset_type_categories', { ...tableData, ...filterData }])
+
+            toast.push(
+                <Notification type="success">Category created!</Notification>,
+                { placement: 'top-center' },
+            )
+            navigate('/asset-type-categories')
+        } catch (err) {
+            console.error(err)
+            toast.push(
+                <Notification type="danger">Create failed!</Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setIsSubmiting(false)
+        }
     }
 
     const handleConfirmDiscard = () => {
@@ -35,7 +58,7 @@ const CustomerEdit = () => {
             <Notification type="success">Customer discardd!</Notification>,
             { placement: 'top-center' },
         )
-        navigate('/concepts/customers/customer-list')
+        navigate('/asset-type-categories')
     }
 
     const handleDiscard = () => {
