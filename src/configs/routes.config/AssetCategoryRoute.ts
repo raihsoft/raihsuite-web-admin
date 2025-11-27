@@ -5,10 +5,38 @@ import {  ASSET_CATEGORY_PREFIX_PATH, ASSET_PREFIX_PATH } from "@/constants/rout
 
 const assetsCategoryRoute: Routes = [
     {
-        key: "employeeCreate",
-        path: `${ASSET_CATEGORY_PREFIX_PATH}/assets-category-create`,   // /employees/employee-create
-        component: lazy(() => import("@/views/ASSETS/asset_categories/CustomerCreate/index")),
+        key: 'assetCategoryCreate',
+        path: `${ASSET_CATEGORY_PREFIX_PATH}/create`,
+        component: lazy(() => import('@/views/ASSETS/asset_categories/CustomerCreate/index')),
         authority: [ADMIN, USER],
+    },
+    {
+        key: 'assetCategoryEdit',
+        path: `${ASSET_CATEGORY_PREFIX_PATH}/:id/edit`,
+        component: lazy(() => import('@/views/ASSETS/asset_categories/CustomerEdit')),
+        authority: [ADMIN, USER],
+        meta: {
+            header: {
+                title: 'Edit Asset Category',
+                description: 'Manage asset category details.',
+                contained: true,
+            },
+            footer: false,
+        },
+    },
+    {
+        key: 'assetCategoryDetails',
+        path: `${ASSET_CATEGORY_PREFIX_PATH}/:id`,
+        component: lazy(() => import('@/views/ASSETS/asset_categories/CustomerDetails/CustomerDetails')),
+        authority: [ADMIN, USER],
+        meta: {
+            header: {
+                title: 'Asset Category Details',
+                description: 'View asset category details.',
+                contained: true,
+            },
+            footer: false,
+        },
     },
     // {
     //     key: "employeeEdit",

@@ -29,7 +29,7 @@ const CustomerEdit = () => {
         )
 
         setIsSubmitting(false)
-        navigate('/assets/assets-create')
+        navigate('/assets')
     }
 
     // ✅ Confirm discard
@@ -39,7 +39,7 @@ const CustomerEdit = () => {
             <Notification type="warning">Changes discarded!</Notification>,
             { placement: 'top-center' }
         )
-        navigate('/assets/assets-create')
+        navigate('/assets')
     }
 
     // ✅ Discard / Cancel handlers

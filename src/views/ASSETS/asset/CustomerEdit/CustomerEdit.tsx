@@ -8,7 +8,6 @@ import { apiGetAssetById, apiUpdateAsset, apiDeleteAsset } from '@/services/Cust
 import CustomerForm from '../CustomerForm'
 import { mutate } from 'swr'
 import { useCustomerListStore } from '../AssetList/store/customerListStore'
-import sleep from '@/utils/sleep'
 import NoUserFound from '@/assets/svg/NoUserFound'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -21,7 +20,7 @@ const CustomerEdit = () => {
 
     const navigate = useNavigate()
 
-    const { data, error, isLoading } = useSWR(
+    const { data, isLoading } = useSWR(
         ['/api/assets', id as string],
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ([_, idParam]) => apiGetAssetById<Customer>(idParam as string),
@@ -91,8 +90,8 @@ const CustomerEdit = () => {
             toast.push(<Notification type="success">Asset deleted!</Notification>, {
                 placement: 'top-center',
             })
-            const { tableData: t, filterData: f } = useCustomerListStore.getState()
-            await mutate(['/api/assets', { ...t, ...f }])
+            // revalidate list with current table/filter state
+            await mutate(['/api/assets', { ...tableData, ...filterData }])
             navigate('/assets')
         } catch (error) {
             toast.push(<Notification type="danger">Delete failed!</Notification>, {
@@ -112,21 +111,12 @@ const CustomerEdit = () => {
     }
 
     const handleBack = () => {
-        navigate(-1)
+        history.back()
     }
 
     return (
         <>
-            {!isLoading && error && (
-                <div className="h-full flex flex-col items-center justify-center">
-                    <NoUserFound height={280} width={280} />
-                    <h3 className="mt-8">Failed to load asset</h3>
-                    <p className="mt-2 text-sm text-muted break-words">
-                        {String(error)}
-                    </p>
-                </div>
-            )}
-            {!isLoading && !data && !error && (
+            {!isLoading && !data && (
                 <div className="h-full flex flex-col items-center justify-center">
                     <NoUserFound height={280} width={280} />
                     <h3 className="mt-8">No asset found!</h3>
