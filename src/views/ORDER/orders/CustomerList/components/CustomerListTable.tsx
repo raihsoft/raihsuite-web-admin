@@ -11,6 +11,29 @@ import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
 import type { TableQueries } from '@/@types/common'
 
+const NameColumn = ({ row, searchQuery }: { row: any; searchQuery?: string }) => {
+    const highlightMatch = (text: string, query?: string) => {
+        if (!query || query.length === 0) return text
+        
+        const regex = new RegExp(`(${query})`, 'gi')
+        const parts = text.split(regex)
+        
+        return parts.map((part, i) => 
+            regex.test(part) ? (
+                <mark key={i} className="bg-yellow-300 font-bold">{part}</mark>
+            ) : (
+                part
+            )
+        )
+    }
+    
+    return (
+        <span className="font-semibold text-gray-900 dark:text-gray-100">
+            {highlightMatch(row.order_by_name, searchQuery)}
+        </span>
+    )
+}
+
 const ActionColumn = ({
     onEdit,
     onViewDetail,
@@ -68,11 +91,40 @@ const CustomerListTable = () => {
         // navigate(/order-details/${customer.id})
     }
 
+    // Filter and sort list - show only matches, with exact matches first
+    const filteredAndSortedList = useMemo(() => {
+        const query = (tableData.query as string || '').toLowerCase().trim()
+        
+        if (!query || query.length === 0) return customerList
+        
+        // Filter to only include matching order names
+        const filtered = customerList.filter(customer =>
+            customer.order_by_name.toLowerCase().includes(query)
+        )
+        
+        // Sort to put exact/partial matches first
+        return filtered.sort((a, b) => {
+            const aName = a.order_by_name.toLowerCase()
+            const bName = b.order_by_name.toLowerCase()
+            
+            // Exact match comes first
+            if (aName === query) return -1
+            if (bName === query) return 1
+            
+            // Starts with query comes next
+            if (aName.startsWith(query) && !bName.startsWith(query)) return -1
+            if (!aName.startsWith(query) && bName.startsWith(query)) return 1
+            
+            return 0
+        })
+    }, [customerList, tableData.query])
+
     const columns: ColumnDef<Customer>[] = useMemo(
         () => [
             {
                 header: 'Name',
                 accessorKey: 'order_by_name',
+                cell: (props) => <NameColumn row={props.row.original} searchQuery={tableData.query as string} />
             },
             {
                 header: 'Mobile',
@@ -224,8 +276,8 @@ const CustomerListTable = () => {
         <DataTable
             selectable
             columns={columns}
-            data={customerList}
-            noData={!isLoading && customerList.length === 0}
+            data={filteredAndSortedList}
+            noData={!isLoading && filteredAndSortedList.length === 0}
             skeletonAvatarColumns={[0]}
             skeletonAvatarProps={{ width: 28, height: 28 }}
             loading={isLoading}

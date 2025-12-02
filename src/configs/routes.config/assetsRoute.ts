@@ -12,7 +12,7 @@ const assetsRoute: Routes = [
     },
     {
         key: 'assetEdit',
-        path: `${ASSET_PREFIX_PATH}/:id/edit`,
+        path: `${ASSET_EDIT_PREFIX_PATH}/:id`,
         component: lazy(() => import('@/views/ASSETS/asset/CustomerEdit/CustomerEdit')),
         authority: [ADMIN, USER],
         meta: {

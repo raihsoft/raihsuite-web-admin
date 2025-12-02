@@ -16,7 +16,7 @@ export const publicRoutes: Routes = [...authRoute]
 
 export const protectedRoutes: Routes = [
     {
-        key: 'home',
+        key: 'hrms.item1',
         path: '/employees',
         component: lazy(() => import('@/views/HRMS/employees/CustomerList')),
         authority: [],

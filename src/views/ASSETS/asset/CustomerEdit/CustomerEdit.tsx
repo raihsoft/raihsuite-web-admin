@@ -40,7 +40,6 @@ const CustomerEdit = () => {
         if (!id) return
         try {
             setIsSubmiting(true)
-            // prepare payload — keep simple and send as JSON; if file update required use FormData
             const payload: any = {
                 title: values.title,
                 description: values.description,
@@ -49,7 +48,14 @@ const CustomerEdit = () => {
                 asset_category: values.asset_category,
                 tags: values.tags,
             }
-
+            
+            // Only include file if a new one was actually uploaded (not a string/path)
+            const newFile = values.file as any
+            if (newFile && typeof newFile !== 'string') {
+                payload.file = newFile
+            }
+            
+            console.log('📝 Sending update with payload:', payload)
             await apiUpdateAsset(id as string, payload)
             toast.push(<Notification type="success">Changes Saved!</Notification>, {
                 placement: 'top-center',
@@ -57,7 +63,12 @@ const CustomerEdit = () => {
             // revalidate list
             await mutate(['/api/assets', { ...tableData, ...filterData }])
             navigate('/assets')
-        } catch (error) {
+        } catch (error: any) {
+            console.error('❌ Update error details:', {
+                message: error?.message,
+                status: error?.response?.status,
+                data: error?.response?.data,
+            })
             toast.push(<Notification type="danger">Update failed!</Notification>, {
                 placement: 'top-center',
             })
