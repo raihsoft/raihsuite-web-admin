@@ -159,7 +159,7 @@ const navigationConfig: NavigationTree[] = [
         path: '/order',
         title: 'ORDER',
         translateKey: 'nav.crm.title',
-        icon: 'contactsIcon',
+        icon: 'orderIcon',
         type: NAV_ITEM_TYPE_COLLAPSE,
         authority: [],
         subMenu: [

@@ -100,15 +100,15 @@ const DropdownToggle = (
         )
     }
 
-    return (
-        <div ref={ref} className={dropdownToggleDefaultClass} {...rest}>
-            <span className="flex items-center gap-1">
-                <DropdownToggleDefaultContent placement={placement}>
-                    {children}
-                </DropdownToggleDefaultContent>
-            </span>
-        </div>
-    )
+    // return (
+    //     <div ref={ref} className={dropdownToggleDefaultClass} {...rest}>
+    //         <span className="flex items-center gap-1">
+    //             <DropdownToggleDefaultContent placement={placement}>
+    //                 {children}
+    //             </DropdownToggleDefaultContent>
+    //         </span>
+    //     </div>
+    // )
 }
 
 export default DropdownToggle

@@ -70,7 +70,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
     return (
         <Card>
-            <h4 className="mb-6">Create New Asset Type</h4>
+            <h4 className="mb-6">Edit Asset Type</h4>
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
                     label="Name"

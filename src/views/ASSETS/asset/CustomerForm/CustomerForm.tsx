@@ -32,9 +32,7 @@ const validationSchema: ZodType<CustomerFormSchema> = z.object({
     asset_type_ref: z.string().min(1, { message: 'Asset Type is required' }),
     asset_category: z.string().min(1, { message: 'Asset Category is required' }),
     tags: z.string().optional(),
-    file: z.any().refine((file) => file instanceof File, {
-        message: 'File is required',
-    }),
+    file: z.any().optional(),
 })
 
 const CustomerForm = (props: CustomerFormPropsWithSubmit) => {

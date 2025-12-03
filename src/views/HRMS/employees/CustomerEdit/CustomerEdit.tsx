@@ -132,6 +132,7 @@ const CustomerEdit = () => {
                                         Delete
                                     </Button>
                                     <Button
+                                        style={{marginLeft:"10px"}}
                                         variant="solid"
                                         type="submit"
                                         loading={isSubmitting}

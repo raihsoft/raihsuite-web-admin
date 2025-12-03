@@ -13,7 +13,7 @@ const assettypes: Routes = [
     {
         key: 'assetTypeEdit',
         path: `${ASSET_TYPE_EDIT_PREFIX_PATH}/:id`, // /assettypes-edit/:id
-        component: lazy(() => import('@/views/ASSETS/asset_types/CustomerEdit')),
+        component: lazy(() => import('@/views/ASSETS/asset_types/CustomerEdit/CustomerEdit')),
         authority: [ADMIN, USER],
         meta: {
             header: {
@@ -27,7 +27,7 @@ const assettypes: Routes = [
     {
         key: 'assetTypeDetails',
         path: `${ASSET_TYPE_PREFIX_PATH}/:id`, // /asset-types/:id
-        component: lazy(() => import('@/views/ASSETS/asset_types/CustomerDetails')),
+        component: lazy(() => import('@/views/ASSETS/asset_types/CustomerDetails/CustomerDetails')),
         authority: [ADMIN, USER],
         meta: {
             header: {

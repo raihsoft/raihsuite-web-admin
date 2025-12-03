@@ -33,7 +33,16 @@ const validationSchema: ZodType<CustomerFormSchema> = z.object({
     youtube_link: z.string().optional(),
     linkedin_link: z.string().optional(),
     website_link: z.string().optional(),
+    phone: z.string().optional(),
+    img: z.any().optional(),
+    country: z.string().optional(),
+    address: z.string().optional(),
+    postcode: z.string().optional(),
+    city: z.string().optional(),
     tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
+    tenant: z.string().optional(),
+    banAccount: z.boolean().optional(),
+    accountVerified: z.boolean().optional(),
 })
 
 const CustomerForm = (props: CustomerFormProps) => {

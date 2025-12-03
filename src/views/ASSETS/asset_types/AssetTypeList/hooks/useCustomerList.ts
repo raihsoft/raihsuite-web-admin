@@ -1,6 +1,7 @@
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import { apiGetAssetType } from '@/services/CustomersService'
+import { transformPaginationParams } from '@/utils/transformPaginationParams'
 import type { TableQueries } from '@/@types/common'
 import type { GetCustomersListResponse } from '../types'
 
@@ -17,7 +18,7 @@ export default function useCustomerList() {
 
     const { data, error, isLoading } = useSWR(
         ['/api/asset_types', { ...tableData, ...filterData }] as const,
-        ([, params]) => apiGetAssetType<GetCustomersListResponse, TableQueries>(params),
+        ([, params]) => apiGetAssetType<GetCustomersListResponse, TableQueries>(transformPaginationParams(params)),
         { revalidateOnFocus: false }
     )
 
