@@ -33,15 +33,9 @@ const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string 
     }
     
     return (
-        <div className="flex items-center">
-            <Avatar size={40} shape="circle" src={row.img} />
-            <Link
-                className={`hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100`}
-                to={`/concepts/customers/customer-details/${row.id}`}
-            >
-                {highlightMatch(row.name, searchQuery)}
-            </Link>
-        </div>
+        <span className="font-semibold text-gray-900 dark:text-gray-100">
+            {highlightMatch(row.name, searchQuery)}
+        </span>
     )
 }
 

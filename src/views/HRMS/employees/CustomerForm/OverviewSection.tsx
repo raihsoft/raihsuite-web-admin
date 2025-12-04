@@ -71,24 +71,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
     <Card>
       <h4 className="mb-6">Edit Employees</h4>
       
-      {/* Profile Image Upload */}
-      <FormItem
-        label="Profile Image"
-        invalid={Boolean(errors.img)}
-        errorMessage={errors.img?.message}
-      >
-        <Controller
-          name="img"
-          control={control}
-          render={({ field }) => (
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={(e) => field.onChange(e.target.files?.[0])}
-            />
-          )}
-        />
-      </FormItem>
+      {/* Profile Image removed per request */}
 
       <div className="grid md:grid-cols-2 gap-4">
         <FormItem

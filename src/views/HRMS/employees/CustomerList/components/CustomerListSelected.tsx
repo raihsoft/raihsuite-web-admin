@@ -9,6 +9,7 @@ import toast from '@/components/ui/toast'
 import RichTextEditor from '@/components/shared/RichTextEditor'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
+import { apiDeleteEmployee } from '@/services/CustomersService'
 import { TbChecks } from 'react-icons/tb'
 
 const CustomerListSelected = () => {
@@ -23,6 +24,7 @@ const CustomerListSelected = () => {
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
     const [sendMessageDialogOpen, setSendMessageDialogOpen] = useState(false)
     const [sendMessageLoading, setSendMessageLoading] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     const handleDelete = () => {
         setDeleteConfirmationOpen(true)
@@ -32,21 +34,36 @@ const CustomerListSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = () => {
-        const newCustomerList = customerList.filter((customer) => {
-            return !selectedCustomer.some(
-                (selected) => selected.id === customer.id,
+    const handleConfirmDelete = async () => {
+        setIsDeleting(true)
+        try {
+            // Delete each selected customer
+            const deletePromises = selectedCustomer.map((customer) =>
+                apiDeleteEmployee(customer.id)
             )
-        })
-        setSelectAllCustomer([])
-        mutate(
-            {
-                list: newCustomerList,
-                total: customerListTotal - selectedCustomer.length,
-            },
-            false,
-        )
-        setDeleteConfirmationOpen(false)
+            
+            await Promise.all(deletePromises)
+            
+            // Clear selections and refresh list
+            setSelectAllCustomer([])
+            toast.push(
+                <Notification type="success">
+                    {selectedCustomer.length} employee(s) deleted successfully!
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        } catch (error) {
+            console.error('Delete error:', error)
+            toast.push(
+                <Notification type="danger">
+                    Failed to delete employee(s)
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setIsDeleting(false)
+            setDeleteConfirmationOpen(false)
+        }
     }
 
     const handleSend = () => {
@@ -98,6 +115,8 @@ const CustomerListSelected = () => {
                                         'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error'
                                     }
                                     onClick={handleDelete}
+                                    loading={isDeleting}
+                                    disabled={isDeleting}
                                 >
                                     Delete
                                 </Button>

@@ -22,10 +22,6 @@ const AxiosRequestIntrceptorConfigCallback = (
         accessToken = sessionStorage.getItem(access_token) || ''
     }
 
-    console.log('📌 Access Token:', accessToken)
-    console.log('📌 TOKEN_TYPE:', TOKEN_TYPE)
-    console.log('📌 REQUEST_HEADER_AUTH_KEY:', REQUEST_HEADER_AUTH_KEY)
-
     // ⭐ MAIN FIX → Add space after Bearer
     if (accessToken) {
         config.headers[REQUEST_HEADER_AUTH_KEY] =
