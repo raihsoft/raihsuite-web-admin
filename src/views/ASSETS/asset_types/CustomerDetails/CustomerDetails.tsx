@@ -2,6 +2,7 @@ import Container from '@/components/shared/Container'
 import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
 import { TbArrowNarrowLeft } from 'react-icons/tb'
+import { FaFileAlt } from 'react-icons/fa'
 import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
 import { apiGetAssetTypeById } from '@/services/CustomersService'
@@ -33,34 +34,32 @@ const CustomerDetails = () => {
                     </button>
                 </div>
 
-                <div className="p-8">
-                    <h3 className="text-lg font-semibold">Asset Type Details</h3>
+                <div className="p-6 md:p-8">
+                    <h3 className="text-3xl font-semibold mb-4">Asset Type Details</h3>
+
                     {data && !isEmpty(data) ? (
-                        <div className="mt-4 grid grid-cols-1 gap-3 max-w-2xl">
-                            <Card>
-                                <div>
-                                    <h4 className="font-semibold">Name</h4>
-                                    <p className="text-gray-700">{data.name}</p>
-                                </div>
-                            </Card>
-                            <Card>
-                                <div>
-                                    <h4 className="font-semibold">Code</h4>
-                                    <p className="text-gray-700">{data.code}</p>
-                                </div>
-                            </Card>
-                            <Card>
-                                <div>
-                                    <h4 className="font-semibold">File Extension</h4>
-                                    <p className="text-gray-700">{data.file_extension}</p>
-                                </div>
-                            </Card>
-                            <Card>
-                                <div>
-                                    <h4 className="font-semibold">Description</h4>
-                                    <p className="text-gray-700">{data.description}</p>
-                                </div>
-                            </Card>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-1">
+                                <Card className="h-full">
+                                    <div className="p-6">
+                                        <h4 className="text-2xl font-semibold mb-2">{data.name}</h4>
+                                        <div className="flex items-center gap-3 text-base text-gray-700 dark:text-gray-300 mb-2">
+                                            <FaFileAlt className="text-lg text-gray-500" />
+                                            <span className="text-sm">{data.file_extension || '—'}</span>
+                                        </div>
+                                        <div className="text-sm text-gray-600">Code: <span className="font-medium text-gray-900">{data.code || '—'}</span></div>
+                                    </div>
+                                </Card>
+                            </div>
+
+                            <div className="lg:col-span-2 space-y-6">
+                                <Card>
+                                    <div className="p-6">
+                                        <h4 className="text-lg font-semibold mb-3">Description</h4>
+                                        <p className="text-lg text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{data.description || '—'}</p>
+                                    </div>
+                                </Card>
+                            </div>
                         </div>
                     ) : (
                         <p className="mt-4 text-sm text-gray-600">No data found.</p>
