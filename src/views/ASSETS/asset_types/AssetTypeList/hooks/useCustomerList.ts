@@ -16,13 +16,19 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
-    const { data, error, isLoading } = useSWR(
+    // SWR fetcher
+    const { data, error, isLoading, mutate } = useSWR(
         ['/api/asset_types', { ...tableData, ...filterData }] as const,
-        ([, params]) => apiGetAssetType<GetCustomersListResponse, TableQueries>(transformPaginationParams(params)),
+        ([, params]) =>
+            apiGetAssetType<GetCustomersListResponse, TableQueries>(
+                transformPaginationParams(params)
+            ),
         { revalidateOnFocus: false }
     )
 
-    const customerList = data?.results?.map((customer: any, index: number) => ({
+    // Transform backend response into customer list
+    const customerList =
+        data?.results?.map((customer: any, index: number) => ({
             id: customer.id ?? index,
             name: customer.name,
             code: customer.code,
@@ -47,5 +53,6 @@ export default function useCustomerList() {
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
+        mutate, // ✅ expose mutate so components can call it
     }
 }

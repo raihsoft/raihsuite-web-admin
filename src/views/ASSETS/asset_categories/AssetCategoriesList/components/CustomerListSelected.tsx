@@ -10,12 +10,13 @@ import RichTextEditor from '@/components/shared/RichTextEditor'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
 import { TbChecks } from 'react-icons/tb'
+import { apiDeleteAssetCategory } from '@/services/CustomersService'
 
 const CustomerListSelected = () => {
     const {
         selectedCustomer,
         customerList,
-        mutate,
+        mutate, // ✅ now returned from useCustomerList
         customerListTotal,
         setSelectAllCustomer,
     } = useCustomerList()
@@ -32,20 +33,60 @@ const CustomerListSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = () => {
-        const newCustomerList = customerList.filter((customer) => {
-            return !selectedCustomer.some(
-                (selected) => selected.id === customer.id,
-            )
-        })
+    const handleConfirmDelete = async () => {
+        // Clear selection first
         setSelectAllCustomer([])
+
+        // Optimistic cache update
         mutate(
-            {
-                list: newCustomerList,
-                total: customerListTotal - selectedCustomer.length,
+            async (currentData) => {
+                const newResults =
+                    currentData?.results.filter(
+                        (customer) =>
+                            !selectedCustomer.some(
+                                (selected) => selected.id === customer.id,
+                            ),
+                    ) ?? []
+
+                return {
+                    results: newResults,
+                    count: (currentData?.count ?? 0) - selectedCustomer.length,
+                }
             },
-            false,
+            false // don't revalidate immediately
         )
+
+        try {
+            // Call delete API for each selected customer
+            await Promise.all(
+                selectedCustomer.map((customer) =>
+                    apiDeleteAssetCategory(customer.id)
+                )
+            )
+
+            // Revalidate with server after successful delete
+            mutate()
+
+            toast.push(
+                <Notification type="success">
+                    Customers deleted successfully!
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } catch (error) {
+            console.error('Delete failed:', error)
+
+            toast.push(
+                <Notification type="danger">
+                    Failed to delete customers. Please try again.
+                </Notification>,
+                { placement: 'top-center' }
+            )
+
+            // Revalidate to restore correct state
+            mutate()
+        }
+
         setDeleteConfirmationOpen(false)
     }
 
@@ -125,9 +166,8 @@ const CustomerListSelected = () => {
                 onConfirm={handleConfirmDelete}
             >
                 <p>
-                    {' '}
                     Are you sure you want to remove these customers? This action
-                    can&apos;t be undo.{' '}
+                    can&apos;t be undone.
                 </p>
             </ConfirmDialog>
             <Dialog
