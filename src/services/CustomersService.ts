@@ -1,6 +1,6 @@
 import { types } from 'util'
 import ApiService from './ApiService'
-
+import axios from 'axios'
 // Get employee list
 export async function apiGetEmployeeList<T, U extends Record<string, unknown>>(
     params: U,
@@ -368,29 +368,47 @@ export async function apiGetAssetType<T, U extends Record<string, unknown>>(para
 
 
 //asset-type-category
-export async function  apiGetAssetTypeCategory<T, U extends Record<string, unknown>>(params: U) {
+// src/services/CustomersService.ts
+import ApiService from '@/services/ApiService'
+
+/**
+ * Get list of asset type categories
+ */
+export async function apiGetAssetTypeCategory<T, U extends Record<string, unknown>>(params: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/asset/asset_type_categories/',
         method: 'get',
-        params,
-    })
-}
-export async function  apiCreateAssetTypeCategory<T, U extends Record<string, unknown>>(params: U) {
-    return ApiService.fetchDataWithAxios<T>({
-        url: '/asset/asset_type_categories/',
-        method: 'post',
-        params,
-    })
-}
-export async function  apiEditAssetTypeCategory<T, U extends Record<string, unknown>>(params: U) {
-    return ApiService.fetchDataWithAxios<T>({
-        url: '/asset/asset_type_categories/',
-        method: 'edit',
-        params,
+        params, // ✅ query params only for GET
     })
 }
 
-// Update asset type category by id
+/**
+ * Create a new asset type category
+ * Backend expects JSON body with { name, description, tenant }
+ */
+export async function apiCreateAssetTypeCategory<T, U extends Record<string, unknown>>(data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_type_categories/',
+        method: 'post',
+        data, // ✅ send as JSON body
+    })
+}
+
+/**
+ * Edit asset type category (full update)
+ * Use PUT if backend expects full replacement
+ */
+export async function apiEditAssetTypeCategory<T, U extends Record<string, unknown>>(id: string, data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_type_categories/${id}/`,
+        method: 'put', // ✅ use put instead of non-standard "edit"
+        data,
+    })
+}
+
+/**
+ * Update asset type category by id (partial update)
+ */
 export async function apiUpdateAssetTypeCategory<T, U extends Record<string, unknown>>(id: string, data: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: `/asset/asset_type_categories/${id}/`,
@@ -399,7 +417,9 @@ export async function apiUpdateAssetTypeCategory<T, U extends Record<string, unk
     })
 }
 
-// Delete asset type category by id
+/**
+ * Delete asset type category by id
+ */
 export async function apiDeleteAssetTypeCategory(id: string) {
     return ApiService.fetchDataWithAxios({
         url: `/asset/asset_type_categories/${id}/`,
@@ -407,7 +427,9 @@ export async function apiDeleteAssetTypeCategory(id: string) {
     })
 }
 
-// Get single asset type category by id
+/**
+ * Get single asset type category by id
+ */
 export async function apiGetAssetTypeCategoryById<T>(id: string) {
     return ApiService.fetchDataWithAxios<T>({
         url: `/asset/asset_type_categories/${id}/`,
@@ -415,4 +437,10 @@ export async function apiGetAssetTypeCategoryById<T>(id: string) {
     })
 }
 
+
+
+
+export const apiDeleteEnquiryById = async (id: string) => {
+  return axios.delete(`/api/enquiries/${id}`)
+}
 

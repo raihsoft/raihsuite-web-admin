@@ -209,7 +209,7 @@ const CustomerListTable = () => {
             setSelectAllCustomer([])
         }
     }
-console.log("customerList", customerList)
+
     return (
         <DataTable
             selectable
