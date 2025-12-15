@@ -15,9 +15,7 @@ import { apiDeleteAssetTypeCategory } from '@/services/CustomersService'
 const CustomerListSelected = () => {
     const {
         selectedCustomer,
-        customerList,
         mutate,
-        customerListTotal,
         setSelectAllCustomer,
     } = useCustomerList()
 
@@ -40,22 +38,11 @@ const CustomerListSelected = () => {
                 selectedCustomer.map((c) => apiDeleteAssetTypeCategory(c.id))
             )
 
-            // Update local state after successful delete
-            const newCustomerList = customerList.filter(
-                (customer) =>
-                    !selectedCustomer.some(
-                        (selected) => selected.id === customer.id,
-                    ),
-            )
-
+            // Clear selection
             setSelectAllCustomer([])
-            mutate(
-                {
-                    customers: newCustomerList,
-                    total: customerListTotal - selectedCustomer.length,
-                },
-                false,
-            )
+
+            // Let SWR re-fetch from backend
+            await mutate()
 
             toast.push(
                 <Notification type="success">
@@ -128,7 +115,7 @@ const CustomerListSelected = () => {
                                 >
                                     Delete
                                 </Button>
-                                <Button
+                                {/* <Button
                                     size="sm"
                                     variant="solid"
                                     onClick={() =>
@@ -136,7 +123,7 @@ const CustomerListSelected = () => {
                                     }
                                 >
                                     Message
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                     </div>
