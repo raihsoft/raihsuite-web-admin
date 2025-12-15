@@ -34,37 +34,42 @@ const CustomerListSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = async () => {
-        setIsDeleting(true)
-        try {
-            // Delete each selected customer
-            const deletePromises = selectedCustomer.map((customer) =>
-                apiDeleteEmployee(customer.id)
-            )
-            
-            await Promise.all(deletePromises)
-            
-            // Clear selections and refresh list
-            setSelectAllCustomer([])
-            toast.push(
-                <Notification type="success">
-                    {selectedCustomer.length} employee(s) deleted successfully!
-                </Notification>,
-                { placement: 'top-center' },
-            )
-        } catch (error) {
-            console.error('Delete error:', error)
-            toast.push(
-                <Notification type="danger">
-                    Failed to delete employee(s)
-                </Notification>,
-                { placement: 'top-center' },
-            )
-        } finally {
-            setIsDeleting(false)
-            setDeleteConfirmationOpen(false)
-        }
+   const handleConfirmDelete = async () => {
+    setIsDeleting(true)
+    try {
+        // Delete each selected customer
+        const deletePromises = selectedCustomer.map((customer) =>
+            apiDeleteEmployee(customer.id)
+        )
+        
+        await Promise.all(deletePromises)
+
+        // Clear selections
+        setSelectAllCustomer([])
+
+        // Refresh list (important!)
+        mutate()   // <-- this triggers re-fetch or revalidation
+
+        toast.push(
+            <Notification type="success">
+                {selectedCustomer.length} employee(s) deleted successfully!
+            </Notification>,
+            { placement: 'top-center' },
+        )
+    } catch (error) {
+        console.error('Delete error:', error)
+        toast.push(
+            <Notification type="danger">
+                Failed to delete employee(s)
+            </Notification>,
+            { placement: 'top-center' },
+        )
+    } finally {
+        setIsDeleting(false)
+        setDeleteConfirmationOpen(false)
     }
+    }
+
 
     const handleSend = () => {
         setSendMessageLoading(true)
@@ -120,7 +125,7 @@ const CustomerListSelected = () => {
                                 >
                                     Delete
                                 </Button>
-                                <Button
+                                {/* <Button
                                     size="sm"
                                     variant="solid"
                                     onClick={() =>
@@ -128,7 +133,7 @@ const CustomerListSelected = () => {
                                     }
                                 >
                                     Message
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                     </div>

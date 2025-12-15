@@ -183,6 +183,22 @@ export async function apiGetEnquiryById<T>(id: string) {
         method: 'get',
     })
 }
+// Delete single enquiry by id
+export async function apiDeleteEnquiry(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/crm/enquiries/${id}/`,
+        method: 'delete',
+    })
+}
+
+// Optional: bulk delete if your backend supports it
+export async function apiDeleteEnquiries(ids: string[]) {
+    return ApiService.fetchDataWithAxios({
+        url: `/crm/enquiries/bulk-delete/`,
+        method: 'post',
+        data: { ids },
+    })
+}
 
 // customer activity log
 export async function apiGetCustomerLog<T, U extends Record<string, unknown>>(params: U) {

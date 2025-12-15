@@ -19,13 +19,13 @@ export default function useCustomerList() {
     const swrKey = [
         '/api/enquiries',
         {
-            page: tableData.pageIndex,       // FIXED
-            pageSize: tableData.pageSize,    // FIXED
+            page: tableData.pageIndex,
+            pageSize: tableData.pageSize,
             ...filterData,
         },
     ] as const
 
-    const { data, error, isLoading } = useSWR(
+    const { data, error, isLoading, mutate } = useSWR(
         swrKey,
         ([, params]) =>
             apiGetEnquiries<GetCustomersListResponse, TableQueries>(params),
@@ -57,5 +57,6 @@ export default function useCustomerList() {
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
+        mutate, // <-- added
     }
 }

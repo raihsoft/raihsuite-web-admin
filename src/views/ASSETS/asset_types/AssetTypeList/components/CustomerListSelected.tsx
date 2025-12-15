@@ -10,7 +10,7 @@ import RichTextEditor from '@/components/shared/RichTextEditor'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
 import { TbChecks } from 'react-icons/tb'
-import { apiDeleteAssetType } from '@/services/CustomersService' // adjust import path if needed
+import { apiDeleteAssetType } from '@/services/CustomersService'
 
 const CustomerListSelected = () => {
     const {
@@ -19,7 +19,6 @@ const CustomerListSelected = () => {
         mutate,
         customerListTotal,
         setSelectAllCustomer,
-        refetch, // <-- make sure useCustomerList returns this from useQuery
     } = useCustomerList()
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
@@ -47,23 +46,7 @@ const CustomerListSelected = () => {
             setSelectAllCustomer([])
 
             // 3. Auto refresh the list from backend
-            if (typeof refetch === 'function') {
-                await refetch()
-            } else {
-                // fallback: update local cache
-                const newCustomerList = customerList.filter((customer) => {
-                    return !selectedCustomer.some(
-                        (selected) => selected.id === customer.id,
-                    )
-                })
-                mutate(
-                    {
-                        list: newCustomerList,
-                        total: customerListTotal - selectedCustomer.length,
-                    },
-                    false,
-                )
-            }
+            await mutate()
 
             toast.push(
                 <Notification type="success">
@@ -101,7 +84,7 @@ const CustomerListSelected = () => {
         <>
             {selectedCustomer.length > 0 && (
                 <StickyFooter
-                    className=" flex items-center justify-between py-4 bg-white dark:bg-gray-800"
+                    className="flex items-center justify-between py-4 bg-white dark:bg-gray-800"
                     stickyClass="-mx-4 sm:-mx-8 border-t border-gray-200 dark:border-gray-700 px-8"
                     defaultClass="container mx-auto px-8 rounded-xl border border-gray-200 dark:border-gray-600 mt-4"
                 >
@@ -136,7 +119,7 @@ const CustomerListSelected = () => {
                                 >
                                     Delete
                                 </Button>
-                                <Button
+                                {/* <Button
                                     size="sm"
                                     variant="solid"
                                     onClick={() =>
@@ -144,7 +127,7 @@ const CustomerListSelected = () => {
                                     }
                                 >
                                     Message
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                     </div>
