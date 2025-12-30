@@ -86,7 +86,7 @@ const CustomerEdit = () => {
             await mutate(['/api/asset_categories', { ...tableData, ...filterData }])
 
             // 5. Navigate
-            navigate('/assets-category')
+            navigate('/assetcategories')
 
         } catch (error) {
             console.error('❌ Error saving category:', error)

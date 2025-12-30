@@ -42,7 +42,7 @@ const CustomerEdit = () => {
                 <Notification type="success">Asset type created!</Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/asset-types')
+            navigate('/assettypes')
         } catch (err) {
             console.error(err)
             toast.push(

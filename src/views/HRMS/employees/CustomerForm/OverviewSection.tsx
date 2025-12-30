@@ -131,7 +131,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
       </FormItem>
       <div className="grid md:grid-cols-2 gap-4">
         <FormItem
-          label="Name"
+          label="organization"
           invalid={Boolean(errors.organization)}
           errorMessage={errors.organization?.message}
         >
