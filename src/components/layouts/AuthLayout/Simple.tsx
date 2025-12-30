@@ -9,7 +9,7 @@ interface SimpleProps extends CommonProps {
 
 const Simple = ({ children, content, ...rest }: SimpleProps) => {
     return (
-        <div className="h-full bg-white dark:bg-gray-800">
+        <div className="h-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:to-gray-800">
             <Container className="flex flex-col flex-auto items-center justify-center min-w-0 h-full">
                 <div className="min-w-[320px] md:min-w-[400px] max-w-[400px]">
                     <div>
