@@ -90,9 +90,44 @@ function AuthProvider({ children }: AuthProviderProps) {
             }
             // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         } catch (errors: any) {
+            // No response from server -> network error
+            if (!errors?.response) {
+                const msg = (errors?.code === 'ERR_NETWORK' || errors?.message?.toLowerCase()?.includes('network'))
+                    ? 'No internet connection'
+                    : errors?.message || 'Unable to sign in'
+                return {
+                    status: 'failed',
+                    message: msg,
+                }
+            }
+
+            const status = errors.response?.status
+            const respData = errors.response?.data
+            let dataMessage = ''
+
+            if (typeof respData === 'string') dataMessage = respData
+            else if (respData?.message) dataMessage = respData.message
+            else if (respData?.detail) dataMessage = respData.detail
+            else if (typeof respData === 'object') dataMessage = JSON.stringify(respData)
+
+            // 404 - user not found
+            if (status === 404 || /user not found/i.test(dataMessage)) {
+                return { status: 'failed', message: 'User not found' }
+            }
+
+            // 401 or explicit password error
+            if (status === 401 || /password/i.test(dataMessage) || /invalid credentials/i.test(dataMessage)) {
+                return { status: 'failed', message: 'Wrong password — please try again' }
+            }
+
+            // Server errors
+            if (status >= 500) {
+                return { status: 'failed', message: 'Server is not available. Please try again later.' }
+            }
+
             return {
                 status: 'failed',
-                message: errors?.response?.data?.message || errors.toString(),
+                message: dataMessage || errors.toString(),
             }
         }
     }
