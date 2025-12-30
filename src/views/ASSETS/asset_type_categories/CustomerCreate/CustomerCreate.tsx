@@ -43,7 +43,7 @@ const CustomerEdit = () => {
                 <Notification type="success">Category created!</Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/asset-type-categories')
+            navigate('/asset_type_categories')
         } catch (err: any) {
             console.error('Create failed:', err.response?.data || err.message)
             toast.push(

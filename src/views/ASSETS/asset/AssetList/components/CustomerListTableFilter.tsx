@@ -54,9 +54,9 @@ const CustomerListTableFilter = () => {
 
     return (
         <>
-            <Button icon={<TbFilter />} onClick={() => openDialog()}>
+            {/* <Button icon={<TbFilter />} onClick={() => openDialog()}>
                 Filter
-            </Button>
+            </Button> */}
             <Dialog
                 isOpen={dialogIsOpen}
                 onClose={onDialogClose}
