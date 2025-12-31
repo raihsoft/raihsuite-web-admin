@@ -4,8 +4,9 @@ import Button from '@/components/ui/Button'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import { apiGetEmployeeById, apiUpdateEmployee, apiDeleteEmployee } from '@/services/CustomersService'
+import { apiGetEventsList, apiDeleteParticipant } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
+import sleep from '@/utils/sleep'
 import NoUserFound from '@/assets/svg/NoUserFound'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -15,108 +16,90 @@ import type { Customer } from '../CustomerList/types'
 
 const CustomerEdit = () => {
     const { id } = useParams()
+
     const navigate = useNavigate()
 
-    const { data, isLoading, mutate } = useSWR(
-        id ? `/hrms/employees/${id}/` : null,
-        () => apiGetEmployeeById<Customer>(id as string),
+    const { data: resp, isLoading } = useSWR(
+        ['/api/events/participants', { id: id as string }],
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ([_, params]) => apiGetEventsList<any, { id: string }>(params),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
         },
     )
 
+    const data = resp?.list?.[0] ?? resp?.results?.[0] ?? resp ?? null
+
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [deleteLoading, setDeleteLoading] = useState(false)
+    const [isSubmiting, setIsSubmiting] = useState(false)
 
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        try {
-            setIsSubmitting(true)
-            // If img was changed to a File, send multipart/form-data
-            if (values.img && values.img instanceof File) {
-                const formData = new FormData()
-                formData.append('img', values.img)
-                // append other fields as strings
-                formData.append('name', values.name || '')
-                formData.append('designation', values.designation || '')
-                formData.append('email_link', values.email_link || '')
-                formData.append('organization', values.organization || '')
-                formData.append('facebook_link', values.facebook_link || '')
-                formData.append('instagram_link', values.instagram_link || '')
-                formData.append('youtube_link', values.youtube_link || '')
-                formData.append('linkedin_link', values.linkedin_link || '')
-                formData.append('website_link', values.website_link || '')
-
-                await import('@/services/ApiService').then((m) =>
-                    m.default.fetchDataWithAxios({ url: `/hrms/employees/${id}/`, method: 'patch', data: formData } as any),
-                )
-            } else {
-                await apiUpdateEmployee(id as string, values)
-            }
-
-            toast.push(<Notification type="success">Changes Saved!</Notification>, {
-                placement: 'top-center',
-            })
-            mutate() // refresh SWR data
-            navigate('/employees')
-        } catch (error) {
-            toast.push(<Notification type="danger">Update failed!</Notification>, {
-                placement: 'top-center',
-            })
-        } finally {
-            setIsSubmitting(false)
-        }
+        console.log('Submitted values', values)
+        setIsSubmiting(true)
+        await sleep(800)
+        setIsSubmiting(false)
+        toast.push(<Notification type="success">Changes Saved!</Notification>, {
+            placement: 'top-center',
+        })
+        // navigate('/concepts/customers/customer-list')
     }
 
     const getDefaultValues = () => {
-        if (!data) return {}
-        const {
-            name,
-            designation,
-            email_link,
-            organization,
-            facebook_link,
-            linkedin_link,
-            instagram_link,
-            youtube_link,
-            website_link,
-            img,
-        } = data
+        if (data) {
+            const { firstName, lastName, email, personalInfo, img } = data
 
-        return {
-            name,
-            designation,
-            email_link,
-            organization,
-            facebook_link,
-            linkedin_link,
-            instagram_link,
-            youtube_link,
-            website_link,
-            img,
-            tags: [],
+            return {
+                firstName,
+                lastName,
+                email,
+                img,
+                phoneNumber: personalInfo.phoneNumber,
+                dialCode: personalInfo.dialCode,
+                country: personalInfo.country,
+                address: personalInfo.address,
+                city: personalInfo.city,
+                postcode: personalInfo.postcode,
+                tags: [],
+            }
         }
+
+        return {}
     }
 
     const handleConfirmDelete = async () => {
+        if (!id) return
+        setDeleteLoading(true)
         try {
-            await apiDeleteEmployee(id as string)
-            toast.push(<Notification type="success">Employee deleted!</Notification>, {
-                placement: 'top-center',
-            })
-            navigate('/employees')
-        } catch (error) {
-            toast.push(<Notification type="danger">Delete failed!</Notification>, {
-                placement: 'top-center',
-            })
+            await apiDeleteParticipant(id as string)
+            toast.push(
+                <Notification type="success">Participant deleted!</Notification>,
+                { placement: 'top-center' },
+            )
+            navigate('/participants')
+        } catch (err) {
+            toast.push(
+                <Notification type="danger">Failed to delete participant</Notification>,
+                { placement: 'top-center' },
+            )
         } finally {
+            setDeleteLoading(false)
             setDeleteConfirmationOpen(false)
         }
     }
 
-    const handleDelete = () => setDeleteConfirmationOpen(true)
-    const handleCancel = () => setDeleteConfirmationOpen(false)
-    const handleBack = () => navigate(-1)
+    const handleDelete = () => {
+        setDeleteConfirmationOpen(true)
+    }
+
+    const handleCancel = () => {
+        setDeleteConfirmationOpen(false)
+    }
+
+    const handleBack = () => {
+        history.back()
+    }
 
     return (
         <>
@@ -129,13 +112,14 @@ const CustomerEdit = () => {
             {!isLoading && data && (
                 <>
                     <CustomerForm
-                        defaultValues={getDefaultValues() as unknown as CustomerFormSchema}
+                        defaultValues={getDefaultValues() as CustomerFormSchema}
                         newCustomer={false}
                         onFormSubmit={handleFormSubmit}
                     >
                         <Container>
                             <div className="flex items-center justify-between px-8">
                                 <Button
+                                    className="ltr:mr-3 rtl:ml-3"
                                     type="button"
                                     variant="plain"
                                     icon={<TbArrowNarrowLeft />}
@@ -145,6 +129,7 @@ const CustomerEdit = () => {
                                 </Button>
                                 <div className="flex items-center">
                                     <Button
+                                        className="ltr:mr-3 rtl:ml-3"
                                         type="button"
                                         customColorClass={() =>
                                             'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error bg-transparent'
@@ -155,10 +140,9 @@ const CustomerEdit = () => {
                                         Delete
                                     </Button>
                                     <Button
-                                        style={{marginLeft:"10px"}}
                                         variant="solid"
                                         type="submit"
-                                        loading={isSubmitting}
+                                        loading={isSubmiting}
                                     >
                                         Save
                                     </Button>
@@ -169,13 +153,17 @@ const CustomerEdit = () => {
                     <ConfirmDialog
                         isOpen={deleteConfirmationOpen}
                         type="danger"
-                        title="Remove Employee"
+                        title="Remove participant"
                         onClose={handleCancel}
                         onRequestClose={handleCancel}
                         onCancel={handleCancel}
                         onConfirm={handleConfirmDelete}
+                        confirmButtonProps={{ loading: deleteLoading }}
                     >
-                        <p>Are you sure you want to remove this employee? This action can&apos;t be undone.</p>
+                        <p>
+                            Are you sure you want to remove this customer? This
+                            action can&apos;t be undo.{' '}
+                        </p>
                     </ConfirmDialog>
                 </>
             )}

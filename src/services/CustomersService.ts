@@ -386,6 +386,7 @@ export async function apiGetAssetType<T, U extends Record<string, unknown>>(para
 //asset-type-category
 // src/services/CustomersService.ts
 import ApiService from '@/services/ApiService'
+import { Events } from 'react-scroll'
 
 /**
  * Get list of asset type categories
@@ -459,4 +460,27 @@ export async function apiGetAssetTypeCategoryById<T>(id: string) {
 export const apiDeleteEnquiryById = async (id: string) => {
   return axios.delete(`/api/enquiries/${id}`)
 }
+
+
+
+// Events
+
+export async function apiGetEventsList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/participants/',
+        method: 'get',
+        params,
+    })
+}
+
+// Delete participant by id
+export async function apiDeleteParticipant(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/events/participants/${id}/`,
+        method: 'delete',
+    })
+}
+
 

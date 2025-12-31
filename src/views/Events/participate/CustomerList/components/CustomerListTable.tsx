@@ -32,10 +32,17 @@ const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string 
         )
     }
     
+    const displayName = row.name || `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim()
+
     return (
-        <span className="font-semibold text-gray-900 dark:text-gray-100">
-            {highlightMatch(row.name, searchQuery)}
-        </span>
+        <div className="flex items-center">
+            <Link
+                className={`hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100`}
+                to={`/participants/${row.id}`}
+            >
+                {highlightMatch(displayName, searchQuery)}
+            </Link>
+        </div>
     )
 }
 
@@ -48,7 +55,7 @@ const ActionColumn = ({
 }) => {
     return (
         <div className="flex items-center gap-3">
-            <Tooltip title="Edit">
+            {/* <Tooltip title="Edit">
                 <div
                     className={`text-xl cursor-pointer select-none font-semibold`}
                     role="button"
@@ -56,7 +63,7 @@ const ActionColumn = ({
                 >
                     <TbPencil />
                 </div>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip title="View">
                 <div
                     className={`text-xl cursor-pointer select-none font-semibold`}
@@ -84,21 +91,30 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
+    const handleEdit = (customer: Customer) => {
+        navigate(`/participants/edit/${customer.id}`)
+    }
+
+    const handleViewDetails = (customer: Customer) => {
+        navigate(`/participants/${customer.id}`)
+    }
+
     // Filter and sort list - show only matches, with exact matches first
     const filteredAndSortedList = useMemo(() => {
         const query = (tableData.query as string || '').toLowerCase().trim()
         
         if (!query || query.length === 0) return customerList
         
-        // Filter to only include matching names
-        const filtered = customerList.filter((customer: Customer) =>
-            customer.name.toLowerCase().includes(query)
+        // Filter to include matching names or email
+        const filtered = customerList.filter(customer =>
+            (customer.name || '').toLowerCase().includes(query) ||
+            (customer.email || '').toLowerCase().includes(query)
         )
         
         // Sort to put exact/partial matches first
-        return filtered.sort((a: Customer, b: Customer) => {
-            const aName = a.name.toLowerCase()
-            const bName = b.name.toLowerCase()
+        return filtered.sort((a, b) => {
+            const aName = (a.name || '').toLowerCase()
+            const bName = (b.name || '').toLowerCase()
             
             // Exact match comes first
             if (aName === query) return -1
@@ -112,72 +128,42 @@ const CustomerListTable = () => {
         })
     }, [customerList, tableData.query])
 
-    const handleEdit = (customer: Customer) => {
-        navigate(`/employee-edit/${customer.id}`)
-    }
-
-
-    const handleViewDetails = (customer: Customer) => {
-        navigate(`/employee-details/${customer.id}`)
-    }
-
     const columns: ColumnDef<Customer>[] = useMemo(
         () => [
-               {
-                // header: 'Photo',
-                accessorKey: 'img',
-                cell: (props) => (
-                    <Link to={`/employee-details/${props.row.original.id}`}>
-                        <Avatar size={40} shape="circle" src={props.row.original.img} />
-                    </Link>
-                ),
+            // {
+            //     header: 'Name',
+            //     accessorKey: 'name',
+            //     cell: (props) => {
+            //         const row = props.row.original
+            //         return <NameColumn row={row} searchQuery={tableData.query as string} />
+            //     },
+            // },
 
+            {
+                header: 'first_name',
+                accessorKey: 'firstName',
             },
             {
-                header: 'Name',
-                accessorKey: 'name',
-                cell: (props) => (
-                    <NameColumn
-                        row={props.row.original}
-                        searchQuery={tableData.query as string}
-                    />
-                ),
+                header: 'last_name',
+                accessorKey: 'lastName',
             },
+
             {
                 header: 'Email',
                 accessorKey: 'email',
             },
-         
             {
-                header: 'Designation',
-                accessorKey: 'designation',
-
-            },
-             { 
-                header: 'organization',
-                accessorKey: 'organization',
-
-            },
-              {
-                header: 'Facebook',
-                accessorKey: 'facebook',
-
-            },
-             {
-                header: 'Instagram',
-                accessorKey: 'instagram',
-
-            },
-           
-            {
-                header: 'LinkedIn',
-                accessorKey: 'linkedin',
-
+                header: 'Phone',
+                accessorKey: 'phone',
             },
             {
-                header: 'Website',
-                accessorKey: 'website',
-
+                header: 'Place',
+                accessorKey: 'place',
+            },
+            {
+                header: 'Referenced By',
+                accessorKey: 'referencedBy',
+                cell: (props) => <span>{props.row.original.referencedBy}</span>,
             },
             {
                 header: '',
@@ -191,13 +177,6 @@ const CustomerListTable = () => {
                     />
                 ),
             },
-            
-            
-           
-           
-            
-           
-            
         ],
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [],
@@ -241,14 +220,14 @@ const CustomerListTable = () => {
             setSelectAllCustomer([])
         }
     }
-console.log("customerList", customerList)
+
     return (
         <DataTable
             selectable
             columns={columns}
             data={filteredAndSortedList}
             noData={!isLoading && filteredAndSortedList.length === 0}
-            skeletonAvatarColumns={[2]}
+            skeletonAvatarColumns={[0]}
             skeletonAvatarProps={{ width: 28, height: 28 }}
             loading={isLoading}
             pagingData={{

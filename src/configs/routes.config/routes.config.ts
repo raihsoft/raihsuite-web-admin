@@ -10,7 +10,7 @@ import assetsRoute from './assetsRoute'
 import assetsCategoryRoute from './AssetCategoryRoute'
 import assettypes from './AssetTypeRoute'
 import assetTypeCategories from './AssetTypeCategoriesRoute'
-
+import participantsRoute from './ParticipantsRoute'
 
 export const publicRoutes: Routes = [...authRoute]
 
@@ -132,10 +132,19 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
 
+        {
+        key: 'Delivery',
+        path: '/delivery',
+        component: lazy(
+            () => import('@/views/ORDER/delivery/CustomerList'),
+        ),
+        authority: [],
+    },
+
     
     
 
-    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories
+    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute
 
 ]
 

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import Card from '@/components/ui/Card'
 import Avatar from '@/components/ui/Avatar'
 import Upload from '@/components/ui/Upload'
@@ -10,6 +11,8 @@ import type { FormSectionBaseProps } from './types'
 type ProfileImageSectionProps = FormSectionBaseProps
 
 const ProfileImage = ({ control }: ProfileImageSectionProps) => {
+    const [preview, setPreview] = useState<string | null>(null)
+
     const beforeUpload = (files: FileList | null) => {
         let valid: string | boolean = true
 
@@ -25,6 +28,12 @@ const ProfileImage = ({ control }: ProfileImageSectionProps) => {
         return valid
     }
 
+    useEffect(() => {
+        return () => {
+            if (preview) URL.revokeObjectURL(preview)
+        }
+    }, [preview])
+
     return (
         <Card>
             <h4 className="mb-6">Image</h4>
@@ -33,46 +42,52 @@ const ProfileImage = ({ control }: ProfileImageSectionProps) => {
                     <Controller
                         name="img"
                         control={control}
-                        render={({ field }) => (
-                            <>
-                                <div className="flex items-center justify-center">
-                                    {field.value ? (
-                                        <Avatar
-                                            size={100}
-                                            className="border-4 border-white bg-gray-100 text-gray-300 shadow-lg"
-                                            icon={<HiOutlineUser />}
-                                            src={field.value}
-                                        />
-                                    ) : (
-                                        <DoubleSidedImage
-                                            src="/img/others/upload.png"
-                                            darkModeSrc="/img/others/upload-dark.png"
-                                            alt="Upload image"
-                                        />
-                                    )}
-                                </div>
-                                <Upload
-                                    showList={false}
-                                    uploadLimit={1}
-                                    beforeUpload={beforeUpload}
-                                    onChange={(files) => {
-                                        if (files.length > 0) {
-                                            field.onChange(
-                                                URL.createObjectURL(files[0]),
-                                            )
-                                        }
-                                    }}
-                                >
-                                    <Button
-                                        variant="solid"
-                                        className="mt-4"
-                                        type="button"
+                        render={({ field }) => {
+                            const current = field.value
+                            const src = typeof current === 'string' ? current : preview
+
+                            return (
+                                <>
+                                    <div className="flex items-center justify-center">
+                                        {src ? (
+                                            <Avatar
+                                                size={100}
+                                                className="border-4 border-white bg-gray-100 text-gray-300 shadow-lg"
+                                                icon={<HiOutlineUser />}
+                                                src={src}
+                                            />
+                                        ) : (
+                                            <DoubleSidedImage
+                                                src="/img/others/upload.png"
+                                                darkModeSrc="/img/others/upload-dark.png"
+                                                alt="Upload image"
+                                            />
+                                        )}
+                                    </div>
+                                    <Upload
+                                        showList={false}
+                                        uploadLimit={1}
+                                        beforeUpload={beforeUpload}
+                                        onChange={(files) => {
+                                            if (files.length > 0) {
+                                                const file = files[0]
+                                                const url = URL.createObjectURL(file)
+                                                setPreview(url)
+                                                field.onChange(file)
+                                            }
+                                        }}
                                     >
-                                        Upload Image
-                                    </Button>
-                                </Upload>
-                            </>
-                        )}
+                                        <Button
+                                            variant="solid"
+                                            className="mt-4"
+                                            type="button"
+                                        >
+                                            Upload Image
+                                        </Button>
+                                    </Upload>
+                                </>
+                            )
+                        }}
                     />
                 </div>
             </div>

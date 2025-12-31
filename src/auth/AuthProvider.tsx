@@ -1,10 +1,11 @@
-import { useRef, useImperativeHandle } from 'react'
+import { useRef, useImperativeHandle, useEffect } from 'react'
 import AuthContext from './AuthContext'
 import appConfig from '@/configs/app.config'
 import { useSessionUser, useToken } from '@/store/authStore'
 import { apiSignIn, apiSignOut, apiSignUp } from '@/services/AuthService'
 import { REDIRECT_URL_KEY } from '@/constants/app.constant'
 import { useNavigate } from 'react-router-dom'
+import { mutate } from 'swr'
 import type {
     SignInCredential,
     SignUpCredential,
@@ -70,6 +71,24 @@ function AuthProvider({ children }: AuthProviderProps) {
         setToken('')
         setUser({})
         setSessionSignedIn(false)
+
+        // Remove tokens from localStorage so other tabs see the change
+        try {
+            localStorage.removeItem('access_token')
+            localStorage.removeItem('refresh_token')
+        } catch (e) {
+            // ignore
+        }
+
+        // Clear SWR cache / revalidate to avoid showing stale data
+        // best-effort: call mutate() to revalidate all keys
+        try {
+            // calling mutate without key triggers internal revalidation logic in some setups
+            // if your SWR version doesn't support this, consider targetting specific keys
+            mutate()
+        } catch (e) {
+            // ignore
+        }
     }
 
     const signIn = async (values: SignInCredential): AuthResult => {
@@ -172,6 +191,28 @@ function AuthProvider({ children }: AuthProviderProps) {
             redirect,
         })
     }
+
+    // -----------------------------------------------------------
+    // Cross-tab sign-out: when tokens are removed in another tab,
+    // respond by clearing session state and redirecting to login.
+    // -----------------------------------------------------------
+    useEffect(() => {
+        const onStorage = (e: StorageEvent) => {
+            if (!e.key) return
+
+            const watched = e.key === 'access_token' || e.key === 'refresh_token'
+            if (!watched) return
+
+            // If token was removed or cleared in another tab, sign out locally
+            if (e.newValue === null || e.newValue === '') {
+                handleSignOut()
+                navigatorRef.current?.navigate(appConfig.unAuthenticatedEntryPath)
+            }
+        }
+
+        window.addEventListener('storage', onStorage)
+        return () => window.removeEventListener('storage', onStorage)
+    }, [])
 
     return (
         <AuthContext.Provider
