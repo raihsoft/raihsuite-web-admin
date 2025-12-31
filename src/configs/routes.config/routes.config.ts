@@ -11,6 +11,8 @@ import assetsCategoryRoute from './AssetCategoryRoute'
 import assettypes from './AssetTypeRoute'
 import assetTypeCategories from './AssetTypeCategoriesRoute'
 import participantsRoute from './ParticipantsRoute'
+import eventsRoute from './EventsRoute'
+import EventsRoute from './EventsRoute'
 
 export const publicRoutes: Routes = [...authRoute]
 
@@ -144,7 +146,7 @@ export const protectedRoutes: Routes = [
     
     
 
-    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute
+    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute,...EventsRoute
 
 ]
 

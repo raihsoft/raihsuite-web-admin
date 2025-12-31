@@ -6,6 +6,7 @@ import toast from '@/components/ui/toast'
 import CustomerForm from '../CustomerForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import sleep from '@/utils/sleep'
+import { apiCreateParticipant } from '@/services/CustomersService'
 import { TbTrash } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 import type { CustomerFormSchema } from '../CustomerForm'
@@ -18,15 +19,34 @@ const CustomerEdit = () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
 
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        console.log('Submitted values', values)
         setIsSubmiting(true)
-        await sleep(800)
-        setIsSubmiting(false)
-        toast.push(
-            <Notification type="success">Customer created!</Notification>,
-            { placement: 'top-center' },
-        )
-        navigate('/concepts/customers/customer-list')
+        try {
+            // map form values to API payload as needed
+            const payload = {
+                first_name: values.firstName,
+                last_name: values.lastName,
+                email: values.email,
+                phone: values.phone,
+                event: values.event,
+                place: values.place,
+                referenced_by: values.referencedBy,
+            }
+
+            await apiCreateParticipant(payload)
+
+            toast.push(
+                <Notification type="success">Participant created!</Notification>,
+                { placement: 'top-center' },
+            )
+            navigate('/participants')
+        } catch (err) {
+            toast.push(
+                <Notification type="danger">Failed to create participant</Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setIsSubmiting(false)
+        }
     }
 
     const handleConfirmDiscard = () => {
@@ -35,7 +55,7 @@ const CustomerEdit = () => {
             <Notification type="success">Customer discardd!</Notification>,
             { placement: 'top-center' },
         )
-        navigate('/concepts/customers/customer-list')
+        navigate('/participants')
     }
 
     const handleDiscard = () => {
@@ -54,14 +74,10 @@ const CustomerEdit = () => {
                     firstName: '',
                     lastName: '',
                     email: '',
-                    img: '',
-                    phoneNumber: '',
-                    dialCode: '',
-                    country: '',
-                    address: '',
-                    city: '',
-                    postcode: '',
-                    tags: [],
+                    phone: '',
+                    event: '',
+                    place: '',
+                    referencedBy: '',
                 }}
                 onFormSubmit={handleFormSubmit}
             >

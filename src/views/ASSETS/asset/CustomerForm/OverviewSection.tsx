@@ -72,7 +72,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
     return (
         <Card>
-            <h4 className="mb-6">Edit Assets</h4>
+            <h4 className="mb-6"> Assets</h4>
 
             {/* 🔹 Title & File Type */}
             <div className="grid md:grid-cols-2 gap-4">
