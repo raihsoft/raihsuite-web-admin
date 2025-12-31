@@ -1,18 +1,12 @@
 import type { Control, FieldErrors } from 'react-hook-form'
 
 export type OverviewFields = {
-    name: string
-    email_link: string
-    designation: string
-    organization: string
-   facebook_link: string
-   instagram_link: string
-   youtube_link: string
-   linkedin_link: string
-    phone: string
-    website_link: string
-    img: string | File
-    tenant: string
+    firstName: string
+    lastName: string
+    email: string
+    dialCode: string
+    phoneNumber: string
+    img: string
 }
 
 export type AddressFields = {
@@ -23,7 +17,7 @@ export type AddressFields = {
 }
 
 export type ProfileImageFields = {
-    img: string | File
+    img: string
 }
 
 export type TagsFields = {

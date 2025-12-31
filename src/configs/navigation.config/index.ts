@@ -205,6 +205,28 @@ const navigationConfig: NavigationTree[] = [
             },
         ],
     },
+        {
+        key: 'participate',
+        path: '',
+        title: 'Events',
+        translateKey: 'nav.eventmanagement.title',
+        icon: 'eventsIcon',
+        type: NAV_ITEM_TYPE_COLLAPSE,
+        authority: [],
+        subMenu: [
+            {
+                key: 'participate',
+                path: '/participants',
+                title: 'Participants',
+                translateKey: 'nav.participate.item1',
+                icon: 'MdEvent',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
+        ],
+    },
+
 ]
 
 export default navigationConfig

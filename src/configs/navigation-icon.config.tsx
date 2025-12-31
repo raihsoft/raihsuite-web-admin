@@ -11,9 +11,11 @@ import { LiaAddressBook } from "react-icons/lia";
 import { LiaBandcamp } from "react-icons/lia";
 import { CgBrowse } from "react-icons/cg";
 import { BiPackage } from "react-icons/bi";
-import { BsFillPersonLinesFill } from "react-icons/bs";
-import { BsPersonCheck } from "react-icons/bs";
+import { MdEvent } from "react-icons/md";
+
+
 import type { JSX } from 'react'
+import { BsPersonCheck } from 'react-icons/bs';
 
 export type NavigationIcons = Record<string, JSX.Element>
 
@@ -30,6 +32,7 @@ const navigationIcon: NavigationIcons = {
     contactsIcon:  <span><LiaBandcamp /></span>,
     boxIcon:  <span><LiaAddressBook /></span>,
     orderIcon: <span><BiPackage /></span>,
+    eventsIcon: <span><MdEvent /></span>,
     employeesEdit: <span><CgBrowse /></span>,
 }
 
