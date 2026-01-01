@@ -384,9 +384,6 @@ export async function apiGetAssetType<T, U extends Record<string, unknown>>(para
 
 
 //asset-type-category
-// src/services/CustomersService.ts
-import ApiService from '@/services/ApiService'
-import { Events } from 'react-scroll'
 
 /**
  * Get list of asset type categories
@@ -398,6 +395,18 @@ export async function apiGetAssetTypeCategory<T, U extends Record<string, unknow
         params, // ✅ query params only for GET
     })
 }
+
+/**
+ * Get tenant memberships for the current user
+ * Endpoint: /tenants/tenant_memberships/
+ */
+export async function apiGetTenantMemberships<T, U extends Record<string, unknown>>(params?: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/tenants/tenant_memberships/',
+        method: 'get',
+        params,
+    })
+} 
 
 /**
  * Create a new asset type category
@@ -475,11 +484,75 @@ export async function apiGetEventsList<T, U extends Record<string, unknown>>(
     })
 }
 
+// Create participant
+export async function apiCreateParticipant<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/participants/',
+        method: 'post',
+        data,
+    })
+}
+
 // Delete participant by id
 export async function apiDeleteParticipant(id: string) {
     return ApiService.fetchDataWithAxios({
         url: `/events/participants/${id}/`,
         method: 'delete',
+    })
+}
+
+// Get events list
+export async function apiGetEvents<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/events/',
+        method: 'get',
+        params,
+    })
+}
+
+// Create event
+export async function apiCreateEvent<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/events/',
+        method: 'post',
+        data,
+    })
+}
+
+// Update event
+export async function apiUpdateEvent<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/events/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+// Delete event
+export async function apiDeleteEvent(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/events/events/${id}/`,
+        method: 'delete',
+    })
+}
+
+
+// import ApiService from './ApiService'
+
+// services/CustomersService.ts
+export async function apiGetTenantById<T, U = Record<string, unknown>>(id: number) {
+    return ApiService.fetchDataWithAxios<T, U>({
+        url: `/tenants/tenants/${id}/`,
+        method: 'get',
     })
 }
 

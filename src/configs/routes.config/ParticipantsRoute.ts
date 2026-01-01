@@ -9,6 +9,20 @@ const participantsRoute: Routes = [
         authority: [],
     },
     {
+        key: 'participantCreate',
+        path: '/participants/create',
+        component: lazy(() => import('@/views/Events/participate/CustomerCreate')),
+        authority: [],
+        meta: {
+            header: {
+                title: 'Create Participant',
+                description: 'Create a new participant.',
+                contained: true,
+            },
+            footer: false,
+        },
+    },
+    {
         key: 'participantDetails',
         path: '/participants/:id',
         component: lazy(() => import('@/views/Events/participate/CustomerDetails')),

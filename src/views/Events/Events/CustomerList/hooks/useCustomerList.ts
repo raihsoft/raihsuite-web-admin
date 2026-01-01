@@ -48,7 +48,6 @@ export default function useCustomerList() {
             email: item.email || item.participant_email || '',
             phone: item.phone || item.phone_number || item.contact_number || '',
             place: item.place || '',
-            event_title: item.event_title || '',
             referencedBy: item.referenced_by ?? item.referred_by ?? item.referencedBy ?? '',
 
         }),

@@ -50,7 +50,6 @@ export type Filter = {
 }
 
 export type Customer = {
-    event_title: ReactI18NextChildren | Iterable<ReactI18NextChildren>
     id: string
     name: string
     firstName: string

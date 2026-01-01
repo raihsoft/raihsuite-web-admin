@@ -31,17 +31,32 @@ const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string 
             )
         )
     }
-    
+
     const displayName = row.name || `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim()
+
+    const initials = (row.name || `${row.firstName ?? ''} ${row.lastName ?? ''}`)
+        .split(' ')
+        .map((s) => s.charAt(0))
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
 
     return (
         <div className="flex items-center">
-            <Link
-                className={`hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100`}
-                to={`/participants/${row.id}`}
-            >
-                {highlightMatch(displayName, searchQuery)}
-            </Link>
+            <Avatar className="!w-9 !h-9" alt={displayName}>
+                {initials}
+            </Avatar>
+            <div className="ml-3">
+                <Link
+                    className={`hover:text-primary font-semibold text-gray-900 dark:text-gray-100`}
+                    to={`/participants/${row.id}`}
+                >
+                    {highlightMatch(displayName, searchQuery)}
+                </Link>
+                {row.email && (
+                    <div className="text-sm text-gray-500">{row.email}</div>
+                )}
+            </div>
         </div>
     )
 }
@@ -105,14 +120,13 @@ const CustomerListTable = () => {
         
         if (!query || query.length === 0) return customerList
         
-        // Filter to include matching names, email, or event title
+        // Filter to include matching names or email
         const filtered = customerList.filter(customer =>
             (customer.name || '').toLowerCase().includes(query) ||
-            (customer.email || '').toLowerCase().includes(query) ||
-            (customer.event_title || '').toLowerCase().includes(query)
+            (customer.email || '').toLowerCase().includes(query)
         )
         
-        // Sort to put exact/partial matches first (by name)
+        // Sort to put exact/partial matches first
         return filtered.sort((a, b) => {
             const aName = (a.name || '').toLowerCase()
             const bName = (b.name || '').toLowerCase()
@@ -131,43 +145,37 @@ const CustomerListTable = () => {
 
     const columns: ColumnDef<Customer>[] = useMemo(
         () => [
-            // {
-            //     header: 'Name',
-            //     accessorKey: 'name',
-            //     cell: (props) => {
-            //         const row = props.row.original
-            //         return <NameColumn row={row} searchQuery={tableData.query as string} />
-            //     },
-            // },
             {
-                header: 'First Name',
-                accessorKey: 'firstName',
-            },
-            {
-                header: 'Last Name',
-                accessorKey: 'lastName',
-            },
-            {
-                header: 'Email',
-                accessorKey: 'email',
-            },
-            {
-                header: 'Phone',
-                accessorKey: 'phone',
+                header: 'Name',
+                accessorKey: 'name',
+                cell: (props) => {
+                    const row = props.row.original
+                    return <NameColumn row={row} searchQuery={tableData.query as string} />
+                },
             },
             {
                 header: 'Place',
                 accessorKey: 'place',
             },
             {
-                header: 'Event ',      // <-- New column
-                accessorKey: 'event_title',
-                cell: (props) => <span>{props.row.original.event_title}</span>,
-            },
-            {
                 header: 'Referenced By',
                 accessorKey: 'referencedBy',
-                cell: (props) => <span>{props.row.original.referencedBy}</span>,
+                cell: (props) => (
+                    <Tag className="uppercase text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                        {props.row.original.referencedBy || '—'}
+                    </Tag>
+                ),
+            },
+            {
+                header: 'Email',
+                accessorKey: 'email',
+                cell: (props) => (
+                    <div className="text-sm text-gray-500">{props.row.original.email}</div>
+                ),
+            },
+            {
+                header: 'Phone',
+                accessorKey: 'phone',
             },
             {
                 header: '',
