@@ -1,12 +1,39 @@
+import { useEffect, useState } from 'react'
 import Card from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
 import { FormItem } from '@/components/ui/Form'
 import { Controller } from 'react-hook-form'
 import type { FormSectionBaseProps } from './types'
-
+import { apiGetEvents } from '@/services/CustomersService'
 type OverviewSectionProps = FormSectionBaseProps
 
 const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
+    const [events, setEvents] = useState<{ value: string; label: string }[]>([])
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        let mounted = true
+        const fetchEvents = async () => {
+            setLoading(true)
+            try {
+                const data = await apiGetEvents<any, {}>({})
+                const list = data?.results ?? data?.list ?? data ?? []
+                const options = (list || []).map((e: any) => ({ value: String(e.id), label: e.name || e.title || e.slug || String(e.id) }))
+                if (mounted) setEvents(options)
+            } catch (err) {
+                // eslint-disable-next-line no-console
+                console.error('Failed to load events', err)
+            } finally {
+                if (mounted) setLoading(false)
+            }
+        }
+        fetchEvents()
+        return () => {
+            mounted = false
+        }
+    }, [])
+
     return (
         <Card>
             {/* <h4 className="mb-6">Overview</h4> */}
@@ -85,7 +112,14 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                         name="event"
                         control={control}
                         render={({ field }) => (
-                            <Input type="text" autoComplete="off" placeholder="Event" {...field} />
+                            <Select
+                                options={events}
+                                placeholder="Select event"
+                                isClearable={false}
+                                value={events.filter((option) => option.value === field.value)}
+                                onChange={(option) => field.onChange(option?.value)}
+                                isLoading={loading}
+                            />
                         )}
                     />
                 </FormItem>

@@ -39,11 +39,25 @@ const CustomerEdit = () => {
                 { placement: 'top-center' },
             )
             navigate('/participants')
-        } catch (err) {
-            toast.push(
-                <Notification type="danger">Failed to create participant</Notification>,
-                { placement: 'top-center' },
-            )
+        } catch (err: any) {
+            // If server returned validation errors, show them
+            const data = err?.response?.data
+            if (data && typeof data === 'object') {
+                const messages = Object.entries(data)
+                    .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+                    .join(' \n')
+                toast.push(
+                    <Notification type="danger">Failed to create participant: {messages}</Notification>,
+                    { placement: 'top-center' },
+                )
+            } else {
+                toast.push(
+                    <Notification type="danger">Failed to create participant</Notification>,
+                    { placement: 'top-center' },
+                )
+            }
+            // eslint-disable-next-line no-console
+            console.error(err)
         } finally {
             setIsSubmiting(false)
         }

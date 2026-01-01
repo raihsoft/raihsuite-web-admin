@@ -27,6 +27,7 @@ const validationSchema: ZodType<CustomerFormSchema> = z.object({
         .email({ message: 'Invalid email' }),
     phone: z.string().min(1, { message: 'Phone required' }),
     event: z.string().min(1, { message: 'Event required' }),
+    place: z.string().min(1, { message: 'Place required' }),
 })
 
 const CustomerForm = (props: CustomerFormProps) => {

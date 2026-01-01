@@ -105,13 +105,14 @@ const CustomerListTable = () => {
         
         if (!query || query.length === 0) return customerList
         
-        // Filter to include matching names or email
+        // Filter to include matching names, email, or event title
         const filtered = customerList.filter(customer =>
             (customer.name || '').toLowerCase().includes(query) ||
-            (customer.email || '').toLowerCase().includes(query)
+            (customer.email || '').toLowerCase().includes(query) ||
+            (customer.event_title || '').toLowerCase().includes(query)
         )
         
-        // Sort to put exact/partial matches first
+        // Sort to put exact/partial matches first (by name)
         return filtered.sort((a, b) => {
             const aName = (a.name || '').toLowerCase()
             const bName = (b.name || '').toLowerCase()
@@ -138,16 +139,14 @@ const CustomerListTable = () => {
             //         return <NameColumn row={row} searchQuery={tableData.query as string} />
             //     },
             // },
-
             {
-                header: 'first_name',
+                header: 'First Name',
                 accessorKey: 'firstName',
             },
             {
-                header: 'last_name',
+                header: 'Last Name',
                 accessorKey: 'lastName',
             },
-
             {
                 header: 'Email',
                 accessorKey: 'email',
@@ -159,6 +158,11 @@ const CustomerListTable = () => {
             {
                 header: 'Place',
                 accessorKey: 'place',
+            },
+            {
+                header: 'Event ',      // <-- New column
+                accessorKey: 'event_title',
+                cell: (props) => <span>{props.row.original.event_title}</span>,
             },
             {
                 header: 'Referenced By',
