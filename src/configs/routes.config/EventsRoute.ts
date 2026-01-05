@@ -9,7 +9,7 @@ const EventsRoute: Routes = [
         authority: [],
         meta: {
             header: {
-                title: 'Events',
+                title: '',
                 description: 'Events overview.',
                 contained: true,
             },

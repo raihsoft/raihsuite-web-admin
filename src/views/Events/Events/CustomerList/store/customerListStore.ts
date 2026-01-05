@@ -12,7 +12,7 @@ export const initialTableData: TableQueries = {
     },
 }
 
-export const initialFilterData = {
+export const initialFilterData: Filter = {
     purchasedProducts: '',
     purchaseChannel: [
         'Retail Stores',
@@ -23,48 +23,50 @@ export const initialFilterData = {
     ],
 }
 
-export type CustomersListState = {
+type CustomersListState = {
     tableData: TableQueries
     filterData: Filter
-    selectedCustomer: Partial<Customer>[]
+    selectedCustomer: Customer[]
 }
 
 type CustomersListAction = {
     setFilterData: (payload: Filter) => void
     setTableData: (payload: TableQueries) => void
     setSelectedCustomer: (checked: boolean, customer: Customer) => void
-    setSelectAllCustomer: (customer: Customer[]) => void
-}
-
-const initialState: CustomersListState = {
-    tableData: initialTableData,
-    filterData: initialFilterData,
-    selectedCustomer: [],
+    setSelectAllCustomer: (customers: Customer[]) => void
 }
 
 export const useCustomerListStore = create<
     CustomersListState & CustomersListAction
 >((set) => ({
-    ...initialState,
-    setFilterData: (payload) => set(() => ({ filterData: payload })),
-    setTableData: (payload) => set(() => ({ tableData: payload })),
-    setSelectedCustomer: (checked, row) =>
+    tableData: initialTableData,
+    filterData: initialFilterData,
+    selectedCustomer: [],
+
+    setFilterData: (payload) => set({ filterData: payload }),
+
+    setTableData: (payload) => set({ tableData: payload }),
+
+    // ✅ FIXED
+    setSelectedCustomer: (checked, customer) =>
         set((state) => {
-            const prevData = state.selectedCustomer
             if (checked) {
-                return { selectedCustomer: [...prevData, ...[row]] }
-            } else {
-                if (
-                    prevData.some((prevCustomer) => row.id === prevCustomer.id)
-                ) {
-                    return {
-                        selectedCustomer: prevData.filter(
-                            (prevCustomer) => prevCustomer.id !== row.id,
-                        ),
-                    }
+                if (state.selectedCustomer.some(c => c.id === customer.id)) {
+                    return state
                 }
-                return { selectedCustomer: prevData }
+                return {
+                    selectedCustomer: [...state.selectedCustomer, customer],
+                }
+            }
+
+            return {
+                selectedCustomer: state.selectedCustomer.filter(
+                    (c) => c.id !== customer.id
+                ),
             }
         }),
-    setSelectAllCustomer: (row) => set(() => ({ selectedCustomer: row })),
+
+    // ✅ FIXED
+    setSelectAllCustomer: (customers) =>
+        set({ selectedCustomer: customers }),
 }))

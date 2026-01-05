@@ -495,6 +495,24 @@ export async function apiCreateParticipant<T, U extends Record<string, unknown>>
     })
 }
 
+// Update participant by id
+export async function apiUpdateParticipant<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/participants/${id}/`, // replace with your actual endpoint
+        method: 'patch',
+        data,
+    })
+}
+
+export async function apiGetParticipant<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/participants/${id}/`, // endpoint for a single participant
+        method: 'get',
+    })
+}
 // Delete participant by id
 export async function apiDeleteParticipant(id: string) {
     return ApiService.fetchDataWithAxios({
@@ -526,24 +544,27 @@ export async function apiCreateEvent<T, U extends Record<string, unknown>>(
 }
 
 // Update event
+// Update event by code
 export async function apiUpdateEvent<T, U extends Record<string, unknown>>(
-    id: string,
+    code: string,
     data: U,
 ) {
     return ApiService.fetchDataWithAxios<T>({
-        url: `/events/events/${id}/`,
+        url: `/events/events/${code}/`, // ✅ use code instead of id
         method: 'patch',
         data,
     })
 }
 
+
 // Delete event
-export async function apiDeleteEvent(id: string) {
+export async function apiDeleteEvent(code: string) {
     return ApiService.fetchDataWithAxios({
-        url: `/events/events/${id}/`,
+        url: `/events/events/${code}/`,   // ✅ use code here
         method: 'delete',
     })
 }
+
 
 
 // import ApiService from './ApiService'

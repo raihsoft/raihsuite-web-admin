@@ -3,6 +3,7 @@ import Container from '@/components/shared/Container'
 import EventsTable from './EventsTable'
 import EventsActionTools from './EventsActionTools'
 import EventsTableTools from './EventsTableTools'
+import CustomerListSelected from '../CustomerList/components/CustomerListSelected'
 
 const EventsOverview = () => {
     return (
@@ -19,9 +20,12 @@ const EventsOverview = () => {
 
                         <EventsTableTools />
                         <EventsTable />
+                        
                     </div>
                 </AdaptiveCard>
+                 
             </Container>
+            <CustomerListSelected />
         </>
     )
 }

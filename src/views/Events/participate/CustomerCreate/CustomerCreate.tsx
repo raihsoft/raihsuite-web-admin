@@ -18,50 +18,47 @@ const CustomerEdit = () => {
         useState(false)
     const [isSubmiting, setIsSubmiting] = useState(false)
 
-    const handleFormSubmit = async (values: CustomerFormSchema) => {
-        setIsSubmiting(true)
-        try {
-            // map form values to API payload as needed
-            const payload = {
-                first_name: values.firstName,
-                last_name: values.lastName,
-                email: values.email,
-                phone: values.phone,
-                event: values.event,
-                place: values.place,
-                referenced_by: values.referencedBy,
-            }
+   const handleFormSubmit = async (values: CustomerFormSchema) => {
+    setIsSubmiting(true)
+    try {
+        const payload = {
+            first_name: values.firstName,
+            last_name: values.lastName,
+            email: values.email,
+            phone: values.phone,
+            event: values.event,
+            place: values.place,
+            referred_by: values.referred_by || '', // now captured from form
+        }
 
-            await apiCreateParticipant(payload)
+        await apiCreateParticipant(payload)
 
+        toast.push(
+            <Notification type="success">Participant created!</Notification>,
+            { placement: 'top-center' },
+        )
+        navigate('/participants')
+    } catch (err: any) {
+        const data = err?.response?.data
+        if (data && typeof data === 'object') {
+            const messages = Object.entries(data)
+                .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+                .join(' \n')
             toast.push(
-                <Notification type="success">Participant created!</Notification>,
+                <Notification type="danger">Failed to create participant: {messages}</Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/participants')
-        } catch (err: any) {
-            // If server returned validation errors, show them
-            const data = err?.response?.data
-            if (data && typeof data === 'object') {
-                const messages = Object.entries(data)
-                    .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-                    .join(' \n')
-                toast.push(
-                    <Notification type="danger">Failed to create participant: {messages}</Notification>,
-                    { placement: 'top-center' },
-                )
-            } else {
-                toast.push(
-                    <Notification type="danger">Failed to create participant</Notification>,
-                    { placement: 'top-center' },
-                )
-            }
-            // eslint-disable-next-line no-console
-            console.error(err)
-        } finally {
-            setIsSubmiting(false)
+        } else {
+            toast.push(
+                <Notification type="danger">Failed to create participant</Notification>,
+                { placement: 'top-center' },
+            )
         }
+        console.error(err)
+    } finally {
+        setIsSubmiting(false)
     }
+}
 
     const handleConfirmDiscard = () => {
         setDiscardConfirmationOpen(true)
@@ -91,7 +88,7 @@ const CustomerEdit = () => {
                     phone: '',
                     event: '',
                     place: '',
-                    referencedBy: '',
+                    referred_by: '',
                 }}
                 onFormSubmit={handleFormSubmit}
             >

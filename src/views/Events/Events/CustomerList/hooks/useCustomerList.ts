@@ -13,47 +13,27 @@ export default function useCustomerList() {
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
-    } = useCustomerListStore((state) => state)
+    } = useCustomerListStore()
 
     const { data, error, isLoading, mutate } = useSWR(
-        ['/api/events/participants', { ...tableData, ...filterData }],
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) =>
-            apiGetEventsList<GetCustomersListResponse, TableQueries>(params),
-        {
-            revalidateOnFocus: false,
-        },
+        ['/api/events', { ...tableData, ...filterData }],
+        ([_, params]) => apiGetEventsList(params),
+        { revalidateOnFocus: false }
     )
 
-    // Debug: log API response for participants to help diagnose missing data
-    // Remove or guard this in production
-    // eslint-disable-next-line no-console
-    console.debug('apiGetEventsList response', { data, error })
+    const rawList = data?.results ?? data ?? []
 
-    // Normalize various API response shapes to the expected table-friendly structure
-    // Support: { list: [], total }, { results: [], count }, or flat array
-    const rawList: any[] = data?.list ?? data?.results ?? data ?? []
+    const customerList = rawList.map((item: any) => ({
+        id: item.id, 
+        code: item.code,       // ✅ add this
+        name: item.title || 'Untitled Event',
+        startDate: item.start_date,
+        endDate: item.end_date,
+        place: item.place || '',
+    }))
 
-    const customerList = (Array.isArray(rawList) ? rawList : []).map(
-        (item, index) => ({
-            id: item.id ?? item.pk ?? `tmp-${index}`,
-            firstName: item.first_name || item.firstName || '',
-            lastName: item.last_name || item.lastName || '',
-            name:
-                item.name ||
-                item.full_name ||
-                `${item.first_name ?? item.firstName ?? ''} ${item.last_name ?? item.lastName ?? ''}`.trim() ||
-                item.email ||
-                `Participant ${index + 1}`,
-            email: item.email || item.participant_email || '',
-            phone: item.phone || item.phone_number || item.contact_number || '',
-            place: item.place || '',
-            referencedBy: item.referenced_by ?? item.referred_by ?? item.referencedBy ?? '',
 
-        }),
-    )
-
-    const customerListTotal = data?.total ?? data?.count ?? (Array.isArray(rawList) ? rawList.length : 0)
+    const customerListTotal = data?.count ?? customerList.length
 
     return {
         customerList,

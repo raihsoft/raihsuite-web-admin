@@ -59,5 +59,6 @@ export default function useEventsList() {
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
+        
     }
 }

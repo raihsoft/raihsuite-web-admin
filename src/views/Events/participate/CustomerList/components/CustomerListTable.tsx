@@ -55,7 +55,7 @@ const ActionColumn = ({
 }) => {
     return (
         <div className="flex items-center gap-3">
-            {/* <Tooltip title="Edit">
+            <Tooltip title="Edit">
                 <div
                     className={`text-xl cursor-pointer select-none font-semibold`}
                     role="button"
@@ -63,7 +63,7 @@ const ActionColumn = ({
                 >
                     <TbPencil />
                 </div>
-            </Tooltip> */}
+            </Tooltip>
             <Tooltip title="View">
                 <div
                     className={`text-xl cursor-pointer select-none font-semibold`}
@@ -165,10 +165,15 @@ const CustomerListTable = () => {
                 cell: (props) => <span>{props.row.original.event_title}</span>,
             },
             {
-                header: 'Referenced By',
-                accessorKey: 'referencedBy',
-                cell: (props) => <span>{props.row.original.referencedBy}</span>,
-            },
+            header: 'Referenced By',
+            accessorKey: 'referencedBy',
+            cell: (props) => (
+                <span className="font-medium">
+                    {props.row.original.referencedBy || '-'}
+                </span>
+            ),
+        },
+
             {
                 header: '',
                 id: 'action',
