@@ -14,7 +14,7 @@ import type { CustomerFormSchema } from './types'
 
 type CustomerFormProps = {
     onFormSubmit: (values: CustomerFormSchema) => void
-    defaultValues?: CustomerFormSchema
+    defaultValues?: Partial<CustomerFormSchema> // ✅ FIX
     newCustomer?: boolean
 } & CommonProps
 
@@ -28,12 +28,13 @@ const validationSchema: ZodType<CustomerFormSchema> = z.object({
     phone: z.string().min(1, { message: 'Phone required' }),
     event: z.string().min(1, { message: 'Event required' }),
     place: z.string().min(1, { message: 'Place required' }),
+    referred_by: z.string().optional(), // ✅ OK
 })
 
 const CustomerForm = (props: CustomerFormProps) => {
     const {
         onFormSubmit,
-        defaultValues = {},
+        defaultValues,
         newCustomer = false,
         children,
     } = props
@@ -44,39 +45,36 @@ const CustomerForm = (props: CustomerFormProps) => {
         formState: { errors },
         control,
     } = useForm<CustomerFormSchema>({
-        defaultValues: {
-            ...{
-                banAccount: false,
-                accountVerified: true,
-            },
-            ...defaultValues,
-        },
         resolver: zodResolver(validationSchema),
+        defaultValues: {
+            banAccount: false,
+            accountVerified: true,
+            ...defaultValues, // ✅ SAFE MERGE
+        },
     })
 
     useEffect(() => {
-        if (!isEmpty(defaultValues)) {
-            reset(defaultValues)
+        if (defaultValues && !isEmpty(defaultValues)) {
+            reset({
+                banAccount: false,
+                accountVerified: true,
+                ...defaultValues,
+            })
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [JSON.stringify(defaultValues)])
-
-    const onSubmit = (values: CustomerFormSchema) => {
-        onFormSubmit?.(values)
-    }
+    }, [defaultValues, reset])
 
     return (
         <Form
             className="flex w-full h-full"
             containerClassName="flex flex-col w-full justify-between"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(onFormSubmit)}
         >
             <Container>
                 <div className="flex flex-col md:flex-row gap-4">
-                    <div className="gap-4 flex flex-col flex-auto">
+                    <div className="flex flex-col gap-4 flex-auto">
                         <OverviewSection control={control} errors={errors} />
                     </div>
-                    <div className="md:w-[370px] gap-4 flex flex-col">
+                    <div className="md:w-[370px] flex flex-col gap-4">
                         {!newCustomer && (
                             <AccountSection control={control} errors={errors} />
                         )}

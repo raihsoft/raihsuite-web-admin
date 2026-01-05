@@ -29,7 +29,7 @@ const CustomerEdit = () => {
     const navigate = useNavigate()
 
     const { data: resp, isLoading, error } = useSWR(
-        id ? ['/api/events/events', { id: id as string }] : null,
+        id ? ['/events/events', { id: id as string }] : null,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ([_, params]) => apiGetEvents<any, { id: string }>(params),
         { revalidateOnFocus: false, revalidateIfStale: false },
@@ -110,61 +110,195 @@ const CustomerEdit = () => {
     }
 
     return (
-        <>
-            {data && (
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <Container>
-                        <div className="flex items-center justify-between px-8">
-                            <Button className="ltr:mr-3 rtl:ml-3" type="button" variant="plain" icon={<TbArrowNarrowLeft />} onClick={handleBack}>
-                                Back
-                            </Button>
-                            <div className="flex items-center">
-                                <Button className="ltr:mr-3 rtl:ml-3" type="button" customColorClass={() => 'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error bg-transparent'} icon={<TbTrash />} onClick={handleDelete}>
-                                    Delete
-                                </Button>
-                                <Button variant="solid" type="submit" loading={isSubmitting}>
-                                    Save
-                                </Button>
+<>
+    {data && (
+        <form onSubmit={handleSubmit(onSubmit)}>
+            {/* Form Card */}
+            <Container>
+                <div className="max-w-6xl mx-auto mt-6 mb-28">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 space-y-8">
+                        {/* Section Title */}
+                        <div>
+                            <h4 className="text-xl font-semibold">
+                                Event Details
+                            </h4>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Update event information below
+                            </p>
+                        </div>
+
+                        {/* Title */}
+                        <div>
+                            <label className="label font-medium">
+                                Event Title
+                            </label>
+                            <Controller
+                                name="title"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        {...field}
+                                        placeholder="Enter event title"
+                                        className="h-12 text-base"
+                                    />
+                                )}
+                            />
+                            {errors.title && (
+                                <p className="text-sm text-error mt-1">
+                                    {errors.title.message}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Code */}
+                        <div>
+                            <label className="label font-medium">
+                                Event Code
+                            </label>
+                            <Controller
+                                name="code"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input
+                                        {...field}
+                                        placeholder="Unique event code"
+                                        className="h-12 text-base"
+                                    />
+                                )}
+                            />
+                            {errors.code && (
+                                <p className="text-sm text-error mt-1">
+                                    {errors.code.message}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Dates */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label className="label font-medium">
+                                    Start Date
+                                </label>
+                                <Controller
+                                    name="start_date"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <DatePicker
+                                            value={field.value as any}
+                                            onChange={(d) =>
+                                                field.onChange(d)
+                                            }
+                                            inputFormat="YYYY-MM-DD HH:mm"
+                                            type="date"
+                                            className="h-12"
+                                        />
+                                    )}
+                                />
+                                {errors.start_date && (
+                                    <p className="text-sm text-error mt-1">
+                                        {errors.start_date.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="label font-medium">
+                                    End Date
+                                </label>
+                                <Controller
+                                    name="end_date"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <DatePicker
+                                            value={field.value as any}
+                                            onChange={(d) =>
+                                                field.onChange(d)
+                                            }
+                                            inputFormat="YYYY-MM-DD HH:mm"
+                                            type="date"
+                                            className="h-12"
+                                        />
+                                    )}
+                                />
+                                {errors.end_date && (
+                                    <p className="text-sm text-error mt-1">
+                                        {errors.end_date.message}
+                                    </p>
+                                )}
                             </div>
                         </div>
-                    </Container>
+                    </div>
+                </div>
+            </Container>
 
-                    <Container>
-                        <div className="flex flex-col gap-6 p-4">
-                            <div>
-                                <label className="label">Title</label>
-                                <Controller name="title" control={control} render={({ field }) => <Input {...field} placeholder="Event title" />} />
-                                {errors.title && <div className="text-sm text-error mt-1">{errors.title.message}</div>}
-                            </div>
+            {/* Sticky Bottom Action Bar */}
+          {/* Sticky Bottom Action Bar */}
+<div className="
+    fixed bottom-0 right-0 z-20
+    bg-white dark:bg-gray-900
+    border-t border-gray-200 dark:border-gray-700
+    w-full lg:w-[calc(105%-24.1rem)]
+    lg:ml-64
+">
+    <Container>
+        <div className="flex items-center justify-between py-4">
+            <Button
+                type="button"
+                variant="plain"
+                icon={<TbArrowNarrowLeft />}
+                onClick={handleBack}
+            >
+                Back
+            </Button>
 
-                            <div>
-                                <label className="label">Code</label>
-                                <Controller name="code" control={control} render={({ field }) => <Input {...field} placeholder="Event code" />} />
-                                {errors.code && <div className="text-sm text-error mt-1">{errors.code.message}</div>}
-                            </div>
+            <div className="flex items-center gap-4">
+                <Button
+                    type="button"
+                    customColorClass={() =>
+                        'border-error ring-1 ring-error text-error hover:bg-error/10'
+                    }
+                    icon={<TbTrash />}
+                    onClick={handleDelete}
+                >
+                    Delete
+                </Button>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="label">Start Date</label>
-                                    <Controller name="start_date" control={control} render={({ field }) => <DatePicker value={field.value as any} onChange={(d) => field.onChange(d)} inputFormat="YYYY-MM-DD HH:mm" type="date" />} />
-                                    {errors.start_date && <div className="text-sm text-error mt-1">{errors.start_date.message}</div>}
-                                </div>
+                <Button
+                    variant="solid"
+                    type="submit"
+                    loading={isSubmitting}
+                    className="min-w-[110px]"
+                    style={{marginRight:10}}
+                >
+                    Save 
+                </Button>
+            </div>
+        </div>
+    </Container>
+</div>
 
-                                <div>
-                                    <label className="label">End Date</label>
-                                    <Controller name="end_date" control={control} render={({ field }) => <DatePicker value={field.value as any} onChange={(d) => field.onChange(d)} inputFormat="YYYY-MM-DD HH:mm" type="date" />} />
-                                    {errors.end_date && <div className="text-sm text-error mt-1">{errors.end_date.message}</div>}
-                                </div>
-                            </div>
-                        </div>
-                    </Container>
-                </form>
-            )}
+        </form>
+    )}
 
-            <ConfirmDialog isOpen={deleteConfirmationOpen} type="danger" title="Remove event" onClose={handleCancel} onRequestClose={handleCancel} onCancel={handleCancel} onConfirm={handleConfirmDelete} confirmButtonProps={{ loading: deleteLoading }}>
-                <p>Are you sure you want to remove this event? This action can&apos;t be undo.</p>
-            </ConfirmDialog>
-        </>
+    {/* Delete Confirmation */}
+    <ConfirmDialog
+        isOpen={deleteConfirmationOpen}
+        type="danger"
+        title="Remove event"
+        onClose={handleCancel}
+        onRequestClose={handleCancel}
+        onCancel={handleCancel}
+        onConfirm={handleConfirmDelete}
+        confirmButtonProps={{ loading: deleteLoading }}
+    >
+        <p>
+            Are you sure you want to remove this event? This action
+            can&apos;t be undone.
+        </p>
+    </ConfirmDialog>
+</>
+
+
     )
 }
 

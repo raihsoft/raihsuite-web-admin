@@ -58,7 +58,7 @@ export type Customer = {
     email: string
     phone?: string
     place?: string
-    referencedBy?: string
+    referred_by?: string
     img: string
     role: string
     lastOnline: number
