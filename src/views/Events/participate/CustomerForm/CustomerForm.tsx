@@ -74,11 +74,6 @@ const CustomerForm = (props: CustomerFormProps) => {
                     <div className="flex flex-col gap-4 flex-auto">
                         <OverviewSection control={control} errors={errors} />
                     </div>
-                    <div className="md:w-[370px] flex flex-col gap-4">
-                        {!newCustomer && (
-                            <AccountSection control={control} errors={errors} />
-                        )}
-                    </div>
                 </div>
             </Container>
             <BottomStickyBar>{children}</BottomStickyBar>
