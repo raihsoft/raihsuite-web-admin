@@ -1,82 +1,73 @@
 import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
-import { apiGetEvents} from '@/services/CustomersService'
+import { apiGetEvent } from '@/services/CustomersService'
 import useSWR from 'swr'
 import { useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
 import dayjs from 'dayjs'
 
 const EventDetails = () => {
-    const { id } = useParams()
+    const { id } = useParams<{ id: string }>()
 
-    const { data: resp, isLoading } = useSWR(
-        ['/events/events', { code: id as string }],
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) =>
-            apiGetEvents<any, { code: string }>(params),
+    const { data, isLoading, error } = useSWR(
+        id ? ['/events/events', id] : null,
+        () => apiGetEvent<any>(id!),
         {
             revalidateOnFocus: false,
-            revalidateIfStale: false,
         }
     )
 
-    // Normalize response to single event object
-    const data: any =
-        resp?.list?.[0] ??
-        resp?.results?.[0] ??
-        resp ??
-        null
+    if (isLoading) {
+        return <Loading loading />
+    }
+
+    if (error || isEmpty(data)) {
+        return (
+            <div className="h-full flex flex-col items-center justify-center">
+                <p className="text-gray-500">No event found.</p>
+            </div>
+        )
+    }
 
     return (
-<Loading loading={isLoading}>
-  {isEmpty(data) ? (
-    <div className="h-full flex flex-col items-center justify-center">
-      <p className="text-gray-500">No event found.</p>
-    </div>
-  ) : (
-    <Card className="p-12 max-w-6xl mx-auto">
-      <h3 className="text-3xl font-bold mb-8 text-black">
-        Event Details
-      </h3>
+        <Card className="p-12 max-w-6xl mx-auto">
+            <h3 className="text-3xl font-bold mb-8 text-black">
+                Event Details
+            </h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-        {/* Title */}
-        <div>
-          <div className="text-base text-gray-500">Event Title</div>
-          <div className="text-xl font-semibold">{data.title ?? '—'}</div>
-        </div>
-
-        {/* Code */}
-        <div>
-          <div className="text-base text-gray-500">Event Code</div>
-          <div className="text-xl font-semibold">{data.code ?? '—'}</div>
-        </div>
-
-        {/* Start Date */}
-        <div>
-          <div className="text-base text-gray-500">Start Date</div>
-          <div className="text-xl font-semibold">
-            {data.start_date
-              ? dayjs(data.start_date).format('DD MMM YYYY, hh:mm A')
-              : '—'}
-          </div>
-        </div>
-
-        {/* End Date */}
-        <div>
-          <div className="text-base text-gray-500">End Date</div>
-          <div className="text-xl font-semibold">
-            {data.end_date
-              ? dayjs(data.end_date).format('DD MMM YYYY, hh:mm A')
-              : '—'}
-          </div>
-        </div>
-      </div>
-    </Card>
-  )}
-</Loading>
-
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <Detail label="Event Title" value={data.title ?? '—'} />
+                <Detail label="Event Code" value={data.code ?? '—'} />
+                <Detail
+                    label="Start Date"
+                    value={
+                        data.start_date
+                            ? dayjs(data.start_date).format(
+                                  'DD MMM YYYY, hh:mm A'
+                              )
+                            : '—'
+                    }
+                />
+                <Detail
+                    label="End Date"
+                    value={
+                        data.end_date
+                            ? dayjs(data.end_date).format(
+                                  'DD MMM YYYY, hh:mm A'
+                              )
+                            : '—'
+                    }
+                />
+            </div>
+        </Card>
     )
 }
+
+const Detail = ({ label, value }: { label: string; value: string }) => (
+    <div>
+        <div className="text-base text-gray-500">{label}</div>
+        <div className="text-xl font-semibold">{value}</div>
+    </div>
+)
 
 export default EventDetails

@@ -69,56 +69,43 @@ const handleConfirmDelete = async () => {
 
 
     return (
-<div className="pb-12"> 
+        
     <>
+          {selectedCustomer.length > 0 && (
     <StickyFooter
-        className="flex items-center justify-between py-4 bg-white dark:bg-gray-800"
+        className="flex items-center justify-between py-4 bg-white dark:bg-gray-800 mb-6"
         stickyClass="-mx-4 sm:-mx-8 border-t border-gray-200 dark:border-gray-700 px-8"
         defaultClass="container mx-auto px-8 rounded-xl border border-gray-200 dark:border-gray-600 mt-4"
     >
-        {/* Fade only the inner content */}
-        <div
-            className={`w-full transition-opacity duration-150 ${
-                selectedCustomer.length > 0
-                    ? 'opacity-100 visible'
-                    : 'opacity-0 invisible pointer-events-none'
-            }`}
-        >
-            <div className="container mx-auto">
-                <div className="flex items-center justify-between">
-                    <span>
-                        {selectedCustomer.length > 0 && (
-                            <span className="flex items-center gap-2">
-                                <span className="text-lg text-primary">
-                                    <TbChecks />
-                                </span>
-                                <span className="font-semibold flex items-center gap-1">
-                                    <span className="heading-text">
-                                        {selectedCustomer.length} Events
-                                    </span>
-                                    <span>selected</span>
-                                </span>
-                            </span>
-                        )}
+        <div className="container mx-auto">
+            <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                    <span className="text-lg text-primary">
+                        <TbChecks />
                     </span>
+                    <span className="font-semibold flex items-center gap-1">
+                        <span className="heading-text">
+                            {selectedCustomer.length} Customers
+                        </span>
+                        <span>selected</span>
+                    </span>
+                </span>
 
-                    <div className="flex items-center">
-                        <Button
-                            size="sm"
-                            className="ltr:mr-3 rtl:ml-3"
-                            type="button"
-                            customColorClass={() =>
-                                'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error'
-                            }
-                            onClick={handleDelete}
-                        >
-                            Delete
-                        </Button>
-                    </div>
-                </div>
+                <Button
+                    size="sm"
+                    className="ltr:mr-3 rtl:ml-3"
+                    type="button"
+                    customColorClass={() =>
+                        'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error'
+                    }
+                    onClick={handleDelete}
+                >
+                    Delete
+                </Button>
             </div>
         </div>
     </StickyFooter>
+)}
 
     <ConfirmDialog
         isOpen={deleteConfirmationOpen}
@@ -136,7 +123,7 @@ const handleConfirmDelete = async () => {
         </p>
     </ConfirmDialog>
 </>
-</div>
+
 
 
 

@@ -532,6 +532,14 @@ export async function apiGetEvents<T, U extends Record<string, unknown>>(
     })
 }
 
+export async function apiGetEvent<T>(code: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/events/${code}/`,
+        method: 'get',
+    })
+}
+
+
 // Create event
 export async function apiCreateEvent<T, U extends Record<string, unknown>>(
     data: U,
