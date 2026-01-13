@@ -4,145 +4,145 @@ import Button from '@/components/ui/Button'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import { apiGetEventsList, apiDeleteParticipant } from '@/services/CustomersService'
+import {
+    apiGetParticipant,
+    apiDeleteParticipant,
+    apiUpdateParticipant,
+} from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
-import sleep from '@/utils/sleep'
-import NoUserFound from '@/assets/svg/NoUserFound'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
 import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
-import type { CustomerFormSchema } from '../CustomerForm'
-import type { Customer } from '../CustomerList/types'
+import type { CustomerFormSchema } from '../types'
 
 const CustomerEdit = () => {
     const { id } = useParams()
-
     const navigate = useNavigate()
 
-    const { data: resp, isLoading } = useSWR(
-        ['/api/events/participants', { id: id as string }],
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) => apiGetEventsList<any, { id: string }>(params),
-        {
-            revalidateOnFocus: false,
-            revalidateIfStale: false,
-        },
+    const { data, isLoading, mutate } = useSWR(
+        id ? `/participants/${id}` : null,
+        () => apiGetParticipant(id as string),
+        { revalidateOnFocus: false }
     )
-
-    const data = resp?.list?.[0] ?? resp?.results?.[0] ?? resp ?? null
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)
-    const [isSubmiting, setIsSubmiting] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const handleFormSubmit = async (values: CustomerFormSchema) => {
-        console.log('Submitted values', values)
-        setIsSubmiting(true)
-        await sleep(800)
-        setIsSubmiting(false)
-        toast.push(<Notification type="success">Changes Saved!</Notification>, {
-            placement: 'top-center',
-        })
-        // navigate('/concepts/customers/customer-list')
+    const getDefaultValues = (): CustomerFormSchema | undefined => {
+        if (!data) return
+
+        return {
+            firstName: data.first_name ?? '',
+            lastName: data.last_name ?? '',
+            email: data.email ?? '',
+            phone: data.phone ?? '',
+            place: data.place ?? '',
+            event: String(data.event ?? ''),
+            referred_by: data.referred_by ?? '',
+        }
     }
 
-    const getDefaultValues = () => {
-        if (data) {
-            const { firstName, lastName, email, personalInfo, img } = data
+    const handleFormSubmit = async (values: CustomerFormSchema) => {
+        if (!id) return
+        setIsSubmitting(true)
 
-            return {
-                firstName,
-                lastName,
-                email,
-                img,
-                phoneNumber: personalInfo.phoneNumber,
-                dialCode: personalInfo.dialCode,
-                country: personalInfo.country,
-                address: personalInfo.address,
-                city: personalInfo.city,
-                postcode: personalInfo.postcode,
-                tags: [],
-            }
+        try {
+            await apiUpdateParticipant(id, {
+                first_name: values.firstName,
+                last_name: values.lastName,
+                email: values.email,
+                phone: values.phone,
+                place: values.place,
+                event: values.event,
+                referred_by: values.referred_by,
+            })
+
+            toast.push(
+                <Notification type="success">
+                    Participant updated successfully!
+                </Notification>,
+                { placement: 'top-center' }
+            )
+            navigate('/participants')
+
+            mutate()
+        } catch {
+            toast.push(
+                <Notification type="danger">
+                    Failed to update participant
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setIsSubmitting(false)
         }
-
-        return {}
     }
 
     const handleConfirmDelete = async () => {
         if (!id) return
         setDeleteLoading(true)
+
         try {
-            await apiDeleteParticipant(id as string)
+            await apiDeleteParticipant(id)
             toast.push(
-                <Notification type="success">Participant deleted!</Notification>,
-                { placement: 'top-center' },
+                <Notification type="success">
+                    Participant deleted!
+                </Notification>,
+                { placement: 'top-center' }
             )
             navigate('/participants')
-        } catch (err) {
-            toast.push(
-                <Notification type="danger">Failed to delete participant</Notification>,
-                { placement: 'top-center' },
-            )
         } finally {
             setDeleteLoading(false)
             setDeleteConfirmationOpen(false)
         }
     }
 
-    const handleDelete = () => {
-        setDeleteConfirmationOpen(true)
-    }
-
-    const handleCancel = () => {
-        setDeleteConfirmationOpen(false)
-    }
-
-    const handleBack = () => {
-        history.back()
+    if (!isLoading && !data) {
+        return (
+            <div className="h-full flex items-center justify-center">
+                <p>No participant found</p>
+            </div>
+        )
     }
 
     return (
         <>
-            {!isLoading && !data && (
-                <div className="h-full flex flex-col items-center justify-center">
-                    <NoUserFound height={280} width={280} />
-                    <h3 className="mt-8">No user found!</h3>
-                </div>
-            )}
             {!isLoading && data && (
                 <>
                     <CustomerForm
-                        defaultValues={getDefaultValues() as CustomerFormSchema}
+                        defaultValues={getDefaultValues()}
                         newCustomer={false}
                         onFormSubmit={handleFormSubmit}
                     >
                         <Container>
-                            <div className="flex items-center justify-between px-8">
+                            <div className="flex justify-between px-8">
                                 <Button
-                                    className="ltr:mr-3 rtl:ml-3"
-                                    type="button"
                                     variant="plain"
                                     icon={<TbArrowNarrowLeft />}
-                                    onClick={handleBack}
+                                    onClick={() => navigate(-1)}
                                 >
                                     Back
                                 </Button>
-                                <div className="flex items-center">
+
+                                <div className="flex gap-2">
                                     <Button
-                                        className="ltr:mr-3 rtl:ml-3"
                                         type="button"
-                                        customColorClass={() =>
-                                            'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error bg-transparent'
-                                        }
                                         icon={<TbTrash />}
-                                        onClick={handleDelete}
+                                        onClick={() =>
+                                            setDeleteConfirmationOpen(true)
+                                        }
+                                        customColorClass={() =>
+                                            'border-error text-error'
+                                        }
                                     >
                                         Delete
                                     </Button>
+
                                     <Button
                                         variant="solid"
                                         type="submit"
-                                        loading={isSubmiting}
+                                        loading={isSubmitting}
                                     >
                                         Save
                                     </Button>
@@ -150,20 +150,16 @@ const CustomerEdit = () => {
                             </div>
                         </Container>
                     </CustomerForm>
+
                     <ConfirmDialog
                         isOpen={deleteConfirmationOpen}
                         type="danger"
                         title="Remove participant"
-                        onClose={handleCancel}
-                        onRequestClose={handleCancel}
-                        onCancel={handleCancel}
+                        onClose={() => setDeleteConfirmationOpen(false)}
                         onConfirm={handleConfirmDelete}
                         confirmButtonProps={{ loading: deleteLoading }}
                     >
-                        <p>
-                            Are you sure you want to remove this customer? This
-                            action can&apos;t be undo.{' '}
-                        </p>
+                        Are you sure you want to remove this participant?
                     </ConfirmDialog>
                 </>
             )}

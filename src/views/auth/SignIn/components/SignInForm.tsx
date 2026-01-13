@@ -76,7 +76,7 @@ const SignInForm = (props: SignInFormProps) => {
                 if (/user not found/i.test(msg) || /no user/i.test(msg)) {
                     setError('email', { type: 'manual', message: 'User not found' })
                 } else if (/wrong password|password/i.test(msg)) {
-                    setError('password', { type: 'manual', message: 'Wrong password — please try again' })
+                    setError('password', { type: 'manual', message: ' wrong username or password — please try again' })
                 } else if (/invalid credentials/i.test(msg)) {
                     // Ambiguous backend message — cannot determine if user missing or password wrong
                     setMessage?.('User not found or wrong password')

@@ -55,7 +55,7 @@ const ActionColumn = ({
 }) => {
     return (
         <div className="flex items-center gap-3">
-            {/* <Tooltip title="Edit">
+            <Tooltip title="Edit">
                 <div
                     className={`text-xl cursor-pointer select-none font-semibold`}
                     role="button"
@@ -63,7 +63,7 @@ const ActionColumn = ({
                 >
                     <TbPencil />
                 </div>
-            </Tooltip> */}
+            </Tooltip>
             <Tooltip title="View">
                 <div
                     className={`text-xl cursor-pointer select-none font-semibold`}
@@ -105,13 +105,14 @@ const CustomerListTable = () => {
         
         if (!query || query.length === 0) return customerList
         
-        // Filter to include matching names or email
+        // Filter to include matching names, email, or event title
         const filtered = customerList.filter(customer =>
             (customer.name || '').toLowerCase().includes(query) ||
-            (customer.email || '').toLowerCase().includes(query)
+            (customer.email || '').toLowerCase().includes(query) ||
+            (customer.event_title || '').toLowerCase().includes(query)
         )
         
-        // Sort to put exact/partial matches first
+        // Sort to put exact/partial matches first (by name)
         return filtered.sort((a, b) => {
             const aName = (a.name || '').toLowerCase()
             const bName = (b.name || '').toLowerCase()
@@ -138,16 +139,14 @@ const CustomerListTable = () => {
             //         return <NameColumn row={row} searchQuery={tableData.query as string} />
             //     },
             // },
-
             {
-                header: 'first_name',
+                header: 'First Name',
                 accessorKey: 'firstName',
             },
             {
-                header: 'last_name',
+                header: 'Last Name',
                 accessorKey: 'lastName',
             },
-
             {
                 header: 'Email',
                 accessorKey: 'email',
@@ -161,10 +160,20 @@ const CustomerListTable = () => {
                 accessorKey: 'place',
             },
             {
-                header: 'Referenced By',
-                accessorKey: 'referencedBy',
-                cell: (props) => <span>{props.row.original.referencedBy}</span>,
+                header: 'Event ',      // <-- New column
+                accessorKey: 'event_title',
+                cell: (props) => <span>{props.row.original.event_title}</span>,
             },
+            {
+            header: 'Referenced By',
+            accessorKey: 'referencedBy',
+            cell: (props) => (
+                <span className="font-medium">
+                    {props.row.original.referencedBy || '-'}
+                </span>
+            ),
+        },
+
             {
                 header: '',
                 id: 'action',

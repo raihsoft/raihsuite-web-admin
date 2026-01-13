@@ -7,7 +7,7 @@ export type OverviewFields = {
     phone: string
     event: string
     place?: string
-    referencedBy?: string
+    referred_by?: string
 }
 
 export type AccountField = {

@@ -384,9 +384,6 @@ export async function apiGetAssetType<T, U extends Record<string, unknown>>(para
 
 
 //asset-type-category
-// src/services/CustomersService.ts
-import ApiService from '@/services/ApiService'
-import { Events } from 'react-scroll'
 
 /**
  * Get list of asset type categories
@@ -398,6 +395,18 @@ export async function apiGetAssetTypeCategory<T, U extends Record<string, unknow
         params, // ✅ query params only for GET
     })
 }
+
+/**
+ * Get tenant memberships for the current user
+ * Endpoint: /tenants/tenant_memberships/
+ */
+export async function apiGetTenantMemberships<T, U extends Record<string, unknown>>(params?: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/tenants/tenant_memberships/',
+        method: 'get',
+        params,
+    })
+} 
 
 /**
  * Create a new asset type category
@@ -486,6 +495,24 @@ export async function apiCreateParticipant<T, U extends Record<string, unknown>>
     })
 }
 
+// Update participant by id
+export async function apiUpdateParticipant<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/participants/${id}/`, // replace with your actual endpoint
+        method: 'patch',
+        data,
+    })
+}
+
+export async function apiGetParticipant<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/participants/${id}/`, // endpoint for a single participant
+        method: 'get',
+    })
+}
 // Delete participant by id
 export async function apiDeleteParticipant(id: string) {
     return ApiService.fetchDataWithAxios({
@@ -505,6 +532,14 @@ export async function apiGetEvents<T, U extends Record<string, unknown>>(
     })
 }
 
+export async function apiGetEvent<T>(code: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/events/${code}/`,
+        method: 'get',
+    })
+}
+
+
 // Create event
 export async function apiCreateEvent<T, U extends Record<string, unknown>>(
     data: U,
@@ -517,22 +552,36 @@ export async function apiCreateEvent<T, U extends Record<string, unknown>>(
 }
 
 // Update event
+// Update event by code
 export async function apiUpdateEvent<T, U extends Record<string, unknown>>(
-    id: string,
+    code: string,
     data: U,
 ) {
     return ApiService.fetchDataWithAxios<T>({
-        url: `/events/events/${id}/`,
+        url: `/events/events/${code}/`, // ✅ use code instead of id
         method: 'patch',
         data,
     })
 }
 
+
 // Delete event
-export async function apiDeleteEvent(id: string) {
+export async function apiDeleteEvent(code: string) {
     return ApiService.fetchDataWithAxios({
-        url: `/events/events/${id}/`,
+        url: `/events/events/${code}/`,   // ✅ use code here
         method: 'delete',
+    })
+}
+
+
+
+// import ApiService from './ApiService'
+
+// services/CustomersService.ts
+export async function apiGetTenantById<T, U = Record<string, unknown>>(id: number) {
+    return ApiService.fetchDataWithAxios<T, U>({
+        url: `/tenants/tenants/${id}/`,
+        method: 'get',
     })
 }
 

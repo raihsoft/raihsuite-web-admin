@@ -1,67 +1,73 @@
 import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
-import { apiGetEventsList } from '@/services/CustomersService'
+import { apiGetEvent } from '@/services/CustomersService'
 import useSWR from 'swr'
 import { useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
-import type { Customer } from '../CustomerList/types'
+import dayjs from 'dayjs'
 
-const CustomerDetails = () => {
-    const { id } = useParams()
+const EventDetails = () => {
+    const { id } = useParams<{ id: string }>()
 
-    const { data: resp, isLoading } = useSWR(
-        ['/api/events/participants', { id: id as string }],
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) => apiGetEventsList<any, { id: string }>(params),
+    const { data, isLoading, error } = useSWR(
+        id ? ['/events/events', id] : null,
+        () => apiGetEvent<any>(id!),
         {
             revalidateOnFocus: false,
-            revalidateIfStale: false,
-            evalidateOnFocus: false,
-        },
+        }
     )
 
-    // Normalize response to single participant object
-    const data: any = resp?.list?.[0] ?? resp?.results?.[0] ?? resp ?? null
+    if (isLoading) {
+        return <Loading loading />
+    }
+
+    if (error || isEmpty(data)) {
+        return (
+            <div className="h-full flex flex-col items-center justify-center">
+                <p className="text-gray-500">No event found.</p>
+            </div>
+        )
+    }
 
     return (
-        <Loading loading={isLoading}>
-            {isEmpty(data) ? (
-                <div className="h-full flex flex-col items-center justify-center">
-                    <p className="text-gray-500">No participant found.</p>
-                </div>
-            ) : (
-                <Card className="p-8 max-w-3xl mx-auto">
-                    <h3 className="text-2xl font-bold mb-6 text-black">Participant Details</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div>
-                            <div className="text-sm text-gray-500">First name</div>
-                            <div className="text-lg font-semibold">{data.first_name ?? data.firstName ?? data.name ?? '—'}</div>
-                        </div>
-                        <div>
-                            <div className="text-sm text-gray-500">Last name</div>
-                            <div className="text-lg font-semibold">{data.last_name ?? data.lastName ?? '—'}</div>
-                        </div>
-                        <div>
-                            <div className="text-sm text-gray-500">Email</div>
-                            <div className="text-lg font-semibold">{data.email ?? '—'}</div>
-                        </div>
-                        <div>
-                            <div className="text-sm text-gray-500">Phone</div>
-                            <div className="text-lg font-semibold">{data.phone ?? data.phone_number ?? '—'}</div>
-                        </div>
-                        <div>
-                            <div className="text-sm text-gray-500">Place</div>
-                            <div className="text-lg font-semibold">{data.place ?? data.location ?? '—'}</div>
-                        </div>
-                        <div>
-                            <div className="text-sm text-gray-500">Referenced By</div>
-                            <div className="text-lg font-semibold">{data.referenced_by ?? data.referencedBy ?? data.referred_by ?? '—'}</div>
-                        </div>
-                    </div>
-                </Card>
-            )}
-        </Loading>
+        <Card className="p-12 max-w-6xl mx-auto">
+            <h3 className="text-3xl font-bold mb-8 text-black">
+                Event Details
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <Detail label="Event Title" value={data.title ?? '—'} />
+                <Detail label="Event Code" value={data.code ?? '—'} />
+                <Detail
+                    label="Start Date"
+                    value={
+                        data.start_date
+                            ? dayjs(data.start_date).format(
+                                  'DD MMM YYYY, hh:mm A'
+                              )
+                            : '—'
+                    }
+                />
+                <Detail
+                    label="End Date"
+                    value={
+                        data.end_date
+                            ? dayjs(data.end_date).format(
+                                  'DD MMM YYYY, hh:mm A'
+                              )
+                            : '—'
+                    }
+                />
+            </div>
+        </Card>
     )
 }
 
-export default CustomerDetails
+const Detail = ({ label, value }: { label: string; value: string }) => (
+    <div>
+        <div className="text-base text-gray-500">{label}</div>
+        <div className="text-xl font-semibold">{value}</div>
+    </div>
+)
+
+export default EventDetails

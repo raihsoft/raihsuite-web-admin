@@ -70,7 +70,7 @@ const ActionColumn = ({
 }) => {
     return (
         <div className="flex items-center gap-3">
-            {/* <Tooltip title="Edit">
+            <Tooltip title="Edit">
                 <div
                     className={`text-xl cursor-pointer select-none font-semibold`}
                     role="button"
@@ -78,7 +78,7 @@ const ActionColumn = ({
                 >
                     <TbPencil />
                 </div>
-            </Tooltip> */}
+            </Tooltip>
             <Tooltip title="View">
                 <div
                     className={`text-xl cursor-pointer select-none font-semibold`}
@@ -107,7 +107,7 @@ const CustomerListTable = () => {
     } = useCustomerList()
 
     const handleEdit = (customer: Customer) => {
-        navigate(`/participants/edit/${customer.id}`)
+        navigate(`events/${customer.id}/edit`)
     }
 
     const handleViewDetails = (customer: Customer) => {

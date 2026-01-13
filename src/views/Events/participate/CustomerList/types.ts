@@ -50,6 +50,7 @@ export type Filter = {
 }
 
 export type Customer = {
+    event_title: ReactI18NextChildren | Iterable<ReactI18NextChildren>
     id: string
     name: string
     firstName: string
@@ -57,7 +58,7 @@ export type Customer = {
     email: string
     phone?: string
     place?: string
-    referencedBy?: string
+    referred_by?: string
     img: string
     role: string
     lastOnline: number

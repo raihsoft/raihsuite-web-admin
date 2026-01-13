@@ -1,30 +1,26 @@
 import { useState } from 'react'
+import { mutate as globalMutate } from 'swr'
 import StickyFooter from '@/components/shared/StickyFooter'
 import Button from '@/components/ui/Button'
-import Dialog from '@/components/ui/Dialog'
-import Avatar from '@/components/ui/Avatar'
-import Tooltip from '@/components/ui/Tooltip'
+import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
-import RichTextEditor from '@/components/shared/RichTextEditor'
-import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import useCustomerList from '../hooks/useCustomerList'
-import { apiDeleteParticipant } from '@/services/CustomersService'
 import { TbChecks } from 'react-icons/tb'
+import useCustomerList from '../hooks/useCustomerList'
+import { apiDeleteEvent } from '@/services/CustomersService'
 
 const CustomerListSelected = () => {
     const {
         selectedCustomer,
-        customerList,
-        mutate,
-        customerListTotal,
         setSelectAllCustomer,
+        mutate,
+        customerList, // get the list
     } = useCustomerList()
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)
-    const [sendMessageDialogOpen, setSendMessageDialogOpen] = useState(false)
-    const [sendMessageLoading, setSendMessageLoading] = useState(false)
+
+    if (!selectedCustomer || selectedCustomer.length === 0) return null
 
     const handleDelete = () => {
         setDeleteConfirmationOpen(true)
@@ -34,198 +30,103 @@ const CustomerListSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = async () => {
-        // Ensure we only call API for valid ids
-        const ids = selectedCustomer.map((c) => c.id).filter(Boolean) as string[]
-        if (ids.length === 0) {
-            toast.push(
-                <Notification type="warning">No participants selected to delete.</Notification>,
-                { placement: 'top-center' },
-            )
-            setDeleteConfirmationOpen(false)
-            return
-        }
+const handleConfirmDelete = async () => {
+    setDeleteLoading(true)
 
-        setDeleteLoading(true)
-        try {
-            // Debug: log selected ids
-            // eslint-disable-next-line no-console
-            console.debug('Deleting participant ids', ids)
+    try {
+        await Promise.all(
+            selectedCustomer.map((item) => apiDeleteEvent(item.code))
+        )
 
-            // Call API for each id and collect results
-            const results = await Promise.all(
-                ids.map(async (id) => {
-                    try {
-                        await apiDeleteParticipant(id)
-                        return { id, ok: true }
-                    } catch (err) {
-                        // capture error per id
-                        // eslint-disable-next-line no-console
-                        console.error('Failed to delete participant', id, err)
-                        return { id, ok: false, err }
-                    }
-                }),
-            )
+        // ✅ Force SWR to re-fetch all keys from the server (hard refresh)
+        await globalMutate(() => true, undefined, { revalidate: true })
 
-            const failed = results.filter((r) => !r.ok)
+        // ✅ Clear selection
+        setSelectAllCustomer([])
 
-            // Refresh list from server
-            await mutate()
-
-            setSelectAllCustomer([])
-
-            if (failed.length === 0) {
-                toast.push(
-                    <Notification type="success">Participants deleted!</Notification>,
-                    { placement: 'top-center' },
-                )
-            } else {
-                toast.push(
-                    <Notification type="danger">Failed to delete some participants ({failed.length} failed)</Notification>,
-                    { placement: 'top-center' },
-                )
-            }
-        } catch (err) {
-            // eslint-disable-next-line no-console
-            console.error(err)
-            toast.push(
-                <Notification type="danger">Failed to delete participants</Notification>,
-                { placement: 'top-center' },
-            )
-        } finally {
-            setDeleteLoading(false)
-            setDeleteConfirmationOpen(false)
-        }
+        toast.push(
+            <Notification type="success">
+                Events deleted successfully!
+            </Notification>,
+            { placement: 'top-center' }
+        )
+    } catch (error) {
+        console.error(error)
+        toast.push(
+            <Notification type="danger">
+                Failed to delete events
+            </Notification>,
+            { placement: 'top-center' }
+        )
+    } finally {
+        setDeleteLoading(false)
+        setDeleteConfirmationOpen(false)
     }
+}
 
-    const handleSend = () => {
-        setSendMessageLoading(true)
-        setTimeout(() => {
-            toast.push(
-                <Notification type="success">Message sent!</Notification>,
-                { placement: 'top-center' },
-            )
-            setSendMessageLoading(false)
-            setSendMessageDialogOpen(false)
-            setSelectAllCustomer([])
-        }, 500)
-    }
+
+
+
 
     return (
-        <>
-            {selectedCustomer.length > 0 && (
-                <StickyFooter
-                    className=" flex items-center justify-between py-4 bg-white dark:bg-gray-800"
-                    stickyClass="-mx-4 sm:-mx-8 border-t border-gray-200 dark:border-gray-700 px-8"
-                    defaultClass="container mx-auto px-8 rounded-xl border border-gray-200 dark:border-gray-600 mt-4"
-                >
-                    <div className="container mx-auto">
-                        <div className="flex items-center justify-between">
-                            <span>
-                                {selectedCustomer.length > 0 && (
-                                    <span className="flex items-center gap-2">
-                                        <span className="text-lg text-primary">
-                                            <TbChecks />
-                                        </span>
-                                        <span className="font-semibold flex items-center gap-1">
-                                            <span className="heading-text">
-                                                {selectedCustomer.length}{' '}
-                                                Customers
-                                            </span>
-                                            <span>selected</span>
-                                        </span>
-                                    </span>
-                                )}
-                            </span>
+        
+    <>
+          {selectedCustomer.length > 0 && (
+    <StickyFooter
+        className="flex items-center justify-between py-4 bg-white dark:bg-gray-800 mb-6"
+        stickyClass="-mx-4 sm:-mx-8 border-t border-gray-200 dark:border-gray-700 px-8"
+        defaultClass="container mx-auto px-8 rounded-xl border border-gray-200 dark:border-gray-600 mt-4"
+    >
+        <div className="container mx-auto">
+            <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                    <span className="text-lg text-primary">
+                        <TbChecks />
+                    </span>
+                    <span className="font-semibold flex items-center gap-1">
+                        <span className="heading-text">
+                            {selectedCustomer.length} Customers
+                        </span>
+                        <span>selected</span>
+                    </span>
+                </span>
 
-                            <div className="flex items-center">
-                                <Button
-                                    size="sm"
-                                    className="ltr:mr-3 rtl:ml-3"
-                                    type="button"
-                                    customColorClass={() =>
-                                        'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error'
-                                    }
-                                    onClick={handleDelete}
-                                >
-                                    Delete
-                                </Button>
-                                {/* <Button
-                                    size="sm"
-                                    variant="solid"
-                                    onClick={() =>
-                                        setSendMessageDialogOpen(true)
-                                    }
-                                >
-                                    Message
-                                </Button> */}
-                            </div>
-                        </div>
-                    </div>
-                </StickyFooter>
-            )}
-            <ConfirmDialog
-                isOpen={deleteConfirmationOpen}
-                type="danger"
-                title="Remove participants"
-                onClose={handleCancel}
-                onRequestClose={handleCancel}
-                onCancel={handleCancel}
-                onConfirm={handleConfirmDelete}
-                confirmButtonProps={{ loading: deleteLoading }}
-            >
-                <p>
-                    Are you sure you want to remove these customers? This action
-                    can&apos;t be undone.
-                </p>
-                {selectedCustomer.length > 0 && (
-                    <div className="mt-3 text-sm text-gray-600">
-                        Will delete {selectedCustomer.length} customer(s):{' '}
-                        {selectedCustomer.map((c) => c.id).join(', ')}
-                    </div>
-                )}
-            </ConfirmDialog>
-            <Dialog
-                isOpen={sendMessageDialogOpen}
-                onRequestClose={() => setSendMessageDialogOpen(false)}
-                onClose={() => setSendMessageDialogOpen(false)}
-            >
-                <h5 className="mb-2">Send Message</h5>
-                <p>Send message to the following customers</p>
-                <Avatar.Group
-                    chained
-                    omittedAvatarTooltip
-                    className="mt-4"
-                    maxCount={4}
-                    omittedAvatarProps={{ size: 30 }}
+                <Button
+                    size="sm"
+                    className="ltr:mr-3 rtl:ml-3"
+                    type="button"
+                    customColorClass={() =>
+                        'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error'
+                    }
+                    onClick={handleDelete}
                 >
-                    {selectedCustomer.map((customer) => (
-                        <Tooltip key={customer.id} title={customer.name}>
-                            <Avatar size={30} src={customer.img} alt="" />
-                        </Tooltip>
-                    ))}
-                </Avatar.Group>
-                <div className="my-4">
-                    <RichTextEditor content={''} />
-                </div>
-                <div className="ltr:justify-end flex items-center gap-2">
-                    {/* <Button
-                        size="sm"
-                        onClick={() => setSendMessageDialogOpen(false)}
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        size="sm"
-                        variant="solid"
-                        loading={sendMessageLoading}
-                        onClick={handleSend}
-                    >
-                        Send
-                    </Button> */}
-                </div>
-            </Dialog>
-        </>
+                    Delete
+                </Button>
+            </div>
+        </div>
+    </StickyFooter>
+)}
+
+    <ConfirmDialog
+        isOpen={deleteConfirmationOpen}
+        type="danger"
+        title="Remove participants"
+        onClose={handleCancel}
+        onRequestClose={handleCancel}
+        onCancel={handleCancel}
+        onConfirm={handleConfirmDelete}
+        confirmButtonProps={{ loading: deleteLoading }}
+    >
+        <p>
+            Are you sure you want to remove these customers? This action
+            can&apos;t be undone.
+        </p>
+    </ConfirmDialog>
+</>
+
+
+
+
     )
 }
 
