@@ -101,7 +101,7 @@ const CustomerListSelected = () => {
                                 >
                                     Delete
                                 </Button>
-                                <Button
+                                {/* <Button
                                     size="sm"
                                     variant="solid"
                                     onClick={() =>
@@ -109,7 +109,7 @@ const CustomerListSelected = () => {
                                     }
                                 >
                                     Message
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                     </div>

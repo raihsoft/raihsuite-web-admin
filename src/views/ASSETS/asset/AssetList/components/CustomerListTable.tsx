@@ -16,17 +16,29 @@ const statusColor: Record<string, string> = {
     blocked: 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900',
 }
 
-const NameColumn = ({ row }: { row: Customer }) => {
+const NameColumn = ({ row, searchQuery }: { row: any; searchQuery?: string }) => {
+    const highlightMatch = (text: string, query?: string) => {
+        if (!query || query.length === 0) return text
+        
+        const regex = new RegExp(`(${query})`, 'gi')
+        const parts = text.split(regex)
+        
+        return parts.map((part, i) => 
+            regex.test(part) ? (
+                <mark key={i} className="bg-yellow-300 font-bold">{part}</mark>
+            ) : (
+                part
+            )
+        )
+    }
+    
     return (
-        <div className="flex items-center">
-            <Avatar size={40} shape="circle" src={row.img} />
-            <Link
-                className={`hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100`}
-                to={`/concepts/customers/customer-details/${row.id}`}
-            >
-                {row.name}
-            </Link>
-        </div>
+        <Link
+            className={`hover:text-primary font-semibold text-gray-900 dark:text-gray-100`}
+            to={`/assets/${row.id}`}
+        >
+            {highlightMatch(row.title, searchQuery)}
+        </Link>
     )
 }
 
@@ -75,20 +87,48 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
+    // Filter and sort list - show only matches, with exact matches first
+    const filteredAndSortedList = useMemo(() => {
+        const query = (tableData.query as string || '').toLowerCase().trim()
+        
+        if (!query || query.length === 0) return customerList
+        
+        // Filter to only include matching titles
+        const filtered = customerList.filter(customer =>
+            customer.title.toLowerCase().includes(query)
+        )
+        
+        // Sort to put exact/partial matches first
+        return filtered.sort((a, b) => {
+            const aTitle = a.title.toLowerCase()
+            const bTitle = b.title.toLowerCase()
+            
+            // Exact match comes first
+            if (aTitle === query) return -1
+            if (bTitle === query) return 1
+            
+            // Starts with query comes next
+            if (aTitle.startsWith(query) && !bTitle.startsWith(query)) return -1
+            if (!aTitle.startsWith(query) && bTitle.startsWith(query)) return 1
+            
+            return 0
+        })
+    }, [customerList, tableData.query])
+
     const handleEdit = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-edit/${customer.id}`)
+        navigate(`/asset-edit/${customer.id}`)
     }
 
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/concepts/customers/customer-details/${customer.id}`)
+        navigate(`/assets/${customer.id}`)
     }
 
-    const columns: ColumnDef<Customer>[] = useMemo(
+    const columns: ColumnDef<any>[] = useMemo(
         () => [
             {
                 header: 'Title',
                 accessorKey: 'title',
-
+                cell: (props) => <NameColumn row={props.row.original} searchQuery={tableData.query as string} />
             },
             {
                 header: 'File Extension',
@@ -117,6 +157,32 @@ const CustomerListTable = () => {
                 header: 'Description',
                 accessorKey: 'description',
 
+            },
+            {
+                header: '',
+                id: 'action',
+                cell: (props) => (
+                    <div className="flex items-center gap-3">
+                        <Tooltip title="Edit">
+                            <div
+                                className={`text-xl cursor-pointer select-none font-semibold`}
+                                role="button"
+                                onClick={() => handleEdit(props.row.original)}
+                            >
+                                <TbPencil />
+                            </div>
+                        </Tooltip>
+                        <Tooltip title="View">
+                            <div
+                                className={`text-xl cursor-pointer select-none font-semibold`}
+                                role="button"
+                                onClick={() => handleViewDetails(props.row.original)}
+                            >
+                                <TbEye />
+                            </div>
+                        </Tooltip>
+                    </div>
+                ),
             },
         ],
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -149,11 +215,11 @@ const CustomerListTable = () => {
         handleSetTableData(newTableData)
     }
 
-    const handleRowSelect = (checked: boolean, row: Customer) => {
+    const handleRowSelect = (checked: boolean, row: any) => {
         setSelectedCustomer(checked, row)
     }
 
-    const handleAllRowSelect = (checked: boolean, rows: Row<Customer>[]) => {
+    const handleAllRowSelect = (checked: boolean, rows: Row<any>[]) => {
         if (checked) {
             const originalRows = rows.map((row) => row.original)
             setSelectAllCustomer(originalRows)
@@ -166,8 +232,8 @@ const CustomerListTable = () => {
         <DataTable
             selectable
             columns={columns}
-            data={customerList}
-            noData={!isLoading && customerList.length === 0}
+            data={filteredAndSortedList}
+            noData={!isLoading && filteredAndSortedList.length === 0}
             skeletonAvatarColumns={[0]}
             skeletonAvatarProps={{ width: 28, height: 28 }}
             loading={isLoading}

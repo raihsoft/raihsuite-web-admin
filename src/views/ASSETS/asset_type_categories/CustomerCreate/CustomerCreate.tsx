@@ -5,37 +5,63 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import CustomerForm from '../CustomerForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import sleep from '@/utils/sleep'
 import { TbTrash } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 import type { CustomerFormSchema } from '../CustomerForm'
+import { apiCreateAssetTypeCategory } from '@/services/CustomersService'
+import { mutate } from 'swr'
+import { useCustomerListStore } from '../AssetTypeCategoriesList/store/customerListStore'
 
 const CustomerEdit = () => {
     const navigate = useNavigate()
 
-    const [discardConfirmationOpen, setDiscardConfirmationOpen] =
-        useState(false)
+    const [discardConfirmationOpen, setDiscardConfirmationOpen] = useState(false)
     const [isSubmiting, setIsSubmiting] = useState(false)
 
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        console.log('Submitted values', values)
-        setIsSubmiting(true)
-        await sleep(800)
-        setIsSubmiting(false)
-        toast.push(
-            <Notification type="success">Customer created!</Notification>,
-            { placement: 'top-center' },
-        )
-        navigate('/concepts/customers/customer-list')
+        try {
+            setIsSubmiting(true)
+            const tenant = localStorage.getItem('tenant')
+            if (!tenant) throw new Error('Tenant missing')
+
+            // ✅ Use JSON payload instead of FormData
+            const payload = {
+                name: values.name,
+                description: values.description || '',
+                tenant,
+            }
+
+            // console.log('Submitting payload:', payload)
+
+            await apiCreateAssetTypeCategory(payload)
+
+            // ✅ Revalidate SWR cache
+            const { tableData, filterData } = useCustomerListStore.getState()
+            await mutate(['/api/asset_type_categories', { ...tableData, ...filterData }])
+
+            toast.push(
+                <Notification type="success">Category created!</Notification>,
+                { placement: 'top-center' },
+            )
+            navigate('/asset_type_categories')
+        } catch (err: any) {
+            console.error('Create failed:', err.response?.data || err.message)
+            toast.push(
+                <Notification type="danger">Create failed!</Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setIsSubmiting(false)
+        }
     }
 
     const handleConfirmDiscard = () => {
         setDiscardConfirmationOpen(true)
         toast.push(
-            <Notification type="success">Customer discardd!</Notification>,
+            <Notification type="success">Customer discarded!</Notification>,
             { placement: 'top-center' },
         )
-        navigate('/concepts/customers/customer-list')
+        navigate('/asset-type-categories')
     }
 
     const handleDiscard = () => {
@@ -92,8 +118,8 @@ const CustomerEdit = () => {
                 onConfirm={handleConfirmDiscard}
             >
                 <p>
-                    Are you sure you want discard this? This action can&apos;t
-                    be undo.{' '}
+                    Are you sure you want to discard this? This action can&apos;t
+                    be undone.
                 </p>
             </ConfirmDialog>
         </>

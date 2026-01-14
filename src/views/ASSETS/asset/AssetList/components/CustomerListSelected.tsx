@@ -9,11 +9,12 @@ import toast from '@/components/ui/toast'
 import RichTextEditor from '@/components/shared/RichTextEditor'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
+import { apiDeleteAsset } from '@/services/CustomersService'
 import { TbChecks } from 'react-icons/tb'
 
-const CustomerListSelected = () => {
+const AssetListSelected = () => {
     const {
-        selectedCustomer,
+        selectedCustomer,       // here these are assets selected
         customerList,
         mutate,
         customerListTotal,
@@ -23,6 +24,7 @@ const CustomerListSelected = () => {
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
     const [sendMessageDialogOpen, setSendMessageDialogOpen] = useState(false)
     const [sendMessageLoading, setSendMessageLoading] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     const handleDelete = () => {
         setDeleteConfirmationOpen(true)
@@ -32,21 +34,39 @@ const CustomerListSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = () => {
-        const newCustomerList = customerList.filter((customer) => {
-            return !selectedCustomer.some(
-                (selected) => selected.id === customer.id,
+    const handleConfirmDelete = async () => {
+        setIsDeleting(true)
+        try {
+            // Call backend delete API for each selected asset
+            const deletePromises = selectedCustomer.map((asset) =>
+                apiDeleteAsset(asset.id)
             )
-        })
-        setSelectAllCustomer([])
-        mutate(
-            {
-                list: newCustomerList,
-                total: customerListTotal - selectedCustomer.length,
-            },
-            false,
-        )
-        setDeleteConfirmationOpen(false)
+            await Promise.all(deletePromises)
+
+            // Refresh SWR list from backend
+            await mutate()
+
+            // Clear selections
+            setSelectAllCustomer([])
+
+            toast.push(
+                <Notification type="success">
+                    {selectedCustomer.length} asset(s) deleted successfully!
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        } catch (error) {
+            console.error('Delete error:', error)
+            toast.push(
+                <Notification type="danger">
+                    Failed to delete asset(s)
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setIsDeleting(false)
+            setDeleteConfirmationOpen(false)
+        }
     }
 
     const handleSend = () => {
@@ -66,7 +86,7 @@ const CustomerListSelected = () => {
         <>
             {selectedCustomer.length > 0 && (
                 <StickyFooter
-                    className=" flex items-center justify-between py-4 bg-white dark:bg-gray-800"
+                    className="flex items-center justify-between py-4 bg-white dark:bg-gray-800"
                     stickyClass="-mx-4 sm:-mx-8 border-t border-gray-200 dark:border-gray-700 px-8"
                     defaultClass="container mx-auto px-8 rounded-xl border border-gray-200 dark:border-gray-600 mt-4"
                 >
@@ -81,7 +101,7 @@ const CustomerListSelected = () => {
                                         <span className="font-semibold flex items-center gap-1">
                                             <span className="heading-text">
                                                 {selectedCustomer.length}{' '}
-                                                Customers
+                                                Assets
                                             </span>
                                             <span>selected</span>
                                         </span>
@@ -98,10 +118,12 @@ const CustomerListSelected = () => {
                                         'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error'
                                     }
                                     onClick={handleDelete}
+                                    loading={isDeleting}
+                                    disabled={isDeleting}
                                 >
                                     Delete
                                 </Button>
-                                <Button
+                                {/* <Button
                                     size="sm"
                                     variant="solid"
                                     onClick={() =>
@@ -109,7 +131,7 @@ const CustomerListSelected = () => {
                                     }
                                 >
                                     Message
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                     </div>
@@ -118,16 +140,15 @@ const CustomerListSelected = () => {
             <ConfirmDialog
                 isOpen={deleteConfirmationOpen}
                 type="danger"
-                title="Remove customers"
+                title="Remove assets"
                 onClose={handleCancel}
                 onRequestClose={handleCancel}
                 onCancel={handleCancel}
                 onConfirm={handleConfirmDelete}
             >
                 <p>
-                    {' '}
-                    Are you sure you want to remove these customers? This action
-                    can&apos;t be undo.{' '}
+                    Are you sure you want to remove these assets? This action
+                    can&apos;t be undone.
                 </p>
             </ConfirmDialog>
             <Dialog
@@ -136,7 +157,7 @@ const CustomerListSelected = () => {
                 onClose={() => setSendMessageDialogOpen(false)}
             >
                 <h5 className="mb-2">Send Message</h5>
-                <p>Send message to the following customers</p>
+                <p>Send message to the following assets</p>
                 <Avatar.Group
                     chained
                     omittedAvatarTooltip
@@ -144,9 +165,9 @@ const CustomerListSelected = () => {
                     maxCount={4}
                     omittedAvatarProps={{ size: 30 }}
                 >
-                    {selectedCustomer.map((customer) => (
-                        <Tooltip key={customer.id} title={customer.name}>
-                            <Avatar size={30} src={customer.img} alt="" />
+                    {selectedCustomer.map((asset) => (
+                        <Tooltip key={asset.id} title={asset.name}>
+                            <Avatar size={30} src={asset.img} alt="" />
                         </Tooltip>
                     ))}
                 </Avatar.Group>
@@ -174,4 +195,4 @@ const CustomerListSelected = () => {
     )
 }
 
-export default CustomerListSelected
+export default AssetListSelected

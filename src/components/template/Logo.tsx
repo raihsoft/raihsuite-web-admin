@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import { APP_NAME } from '@/constants/app.constant'
 import type { CommonProps } from '@/@types/common'
+import SideNavToggle from '@/components/template/SideNavToggle'
 
 interface LogoProps extends CommonProps {
     type?: 'full' | 'streamline'
@@ -34,9 +35,9 @@ const Logo = (props: LogoProps) => {
 
             <span
                 className={classNames('text-3xl ml-3 font-bold', textClass)}
-                style={{ color: '#1E5555' }}
+                style={{ color: 'black', marginLeft: '2px' }}
             >
-                Raihsuite
+                <SideNavToggle />
             </span>
         </div>
     )

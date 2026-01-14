@@ -1,39 +1,54 @@
-import { lazy } from 'react'
-import { HRM_EMPLOYEES_DEATILS_PREFIX_PATH, HRM_EMPLOYEES_EDIT_PREFIX_PATH } from '@/constants/route.constant'
+import {ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH } from '@/constants/route.constant'
+import {
+    NAV_ITEM_TYPE_TITLE,
+    NAV_ITEM_TYPE_COLLAPSE,
+    NAV_ITEM_TYPE_ITEM,
+} from '@/constants/navigation.constant'
 import { ADMIN, USER } from '@/constants/roles.constant'
-import type { Routes } from '@/@types/routes'
+import type { NavigationTree } from '@/@types/navigation'
 
-const conceptsRoute: Routes = [
+const conceptsNavigationConfig: NavigationTree[] = [
     {
-    key: 'employee.edit',
-    path: `${HRM_EMPLOYEES_EDIT_PREFIX_PATH}/:id`, // not /employee-edit/employee-edit
-    component: lazy(() => import('@/views/HRMS/employees/CustomerEdit')),
-    authority: [ADMIN, USER],
-    meta: {
-        header: {
-            title: 'Edit Employee',
-            description: 'Manage employee details, profile, and preferences.',
-            contained: true,
+        key: 'concepts',
+        path: '',
+        title: 'Concepts',
+        translateKey: 'nav.concepts',
+        icon: 'concepts',
+        type: NAV_ITEM_TYPE_TITLE,
+        authority: [ADMIN, USER],
+        meta: {
+            horizontalMenu: {
+                layout: 'columns',
+                columns: 4,
+            },
         },
-        footer: false,
-    },
-}
-,
-    {
-    key: 'employee.edit',
-    path: `${HRM_EMPLOYEES_DEATILS_PREFIX_PATH}/:id`,
-    component: lazy(() => import('@/views/HRMS/employees/CustomerDetails')),
-    authority: [ADMIN, USER],
-    meta: {
-        header: {
-            title: 'details Employee',
-            description: 'Manage employee details, profile, and preferences.',
-            contained: true,
-        },
-        footer: false,
-    },
-}
+      
+                subMenu: [
+                   
+                    {
+                        key: 'concepts.customers.customerEdit',
+                        path: `${ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH}/assettypecategoriesedit/:id`,
+                        title: 'Asset Type Category Edit',
+                        translateKey: 'nav.conceptsCustomers.customerEdit',
+                        icon: 'customerEdit',
+                        type: NAV_ITEM_TYPE_ITEM,
+                        authority: [ADMIN, USER],
+                        meta: {
+                            description: {
+                                translateKey:
+                                    'nav.conceptsCustomers.customerEditDesc',
+                                label: 'Edit customer info',
+                            },
+                        },
+                        subMenu: [],
+                    },
+                ], 
+            },
+           
+        
 
-]
 
-export default conceptsRoute
+        ]
+
+
+export default conceptsNavigationConfig

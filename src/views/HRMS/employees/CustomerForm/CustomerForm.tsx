@@ -2,9 +2,9 @@ import { useEffect } from 'react'
 import Container from '@/components/shared/Container'
 import BottomStickyBar from '@/components/template/BottomStickyBar'
 import OverviewSection from './OverviewSection'
+import ProfileImageSection from './ProfileImageSection'
 // import AddressSection from './AddressSection'
 // import TagsSection from './TagsSection'
-// import ProfileImageSection from './ProfileImageSection'
 // import AccountSection from './AccountSection'
 import isEmpty from 'lodash/isEmpty'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -33,7 +33,16 @@ const validationSchema: ZodType<CustomerFormSchema> = z.object({
     youtube_link: z.string().optional(),
     linkedin_link: z.string().optional(),
     website_link: z.string().optional(),
+    phone: z.string().optional(),
+    img: z.any().optional(),
+    country: z.string().optional(),
+    address: z.string().optional(),
+    postcode: z.string().optional(),
+    city: z.string().optional(),
     tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
+    tenant: z.string().optional(),
+    banAccount: z.boolean().optional(),
+    accountVerified: z.boolean().optional(),
 })
 
 const CustomerForm = (props: CustomerFormProps) => {
@@ -73,9 +82,15 @@ const CustomerForm = (props: CustomerFormProps) => {
             onSubmit={handleSubmit(onSubmit)}
         >
             <Container>
-                <div className="gap-4 flex flex-col flex-auto">
-                    <OverviewSection control={control} errors={errors} />
-                    {/* <AddressSection control={control} errors={errors} /> */}
+                <div className="flex flex-col md:flex-row gap-4">
+                    <div className="gap-4 flex flex-col flex-auto">
+                        <OverviewSection control={control} errors={errors} />
+                        {/* <AddressSection control={control} errors={errors} /> */}
+                    </div>
+                    <div className="md:w-[370px] gap-4 flex flex-col">
+                        <ProfileImageSection control={control} errors={errors} />
+                        {/* other right-side sections (tags/account) can go here */}
+                    </div>
                 </div>
             </Container>
             <BottomStickyBar>{children}</BottomStickyBar>

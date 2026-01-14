@@ -10,6 +10,7 @@ import RichTextEditor from '@/components/shared/RichTextEditor'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
 import { TbChecks } from 'react-icons/tb'
+import { apiDeleteEnquiry } from '@/services/CustomersService'
 
 const CustomerListSelected = () => {
     const {
@@ -32,21 +33,45 @@ const CustomerListSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = () => {
-        const newCustomerList = customerList.filter((customer) => {
-            return !selectedCustomer.some(
-                (selected) => selected.id === customer.id,
+    const handleConfirmDelete = async () => {
+        try {
+            // 1. Delete from backend
+            await Promise.all(
+                selectedCustomer.map((c) => apiDeleteEnquiry(c.id))
             )
-        })
-        setSelectAllCustomer([])
-        mutate(
-            {
-                list: newCustomerList,
-                total: customerListTotal - selectedCustomer.length,
-            },
-            false,
-        )
-        setDeleteConfirmationOpen(false)
+
+            // 2. Update local cache
+            const newCustomerList = customerList.filter(
+                (customer) =>
+                    !selectedCustomer.some(
+                        (selected) => selected.id === customer.id
+                    )
+            )
+
+            setSelectAllCustomer([])
+
+            mutate(
+                {
+                    results: newCustomerList,
+                    count: customerListTotal - selectedCustomer.length,
+                },
+                false
+            )
+
+            toast.push(
+                <Notification type="success">Customers deleted!</Notification>,
+                { placement: 'top-center' }
+            )
+        } catch (err) {
+            toast.push(
+                <Notification type="danger">
+                    Failed to delete customers
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setDeleteConfirmationOpen(false)
+        }
     }
 
     const handleSend = () => {
@@ -54,7 +79,7 @@ const CustomerListSelected = () => {
         setTimeout(() => {
             toast.push(
                 <Notification type="success">Message sent!</Notification>,
-                { placement: 'top-center' },
+                { placement: 'top-center' }
             )
             setSendMessageLoading(false)
             setSendMessageDialogOpen(false)
@@ -66,27 +91,24 @@ const CustomerListSelected = () => {
         <>
             {selectedCustomer.length > 0 && (
                 <StickyFooter
-                    className=" flex items-center justify-between py-4 bg-white dark:bg-gray-800"
+                    className="flex items-center justify-between py-4 bg-white dark:bg-gray-800"
                     stickyClass="-mx-4 sm:-mx-8 border-t border-gray-200 dark:border-gray-700 px-8"
                     defaultClass="container mx-auto px-8 rounded-xl border border-gray-200 dark:border-gray-600 mt-4"
                 >
                     <div className="container mx-auto">
                         <div className="flex items-center justify-between">
                             <span>
-                                {selectedCustomer.length > 0 && (
-                                    <span className="flex items-center gap-2">
-                                        <span className="text-lg text-primary">
-                                            <TbChecks />
-                                        </span>
-                                        <span className="font-semibold flex items-center gap-1">
-                                            <span className="heading-text">
-                                                {selectedCustomer.length}{' '}
-                                                Customers
-                                            </span>
-                                            <span>selected</span>
-                                        </span>
+                                <span className="flex items-center gap-2">
+                                    <span className="text-lg text-primary">
+                                        <TbChecks />
                                     </span>
-                                )}
+                                    <span className="font-semibold flex items-center gap-1">
+                                        <span className="heading-text">
+                                            {selectedCustomer.length} Customers
+                                        </span>
+                                        <span>selected</span>
+                                    </span>
+                                </span>
                             </span>
 
                             <div className="flex items-center">
@@ -100,15 +122,6 @@ const CustomerListSelected = () => {
                                     onClick={handleDelete}
                                 >
                                     Delete
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="solid"
-                                    onClick={() =>
-                                        setSendMessageDialogOpen(true)
-                                    }
-                                >
-                                    Message
                                 </Button>
                             </div>
                         </div>
@@ -125,9 +138,8 @@ const CustomerListSelected = () => {
                 onConfirm={handleConfirmDelete}
             >
                 <p>
-                    {' '}
                     Are you sure you want to remove these customers? This action
-                    can&apos;t be undo.{' '}
+                    can&apos;t be undone.
                 </p>
             </ConfirmDialog>
             <Dialog

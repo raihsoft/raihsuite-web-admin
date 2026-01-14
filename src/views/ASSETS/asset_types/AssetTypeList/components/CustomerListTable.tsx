@@ -16,17 +16,29 @@ const statusColor: Record<string, string> = {
     blocked: 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900',
 }
 
-const NameColumn = ({ row }: { row: Customer }) => {
+const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string }) => {
+    const highlightMatch = (text: string, query?: string) => {
+        if (!query || query.length === 0) return text
+        
+        const regex = new RegExp(`(${query})`, 'gi')
+        const parts = text.split(regex)
+        
+        return parts.map((part, i) => 
+            regex.test(part) ? (
+                <mark key={i} className="bg-yellow-300 font-bold">{part}</mark>
+            ) : (
+                part
+            )
+        )
+    }
+    
     return (
-        <div className="flex items-center">
-            <Avatar size={40} shape="circle" src={row.img} />
-            <Link
-                className={`hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100`}
-                to={`/concepts/customers/customer-details/${row.id}`}
-            >
-                {row.name}
-            </Link>
-        </div>
+        <Link
+            className={`hover:text-primary font-semibold text-gray-900 dark:text-gray-100`}
+            to={`/asset-types/${row.id}`}
+        >
+            {highlightMatch(row.name, searchQuery)}
+        </Link>
     )
 }
 
@@ -75,14 +87,42 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
-const handleEdit = (customer: Customer) => {
-    navigate(`/employee-edit/${customer.id}`)
-}
+    const handleEdit = (customer: Customer) => {
+        navigate(`/assettypes-edit/${customer.id}`)
+    }
 
 
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/employee-details/${customer.id}`)
+        navigate(`/asset-types/${customer.id}`)
     }
+
+    // Filter and sort list - show only matches, with exact matches first
+    const filteredAndSortedList = useMemo(() => {
+        const query = (tableData.query as string || '').toLowerCase().trim()
+        
+        if (!query || query.length === 0) return customerList
+        
+        // Filter to only include matching names
+        const filtered = customerList.filter(customer =>
+            customer.name.toLowerCase().includes(query)
+        )
+        
+        // Sort to put exact/partial matches first
+        return filtered.sort((a, b) => {
+            const aName = a.name.toLowerCase()
+            const bName = b.name.toLowerCase()
+            
+            // Exact match comes first
+            if (aName === query) return -1
+            if (bName === query) return 1
+            
+            // Starts with query comes next
+            if (aName.startsWith(query) && !bName.startsWith(query)) return -1
+            if (!aName.startsWith(query) && bName.startsWith(query)) return 1
+            
+            return 0
+        })
+    }, [customerList, tableData.query])
 
     
     const columns: ColumnDef<Customer>[] = useMemo(
@@ -90,7 +130,7 @@ const handleEdit = (customer: Customer) => {
             {
                 header: 'Name',
                 accessorKey: 'name',
-
+                cell: (props) => <NameColumn row={props.row.original} searchQuery={tableData.query as string} />
             },
             {
                 header: 'Code',
@@ -169,13 +209,13 @@ const handleEdit = (customer: Customer) => {
             setSelectAllCustomer([])
         }
     }
-console.log("customerList", customerList)
+
     return (
         <DataTable
             selectable
             columns={columns}
-            data={customerList}
-            noData={!isLoading && customerList.length === 0}
+            data={filteredAndSortedList}
+            noData={!isLoading && filteredAndSortedList.length === 0}
             skeletonAvatarColumns={[0]}
             skeletonAvatarProps={{ width: 28, height: 28 }}
             loading={isLoading}

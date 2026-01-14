@@ -32,7 +32,28 @@ const CustomerEdit = () => {
     const handleFormSubmit = async (values: CustomerFormSchema) => {
         try {
             setIsSubmitting(true)
-            await apiUpdateEmployee(id as string, values)
+            // If img was changed to a File, send multipart/form-data
+            if (values.img && values.img instanceof File) {
+                const formData = new FormData()
+                formData.append('img', values.img)
+                // append other fields as strings
+                formData.append('name', values.name || '')
+                formData.append('designation', values.designation || '')
+                formData.append('email_link', values.email_link || '')
+                formData.append('organization', values.organization || '')
+                formData.append('facebook_link', values.facebook_link || '')
+                formData.append('instagram_link', values.instagram_link || '')
+                formData.append('youtube_link', values.youtube_link || '')
+                formData.append('linkedin_link', values.linkedin_link || '')
+                formData.append('website_link', values.website_link || '')
+
+                await import('@/services/ApiService').then((m) =>
+                    m.default.fetchDataWithAxios({ url: `/hrms/employees/${id}/`, method: 'patch', data: formData } as any),
+                )
+            } else {
+                await apiUpdateEmployee(id as string, values)
+            }
+
             toast.push(<Notification type="success">Changes Saved!</Notification>, {
                 placement: 'top-center',
             })
@@ -59,6 +80,7 @@ const CustomerEdit = () => {
             instagram_link,
             youtube_link,
             website_link,
+            img,
         } = data
 
         return {
@@ -71,6 +93,7 @@ const CustomerEdit = () => {
             instagram_link,
             youtube_link,
             website_link,
+            img,
             tags: [],
         }
     }
@@ -106,7 +129,7 @@ const CustomerEdit = () => {
             {!isLoading && data && (
                 <>
                     <CustomerForm
-                        defaultValues={getDefaultValues() as CustomerFormSchema}
+                        defaultValues={getDefaultValues() as unknown as CustomerFormSchema}
                         newCustomer={false}
                         onFormSubmit={handleFormSubmit}
                     >
@@ -132,6 +155,7 @@ const CustomerEdit = () => {
                                         Delete
                                     </Button>
                                     <Button
+                                        style={{marginLeft:"10px"}}
                                         variant="solid"
                                         type="submit"
                                         loading={isSubmitting}

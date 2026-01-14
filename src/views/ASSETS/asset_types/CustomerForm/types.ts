@@ -8,10 +8,12 @@ export type OverviewFields = {
 }
 
 export type AddressFields = {
-    country: string
-    address: string
-    postcode: string
-    city: string
+    addressLine1?: string
+    addressLine2?: string
+    city?: string
+    state?: string
+    zipCode?: string
+    country?: string
 }
 
 export type ProfileImageFields = {

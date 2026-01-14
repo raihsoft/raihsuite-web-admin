@@ -1,10 +1,8 @@
-
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
-// import { apiGetEnquiries } from '@/services/CustomersService'
 import type { TableQueries } from '@/@types/common'
 import type { GetCustomersListResponse } from '../types'
-import {  apiGetEnquiries } from '@/services/CustomersService'
+import { apiGetEnquiries } from '@/services/CustomersService'
 
 export default function useCustomerList() {
     const {
@@ -17,23 +15,33 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
-    const { data, error, isLoading } = useSWR(
-        ['/api/enquiries', { ...tableData, ...filterData }] as const,
-        ([, params]) => apiGetEnquiries<GetCustomersListResponse, TableQueries>(params),
+    // IMPORTANT — Use pageIndex instead of page  
+    const swrKey = [
+        '/api/enquiries',
+        {
+            page: tableData.pageIndex,
+            pageSize: tableData.pageSize,
+            ...filterData,
+        },
+    ] as const
+
+    const { data, error, isLoading, mutate } = useSWR(
+        swrKey,
+        ([, params]) =>
+            apiGetEnquiries<GetCustomersListResponse, TableQueries>(params),
         { revalidateOnFocus: false }
     )
 
-    const customerList = data?.results?.map((customer: any, index: number) => ({
-    id: customer.id ?? index,
-    name: customer.name,
-    email: customer.email,
-    phone: customer.phone,
-    message: customer.message,
-
-    status: 'active',
-    totalSpending: 0,
-})) ?? []
-
+    const customerList =
+        data?.results?.map((customer: any, index: number) => ({
+            id: customer.id ?? index,
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone,
+            message: customer.message,
+            status: 'active',
+            totalSpending: 0,
+        })) ?? []
 
     const customerListTotal = data?.count ?? 0
 
@@ -49,5 +57,6 @@ export default function useCustomerList() {
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
+        mutate, // <-- added
     }
 }

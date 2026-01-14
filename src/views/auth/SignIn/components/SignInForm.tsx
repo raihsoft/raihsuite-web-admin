@@ -41,6 +41,8 @@ const SignInForm = (props: SignInFormProps) => {
         handleSubmit,
         formState: { errors },
         control,
+        setError,
+        clearErrors,
     } = useForm<SignInFormSchema>({
         defaultValues: {
             email: '',
@@ -54,26 +56,56 @@ const SignInForm = (props: SignInFormProps) => {
     const onSignIn = async (values: SignInFormSchema) => {
         const { email, password } = values
 
-        if (!disableSubmit) {
-            setSubmitting(true)
+        if (disableSubmit) return
 
+        setSubmitting(true)
+        // clear previous form errors and messages
+        try {
+            clearErrors()
+        } catch (err) {
+            // ignore
+        }
+        setMessage?.('')
+
+        try {
             const result = await signIn({ email, password })
 
             if (result?.status === 'failed') {
-                setMessage?.(result.message)
-            } else if (result?.status === 'success' && result.data?.user) {
-                // 🔥 Save tenant_id for tenant-based data fetching
-                localStorage.setItem('tenant_id', result.data.user.tenant_id || '')
-                console.log('✅ Tenant ID saved:', result.data.user.tenant_id)
-            }
-        }
+                const msg = result.message || ''
 
-        setSubmitting(false)
+                if (/user not found/i.test(msg) || /no user/i.test(msg)) {
+                    setError('email', { type: 'manual', message: 'User not found' })
+                } else if (/wrong password|password/i.test(msg)) {
+                    setError('password', { type: 'manual', message: ' wrong username or password — please try again' })
+                } else if (/invalid credentials/i.test(msg)) {
+                    // Ambiguous backend message — cannot determine if user missing or password wrong
+                    setMessage?.('User not found or wrong password')
+                } else {
+                    // network / server / fallback messages
+                    setMessage?.(msg)
+                }
+            } else if (result?.status === 'success') {
+                // success - AuthProvider already handled tokens and user state
+            }
+        } catch (err) {
+            // Unexpected errors — show generic message but do not reload
+            setMessage?.('Sign in failed. Please try again.')
+            console.error('Sign in error', err)
+        } finally {
+            setSubmitting(false)
+        }
     }
 
     return (
         <div className={className}>
-            <Form onSubmit={handleSubmit(onSignIn)}>
+            <Form
+                className="space-y-4"
+                onSubmit={(e) => {
+                    e.preventDefault()
+                    // call react-hook-form submit handler explicitly
+                    void handleSubmit(onSignIn)()
+                }}
+            >
                 <FormItem
                     label="Email"
                     invalid={Boolean(errors.email)}
@@ -96,10 +128,7 @@ const SignInForm = (props: SignInFormProps) => {
                     label="Password"
                     invalid={Boolean(errors.password)}
                     errorMessage={errors.password?.message}
-                    className={classNames(
-                        passwordHint && 'mb-0',
-                        errors.password?.message && 'mb-8',
-                    )}
+                    className={`${passwordHint ? 'mb-0' : ''} ${errors.password?.message ? 'mb-8' : ''}`.trim()}
                 >
                     <Controller
                         name="password"
@@ -121,6 +150,7 @@ const SignInForm = (props: SignInFormProps) => {
                     loading={isSubmitting}
                     variant="solid"
                     type="submit"
+                    className="py-3 text-base"
                 >
                     {isSubmitting ? 'Signing in...' : 'Sign In'}
                 </Button>

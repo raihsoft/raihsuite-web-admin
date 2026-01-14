@@ -10,13 +10,12 @@ import RichTextEditor from '@/components/shared/RichTextEditor'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
 import { TbChecks } from 'react-icons/tb'
+import { apiDeleteAssetTypeCategory } from '@/services/CustomersService'
 
 const CustomerListSelected = () => {
     const {
         selectedCustomer,
-        customerList,
         mutate,
-        customerListTotal,
         setSelectAllCustomer,
     } = useCustomerList()
 
@@ -32,21 +31,36 @@ const CustomerListSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = () => {
-        const newCustomerList = customerList.filter((customer) => {
-            return !selectedCustomer.some(
-                (selected) => selected.id === customer.id,
+    const handleConfirmDelete = async () => {
+        try {
+            // Call backend delete for each selected customer
+            await Promise.all(
+                selectedCustomer.map((c) => apiDeleteAssetTypeCategory(c.id))
             )
-        })
-        setSelectAllCustomer([])
-        mutate(
-            {
-                list: newCustomerList,
-                total: customerListTotal - selectedCustomer.length,
-            },
-            false,
-        )
-        setDeleteConfirmationOpen(false)
+
+            // Clear selection
+            setSelectAllCustomer([])
+
+            // Let SWR re-fetch from backend
+            await mutate()
+
+            toast.push(
+                <Notification type="success">
+                    Customers deleted successfully!
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        } catch (err: any) {
+            console.error('Delete failed:', err.response?.data || err.message)
+            toast.push(
+                <Notification type="danger">
+                    Failed to delete customers
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        } finally {
+            setDeleteConfirmationOpen(false)
+        }
     }
 
     const handleSend = () => {
@@ -101,7 +115,7 @@ const CustomerListSelected = () => {
                                 >
                                     Delete
                                 </Button>
-                                <Button
+                                {/* <Button
                                     size="sm"
                                     variant="solid"
                                     onClick={() =>
@@ -109,7 +123,7 @@ const CustomerListSelected = () => {
                                     }
                                 >
                                     Message
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                     </div>
@@ -125,9 +139,8 @@ const CustomerListSelected = () => {
                 onConfirm={handleConfirmDelete}
             >
                 <p>
-                    {' '}
                     Are you sure you want to remove these customers? This action
-                    can&apos;t be undo.{' '}
+                    can&apos;t be undone.
                 </p>
             </ConfirmDialog>
             <Dialog

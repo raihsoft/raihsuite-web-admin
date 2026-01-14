@@ -11,7 +11,7 @@ export type OverviewFields = {
    linkedin_link: string
     phone: string
     website_link: string
-    img: string
+    img: string | File
     tenant: string
 }
 
@@ -23,7 +23,7 @@ export type AddressFields = {
 }
 
 export type ProfileImageFields = {
-    img: string
+    img: string | File
 }
 
 export type TagsFields = {

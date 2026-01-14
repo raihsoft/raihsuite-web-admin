@@ -35,10 +35,13 @@ const AxiosResponseIntrceptorErrorCallback = async (error: AxiosError) => {
 
   // =========================================================
   // 🔥 TOKEN EXPIRED / UNAUTHORIZED
+  // Only try to refresh/force-logout for requests that had an Authorization header
+  // (i.e., requests made with an access token). This prevents sign-in failures
+  // (401) on the auth endpoint from triggering a reload/logout.
   // =========================================================
   if (
     (response.data as any)?.code === "token_not_valid" ||
-    unauthorizedCodes.includes(response.status)
+    (unauthorizedCodes.includes(response.status) && originalRequest.headers?.Authorization)
   ) {
     if (originalRequest._retry) {
       return Promise.reject(error);

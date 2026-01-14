@@ -23,8 +23,15 @@ const OauthSignIn = ({ setMessage, disableSubmit }: OauthSignInProps) => {
                         onSignIn({ accessToken: token }, user)
                         redirect()
                     }
-                } catch (error) {
-                    setMessage?.((error as string)?.toString() || '')
+                } catch (error: any) {
+                    if (!error?.response) {
+                        setMessage?.('No internet connection')
+                    } else if (error.response?.status >= 500) {
+                        setMessage?.('Server is not available. Please try again later.')
+                    } else {
+                        const msg = error?.response?.data?.message || error?.message || 'Sign in failed'
+                        setMessage?.(msg)
+                    }
                 }
             })
         }
@@ -40,8 +47,15 @@ const OauthSignIn = ({ setMessage, disableSubmit }: OauthSignInProps) => {
                         onSignIn({ accessToken: token }, user)
                         redirect()
                     }
-                } catch (error) {
-                    setMessage?.((error as string)?.toString() || '')
+                } catch (error: any) {
+                    if (!error?.response) {
+                        setMessage?.('No internet connection')
+                    } else if (error.response?.status >= 500) {
+                        setMessage?.('Server is not available. Please try again later.')
+                    } else {
+                        const msg = error?.response?.data?.message || error?.message || 'Sign in failed'
+                        setMessage?.(msg)
+                    }
                 }
             })
         }
@@ -49,7 +63,7 @@ const OauthSignIn = ({ setMessage, disableSubmit }: OauthSignInProps) => {
 
     return (
         <div className="flex items-center gap-2">
-            <Button
+            {/* <Button
                 className="flex-1"
                 type="button"
                 onClick={handleGoogleSignIn}
@@ -76,7 +90,7 @@ const OauthSignIn = ({ setMessage, disableSubmit }: OauthSignInProps) => {
                     />
                     <span>Github</span>
                 </div>
-            </Button>
+            </Button> */}
         </div>
     )
 }

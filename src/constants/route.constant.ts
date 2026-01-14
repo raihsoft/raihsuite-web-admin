@@ -1,3 +1,5 @@
+import { ex } from "@fullcalendar/core/internal-common"
+
 export const ROOT = '/'
 export const DASHBOARDS_PREFIX_PATH = '/dashboards'
 export const CONCEPTS_PREFIX_PATH = '/concepts'
@@ -15,6 +17,10 @@ export const ZONE_PREFIX_PATH = '/zone'
 export const ZONE_EDIT_PREFIX_PATH = '/zone-edit'
 export const ZONE_DEATILS_PREFIX_PATH = '/zone-details'
 export const ASSET_PREFIX_PATH = '/assets'
+export const ASSET_EDIT_PREFIX_PATH = '/asset-edit'
+export const ASSET_DETAILS_PREFIX_PATH = '/asset-details'
 export const ASSET_CATEGORY_PREFIX_PATH = '/assets-category'
 export const ASSET_TYPE_PREFIX_PATH = '/asset-types'
 export const ASSET_TYPE_CATEGORIES_PREFIX_PATH = '/asset-type-categories'
+export const ASSET_TYPE_CATEGORIES_EDIT_PREFIX_PATH = '/asset-type-categories-edit'
+export const ASSET_TYPE_EDIT_PREFIX_PATH = '/assettypes-edit'

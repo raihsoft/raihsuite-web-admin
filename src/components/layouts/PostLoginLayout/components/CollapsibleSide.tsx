@@ -7,6 +7,7 @@ import LayoutBase from '@/components//template/LayoutBase'
 import useResponsive from '@/utils/hooks/useResponsive'
 import { LAYOUT_COLLAPSIBLE_SIDE } from '@/constants/theme.constant'
 import type { CommonProps } from '@/@types/common'
+import { color } from 'framer-motion'
 
 const CollapsibleSide = ({ children }: CommonProps) => {
     const { larger, smaller } = useResponsive()
@@ -24,7 +25,8 @@ const CollapsibleSide = ({ children }: CommonProps) => {
                         headerStart={
                             <>
                                 {smaller.lg && <MobileNav />}
-                                {larger.lg && <SideNavToggle />}
+                                {/* {larger.lg && <SideNavToggle />} */}
+                                <h1 style={{color:"#1a7af8ff"}}>Raihsuite</h1>
                             </>
                         }
                         headerEnd={

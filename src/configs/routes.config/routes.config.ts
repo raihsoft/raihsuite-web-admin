@@ -10,13 +10,15 @@ import assetsRoute from './assetsRoute'
 import assetsCategoryRoute from './AssetCategoryRoute'
 import assettypes from './AssetTypeRoute'
 import assetTypeCategories from './AssetTypeCategoriesRoute'
-
+import participantsRoute from './ParticipantsRoute'
+import eventsRoute from './EventsRoute'
+import EventsRoute from './EventsRoute'
 
 export const publicRoutes: Routes = [...authRoute]
 
 export const protectedRoutes: Routes = [
     {
-        key: 'home',
+        key: 'hrms.item1',
         path: '/employees',
         component: lazy(() => import('@/views/HRMS/employees/CustomerList')),
         authority: [],
@@ -52,6 +54,20 @@ export const protectedRoutes: Routes = [
         path: '/enquiries',
         component: lazy(() => import('@/views/CRM/enquiries/EnquiriesList')),
         authority: [],
+    },
+    {
+        key: 'enquiriesDetails',
+        path: '/enquiries/:id',
+        component: lazy(() => import('@/views/CRM/enquiries/CustomerDetails/CustomerDetails')),
+        authority: [],
+        meta: {
+            header: {
+                title: 'Enquiry Details',
+                description: 'View enquiry details.',
+                contained: true,
+            },
+            footer: false,
+        },
     },
     {
         key: 'assettypes',
@@ -118,10 +134,19 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
 
+        {
+        key: 'Delivery',
+        path: '/delivery',
+        component: lazy(
+            () => import('@/views/ORDER/delivery/CustomerList'),
+        ),
+        authority: [],
+    },
+
     
     
 
-    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories
+    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute,...EventsRoute
 
 ]
 

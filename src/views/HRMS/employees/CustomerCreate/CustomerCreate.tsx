@@ -9,6 +9,8 @@ import { TbTrash } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 import type { CustomerFormSchema } from '../CustomerForm'
 import { apiCreateEmployee } from '@/services/CustomersService' // import POST API
+import { mutate } from 'swr'
+import { useCustomerListStore } from '../CustomerList/store/customerListStore' 
 
 const CustomerEdit = () => {
     const navigate = useNavigate()
@@ -32,8 +34,24 @@ const CustomerEdit = () => {
                 website_link: values.website_link,
             }
 
-            const response = await apiCreateEmployee(payload)
+            let response
+            // If img is a File, upload as multipart/form-data
+            if (values.img && values.img instanceof File) {
+                const formData = new FormData()
+                Object.entries(payload).forEach(([k, v]) => formData.append(k, v as any))
+                formData.append('img', values.img)
+                // Use ApiService directly to avoid typing issues
+                response = await import('@/services/ApiService').then((m) =>
+                    m.default.fetchDataWithAxios({ url: '/hrms/employees/', method: 'post', data: formData } as any),
+                )
+            } else {
+                response = await apiCreateEmployee(payload)
+            }
             // console.log("Created employee:", response.data)
+
+            // revalidate employees list
+            const { tableData, filterData } = useCustomerListStore.getState()
+            await mutate(['/api/employees', { ...tableData, ...filterData }])
 
             toast.push(
                 <Notification type="success">
@@ -42,7 +60,7 @@ const CustomerEdit = () => {
                 { placement: 'top-center' },
             )
 
-            navigate('/customers/customer-list')
+            navigate('/employees')
         } catch (error) {
             console.error(error)
             toast.push(
@@ -57,12 +75,12 @@ const CustomerEdit = () => {
     }
 
     const handleConfirmDiscard = () => {
-        setDiscardConfirmationOpen(true)
+        setDiscardConfirmationOpen(false)
         toast.push(
-            <Notification type="success">Customer discarded!</Notification>,
+            <Notification type="warning">Changes discarded!</Notification>,
             { placement: 'top-center' },
         )
-        navigate('/employees/employee-create')
+        navigate('/employees')
     }
 
     const handleDiscard = () => {
@@ -87,6 +105,7 @@ const CustomerEdit = () => {
                     youtube_link: '',
                     linkedin_link: '',
                     website_link: '',
+                    img: '',
                     tags: [],
                 }}
                 onFormSubmit={handleFormSubmit}

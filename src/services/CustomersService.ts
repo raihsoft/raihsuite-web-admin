@@ -1,8 +1,8 @@
 import { types } from 'util'
 import ApiService from './ApiService'
-
+import axios from 'axios'
 // Get employee list
-export async function apiGetEmployees<T, U extends Record<string, unknown>>(
+export async function apiGetEmployeeList<T, U extends Record<string, unknown>>(
     params: U,
 ) {
     return ApiService.fetchDataWithAxios<T>({
@@ -176,6 +176,48 @@ export async function apiGetEnquiries<T, U extends Record<string, unknown>>(
     })
 }
 
+// Get single enquiry by id
+export async function apiGetEnquiryById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/crm/enquiries/${id}/`,
+        method: 'get',
+    })
+}
+// Delete single enquiry by id
+export async function apiDeleteEnquiry(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/crm/enquiries/${id}/`,
+        method: 'delete',
+    })
+}
+
+// Optional: bulk delete if your backend supports it
+export async function apiDeleteEnquiries(ids: string[]) {
+    return ApiService.fetchDataWithAxios({
+        url: `/crm/enquiries/bulk-delete/`,
+        method: 'post',
+        data: { ids },
+    })
+}
+
+// customer activity log
+export async function apiGetCustomerLog<T, U extends Record<string, unknown>>(params: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/customers/log/',
+        method: 'get',
+        params,
+    })
+}
+
+// get customers (list / query)
+export async function apiGetCustomer<T, U extends Record<string, unknown>>(params: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/customers/',
+        method: 'get',
+        params,
+    })
+}
+
 // asset
 
 
@@ -199,6 +241,31 @@ export async function apiCreateAssets<T, U extends Record<string, unknown>>(
     })
 }
 
+// Get single asset by id
+export async function apiGetAssetById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/assets/${id}/`,
+        method: 'get',
+    })
+}
+
+// Update single asset by id
+export async function apiUpdateAsset<T, U extends Record<string, unknown>>(id: string, data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/assets/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+// Delete single asset by id
+export async function apiDeleteAsset(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/asset/assets/${id}/`,
+        method: 'delete',
+    })
+}
+
 // asset-types
 
 export async function apiAssetType<T, U extends Record<string, unknown>>(
@@ -212,12 +279,46 @@ export async function apiAssetType<T, U extends Record<string, unknown>>(
 }
 
 export async function apiCreateAssetType<T, U extends Record<string, unknown>>(
-    params: U,
+    data: U,
 ) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/asset/asset_types/',
         method: 'post',
+        data,
+    })
+}
+export async function apiEditAssetType<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_types/',
+        method: 'get',
         params,
+    })
+}
+
+// Update asset type by id
+export async function apiUpdateAssetType<T, U extends Record<string, unknown>>(id: string, data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_types/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+// Delete asset type by id
+export async function apiDeleteAssetType(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/asset/asset_types/${id}/`,
+        method: 'delete',
+    })
+}
+
+// Get single asset type by id
+export async function apiGetAssetTypeById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_types/${id}/`,
+        method: 'get',
     })
 }
 
@@ -243,6 +344,31 @@ export async function apiCreateAssetCategories<T, U extends Record<string, unkno
     })
 }
 
+// Get single asset category by id
+export async function apiGetAssetCategoryById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_categories/${id}/`,
+        method: 'get',
+    })
+}
+
+// Update asset category by id
+export async function apiUpdateAssetCategory<T, U extends Record<string, unknown>>(id: string, data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_categories/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+// Delete asset category by id
+export async function apiDeleteAssetCategory(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/asset/asset_categories/${id}/`,
+        method: 'delete',
+    })
+}
+
 
 
 // ✅ Asset Type
@@ -258,18 +384,205 @@ export async function apiGetAssetType<T, U extends Record<string, unknown>>(para
 
 
 //asset-type-category
-export async function  apiGetAssetTypeCategory<T, U extends Record<string, unknown>>(params: U) {
+
+/**
+ * Get list of asset type categories
+ */
+export async function apiGetAssetTypeCategory<T, U extends Record<string, unknown>>(params: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/asset/asset_type_categories/',
+        method: 'get',
+        params, // ✅ query params only for GET
+    })
+}
+
+/**
+ * Get tenant memberships for the current user
+ * Endpoint: /tenants/tenant_memberships/
+ */
+export async function apiGetTenantMemberships<T, U extends Record<string, unknown>>(params?: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/tenants/tenant_memberships/',
+        method: 'get',
+        params,
+    })
+} 
+
+/**
+ * Create a new asset type category
+ * Backend expects JSON body with { name, description, tenant }
+ */
+export async function apiCreateAssetTypeCategory<T, U extends Record<string, unknown>>(data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/asset/asset_type_categories/',
+        method: 'post',
+        data, // ✅ send as JSON body
+    })
+}
+
+/**
+ * Edit asset type category (full update)
+ * Use PUT if backend expects full replacement
+ */
+export async function apiEditAssetTypeCategory<T, U extends Record<string, unknown>>(id: string, data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_type_categories/${id}/`,
+        method: 'put', // ✅ use put instead of non-standard "edit"
+        data,
+    })
+}
+
+/**
+ * Update asset type category by id (partial update)
+ */
+export async function apiUpdateAssetTypeCategory<T, U extends Record<string, unknown>>(id: string, data: U) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_type_categories/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+/**
+ * Delete asset type category by id
+ */
+export async function apiDeleteAssetTypeCategory(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/asset/asset_type_categories/${id}/`,
+        method: 'delete',
+    })
+}
+
+/**
+ * Get single asset type category by id
+ */
+export async function apiGetAssetTypeCategoryById<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/asset/asset_type_categories/${id}/`,
+        method: 'get',
+    })
+}
+
+
+
+
+export const apiDeleteEnquiryById = async (id: string) => {
+  return axios.delete(`/api/enquiries/${id}`)
+}
+
+
+
+// Events
+
+export async function apiGetEventsList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/participants/',
         method: 'get',
         params,
     })
 }
-export async function  apiCreateAssetTypeCategory<T, U extends Record<string, unknown>>(params: U) {
+
+// Create participant
+export async function apiCreateParticipant<T, U extends Record<string, unknown>>(
+    data: U,
+) {
     return ApiService.fetchDataWithAxios<T>({
-        url: '/asset/asset_type_categories/',
+        url: '/events/participants/',
         method: 'post',
+        data,
+    })
+}
+
+// Update participant by id
+export async function apiUpdateParticipant<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/participants/${id}/`, // replace with your actual endpoint
+        method: 'patch',
+        data,
+    })
+}
+
+export async function apiGetParticipant<T>(id: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/participants/${id}/`, // endpoint for a single participant
+        method: 'get',
+    })
+}
+// Delete participant by id
+export async function apiDeleteParticipant(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/events/participants/${id}/`,
+        method: 'delete',
+    })
+}
+
+// Get events list
+export async function apiGetEvents<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/events/',
+        method: 'get',
         params,
     })
 }
+
+export async function apiGetEvent<T>(code: string) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/events/${code}/`,
+        method: 'get',
+    })
+}
+
+
+// Create event
+export async function apiCreateEvent<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/events/',
+        method: 'post',
+        data,
+    })
+}
+
+// Update event
+// Update event by code
+export async function apiUpdateEvent<T, U extends Record<string, unknown>>(
+    code: string,
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/events/${code}/`, // ✅ use code instead of id
+        method: 'patch',
+        data,
+    })
+}
+
+
+// Delete event
+export async function apiDeleteEvent(code: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/events/events/${code}/`,   // ✅ use code here
+        method: 'delete',
+    })
+}
+
+
+
+// import ApiService from './ApiService'
+
+// services/CustomersService.ts
+export async function apiGetTenantById<T, U = Record<string, unknown>>(id: number) {
+    return ApiService.fetchDataWithAxios<T, U>({
+        url: `/tenants/tenants/${id}/`,
+        method: 'get',
+    })
+}
+
 

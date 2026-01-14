@@ -4,13 +4,14 @@ import Button from '@/components/ui/Button'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import { apiGetCustomer } from '@/services/CustomersService'
+import { apiGetAssetTypeById, apiUpdateAssetType, apiDeleteAssetType } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
-import sleep from '@/utils/sleep'
 import NoUserFound from '@/assets/svg/NoUserFound'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
 import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
+import { mutate } from 'swr'
+import { useCustomerListStore } from '../AssetTypeList/store/customerListStore'
 import type { CustomerFormSchema } from '../CustomerForm'
 import type { Customer } from '../AssetTypeList/types'
 
@@ -20,58 +21,78 @@ const CustomerEdit = () => {
     const navigate = useNavigate()
 
     const { data, isLoading } = useSWR(
-        [`/api/customers${id}`, { id: id as string }],
+        ['/api/asset_types', id as string],
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) => apiGetCustomer<Customer, { id: string }>(params),
+        ([_, idParam]) => apiGetAssetTypeById<Customer>(idParam as string),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
         },
     )
 
+    const tableData = useCustomerListStore((s) => s.tableData)
+    const filterData = useCustomerListStore((s) => s.filterData)
+
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
     const [isSubmiting, setIsSubmiting] = useState(false)
 
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        console.log('Submitted values', values)
-        setIsSubmiting(true)
-        await sleep(800)
-        setIsSubmiting(false)
-        toast.push(<Notification type="success">Changes Saved!</Notification>, {
-            placement: 'top-center',
-        })
-        // navigate('/concepts/customers/customer-list')
+        if (!id) return
+        try {
+            setIsSubmiting(true)
+            await apiUpdateAssetType(id as string, values)
+            toast.push(<Notification type="success">Changes Saved!</Notification>, {
+                placement: 'top-center',
+            })
+            // revalidate list
+            await mutate(['/api/asset_types', { ...tableData, ...filterData }])
+            navigate('/asset-types')
+        } catch (error) {
+            toast.push(<Notification type="danger">Update failed!</Notification>, {
+                placement: 'top-center',
+            })
+        } finally {
+            setIsSubmiting(false)
+        }
     }
 
     const getDefaultValues = () => {
         if (data) {
-            const { firstName, lastName, email, personalInfo, img } = data
+            const d: any = data
+
+            const name = d.name ?? ''
+            const code = d.code ?? ''
+            const file_extension = d.file_extension ?? ''
+            const description = d.description ?? ''
 
             return {
-                firstName,
-                lastName,
-                email,
-                img,
-                phoneNumber: personalInfo.phoneNumber,
-                dialCode: personalInfo.dialCode,
-                country: personalInfo.country,
-                address: personalInfo.address,
-                city: personalInfo.city,
-                postcode: personalInfo.postcode,
-                tags: [],
+                name,
+                code,
+                file_extension,
+                description,
             }
         }
 
         return {}
     }
 
-    const handleConfirmDelete = () => {
-        setDeleteConfirmationOpen(true)
-        toast.push(
-            <Notification type="success">Customer deleted!</Notification>,
-            { placement: 'top-center' },
-        )
-        // navigate('/concepts/customers/customer-list')
+    const handleConfirmDelete = async () => {
+        if (!id) return
+        try {
+            await apiDeleteAssetType(id as string)
+            toast.push(<Notification type="success">Asset type deleted!</Notification>, {
+                placement: 'top-center',
+            })
+            // revalidate list
+            await mutate(['/api/asset_types', { ...tableData, ...filterData }])
+            navigate('/asset-types')
+        } catch (error) {
+            toast.push(<Notification type="danger">Delete failed!</Notification>, {
+                placement: 'top-center',
+            })
+        } finally {
+            setDeleteConfirmationOpen(false)
+        }
     }
 
     const handleDelete = () => {

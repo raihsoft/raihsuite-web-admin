@@ -1,59 +1,71 @@
+import Container from '@/components/shared/Container'
 import Card from '@/components/ui/Card'
-import Tabs from '@/components/ui/Tabs'
 import Loading from '@/components/shared/Loading'
-import ProfileSection from './ProfileSection'
-import BillingSection from './BillingSection'
-import ActivitySection from './ActivitySection'
-import { apiGetCustomer } from '@/services/CustomersService'
+import { TbArrowNarrowLeft } from 'react-icons/tb'
+import { FaFileAlt } from 'react-icons/fa'
+import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
-import { useParams } from 'react-router-dom'
+import { apiGetAssetTypeById } from '@/services/CustomersService'
 import isEmpty from 'lodash/isEmpty'
-import type { Customer } from '../AssetTypeList/types'
-
-const { TabNav, TabList, TabContent } = Tabs
 
 const CustomerDetails = () => {
     const { id } = useParams()
+    const navigate = useNavigate()
 
     const { data, isLoading } = useSWR(
-        ['/api/customers', { id: id as string }],
+        ['/api/asset_types', id as string],
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) => apiGetCustomer<Customer, { id: string }>(params),
-        {
-            revalidateOnFocus: false,
-            revalidateIfStale: false,
-            evalidateOnFocus: false,
-        },
+        ([_, idParam]) => apiGetAssetTypeById<any>(idParam as string),
+        { revalidateOnFocus: false, revalidateIfStale: false },
     )
+
+    const handleBack = () => navigate(-1)
 
     return (
         <Loading loading={isLoading}>
-            {!isEmpty(data) && (
-                <div className="flex flex-col xl:flex-row gap-4">
-                    <div className="min-w-[330px] 2xl:min-w-[400px]">
-                        <ProfileSection data={data} />
-                    </div>
-                    <Card className="w-full">
-                        <Tabs defaultValue="billing">
-                            <TabList>
-                                <TabNav value="billing">Billing</TabNav>
-                                <TabNav value="activity">Activity</TabNav>
-                            </TabList>
-                            <div className="p-4">
-                                <TabContent value="billing">
-                                    <BillingSection data={data} />
-                                </TabContent>
-                                <TabContent value="activity">
-                                    <ActivitySection
-                                        customerName={data.name}
-                                        id={id as string}
-                                    />
-                                </TabContent>
-                            </div>
-                        </Tabs>
-                    </Card>
+            <Container>
+                <div className="flex items-center justify-between px-8">
+                    <button
+                        type="button"
+                        className="btn-plain"
+                        onClick={handleBack}
+                    >
+                        <TbArrowNarrowLeft /> Back
+                    </button>
                 </div>
-            )}
+
+                <div className="p-6 md:p-8">
+                    <h3 className="text-3xl font-semibold mb-4">Asset Type Details</h3>
+
+                    {data && !isEmpty(data) ? (
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-1">
+                                <Card className="h-full">
+                                    <div className="p-6">
+                                        <h4 className="text-2xl font-semibold mb-2">{data.name}</h4>
+                                        <div className="flex items-center gap-3 text-base text-gray-700 dark:text-gray-300 mb-2">
+                                            <FaFileAlt className="text-lg text-gray-500" />
+                                            <span className="text-sm">{data.file_extension || '—'}</span>
+                                        </div>
+                                        <div className="text-sm text-gray-600">Code: <span className="font-medium text-gray-900">{data.code || '—'}</span></div>
+                                    </div>
+                                </Card>
+                            </div>
+
+                            <div className="lg:col-span-2 space-y-6">
+                                <Card>
+                                    <div className="p-6">
+                                        <h4 className="text-lg font-semibold mb-3">Description</h4>
+                                        <p className="text-lg text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{data.description || '—'}</p>
+                                    </div>
+                                </Card>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="mt-4 text-sm text-gray-600">No data found.</p>
+                    )}
+                </div>
+            </Container>
         </Loading>
     )
 }

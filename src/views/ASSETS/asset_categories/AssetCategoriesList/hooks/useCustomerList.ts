@@ -1,7 +1,6 @@
-
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
-import { apiGetAssetCategories, apiGetAssets } from '@/services/CustomersService'
+import { apiGetAssetCategories } from '@/services/CustomersService'
 import type { TableQueries } from '@/@types/common'
 import type { GetCustomersListResponse } from '../types'
 
@@ -16,23 +15,23 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
-    const { data, error, isLoading } = useSWR(
+    const { data, error, isLoading, mutate } = useSWR(
         ['/api/asset_categories', { ...tableData, ...filterData }] as const,
-        ([, params]) => apiGetAssetCategories<GetCustomersListResponse, TableQueries>(params),
+        ([, params]) =>
+            apiGetAssetCategories<GetCustomersListResponse, TableQueries>(params),
         { revalidateOnFocus: false }
     )
 
-const customerList = data?.results?.map((customer: any, index: number) => ({
-    id: customer.id ?? index,
-    name: customer.name,
-    code: customer.code,
-    title: customer.title,
-    description: customer.description,
-
-    status: 'active',
-    totalSpending: 0,
-})) ?? []
-
+    const customerList =
+        data?.results?.map((customer: any, index: number) => ({
+            id: customer.id ?? index,
+            name: customer.name,
+            code: customer.code,
+            title: customer.title,
+            description: customer.description,
+            status: 'active',
+            totalSpending: 0,
+        })) ?? []
 
     const customerListTotal = data?.count ?? 0
 
@@ -48,5 +47,6 @@ const customerList = data?.results?.map((customer: any, index: number) => ({
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
+        mutate, // <-- expose mutate here
     }
 }
