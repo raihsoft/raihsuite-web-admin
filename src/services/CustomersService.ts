@@ -371,7 +371,9 @@ export async function apiDeleteAssetCategory(id: string) {
 
 
 
-// ✅ Asset Type
+// ✅ Asset 
+
+
 export async function apiGetAssetType<T, U extends Record<string, unknown>>(params: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/asset/asset_types/',
@@ -392,7 +394,7 @@ export async function apiGetAssetTypeCategory<T, U extends Record<string, unknow
     return ApiService.fetchDataWithAxios<T>({
         url: '/asset/asset_type_categories/',
         method: 'get',
-        params, // ✅ query params only for GET
+        params, 
     })
 }
 
@@ -427,7 +429,7 @@ export async function apiCreateAssetTypeCategory<T, U extends Record<string, unk
 export async function apiEditAssetTypeCategory<T, U extends Record<string, unknown>>(id: string, data: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: `/asset/asset_type_categories/${id}/`,
-        method: 'put', // ✅ use put instead of non-standard "edit"
+        method: 'put', 
         data,
     })
 }
@@ -501,7 +503,7 @@ export async function apiUpdateParticipant<T, U extends Record<string, unknown>>
     data: U
 ) {
     return ApiService.fetchDataWithAxios<T>({
-        url: `/events/participants/${id}/`, // replace with your actual endpoint
+        url: `/events/participants/${id}/`,
         method: 'patch',
         data,
     })
@@ -509,7 +511,7 @@ export async function apiUpdateParticipant<T, U extends Record<string, unknown>>
 
 export async function apiGetParticipant<T>(id: string) {
     return ApiService.fetchDataWithAxios<T>({
-        url: `/events/participants/${id}/`, // endpoint for a single participant
+        url: `/events/participants/${id}/`, 
         method: 'get',
     })
 }
@@ -558,7 +560,7 @@ export async function apiUpdateEvent<T, U extends Record<string, unknown>>(
     data: U,
 ) {
     return ApiService.fetchDataWithAxios<T>({
-        url: `/events/events/${code}/`, // ✅ use code instead of id
+        url: `/events/events/${code}/`, 
         method: 'patch',
         data,
     })
@@ -568,7 +570,7 @@ export async function apiUpdateEvent<T, U extends Record<string, unknown>>(
 // Delete event
 export async function apiDeleteEvent(code: string) {
     return ApiService.fetchDataWithAxios({
-        url: `/events/events/${code}/`,   // ✅ use code here
+        url: `/events/events/${code}/`,   
         method: 'delete',
     })
 }
@@ -586,3 +588,38 @@ export async function apiGetTenantById<T, U = Record<string, unknown>>(id: numbe
 }
 
 
+
+// session management
+
+export async function apiGetSessionList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/sessions/',
+        method: 'get',
+        params,
+    })
+}
+
+
+export async function apiCreateSession<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/sessions/',
+        method: 'post',
+        data,
+    })
+}
+
+
+export async function apiUpdateSession<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/sessions/${id}/`,
+        method: 'patch',
+        data,
+    })
+}

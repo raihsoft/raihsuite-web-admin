@@ -16,8 +16,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://api.raihsuite.com/v1/',
-        // target: "https://staging-api.raihsuite.com/v1/",
+        // target: 'https://api.raihsuite.com/v1/',
+        target: "https://staging-api.raihsuite.com/v1/",
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''), // remove /api from request
