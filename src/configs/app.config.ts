@@ -34,7 +34,7 @@ export type AppConfig = {
 }
 
 const appConfig: AppConfig = {
-    apiPrefix: 'https://api.raihsuite.com/v1/',   // ✅ FIX: Added trailing slash
+    apiPrefix: 'https://staging-api.raihsuite.com/v1',   // ✅ FIX: Added trailing slash
     authenticatedEntryPath: '/',
     unAuthenticatedEntryPath: '/sign-in',
     locale: 'en',
