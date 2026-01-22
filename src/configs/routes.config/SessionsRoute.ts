@@ -9,14 +9,14 @@ const SessionRoute: Routes = [
         authority: [],
     },
     {
-        key: 'participantCreate',
+        key: 'sessionCreate',
         path: '/session/create',
         component: lazy(() => import('@/views/Events/session/CustomerCreate')),
         authority: [],
         meta: {
             header: {
                 title: 'Create Session',
-                description: 'Create a new participant.',
+                description: 'Create a new Session.',
                 contained: true,
             },
             footer: false,
@@ -24,7 +24,7 @@ const SessionRoute: Routes = [
     },
     {
         key: 'sessionDetails',
-        path: '/participants/:id',
+        path: '/session/:id',
         component: lazy(() => import('@/views/Events/session/CustomerDetails')),
         authority: [],
         meta: {
