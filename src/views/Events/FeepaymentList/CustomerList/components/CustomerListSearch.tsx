@@ -1,15 +1,15 @@
 import DebouceInput from '@/components/shared/DebouceInput'
 import { TbSearch } from 'react-icons/tb'
-import { Ref } from 'react'
+import { forwardRef } from 'react'
 
 type CustomerListSearchProps = {
     onInputChange: (value: string) => void
-    ref?: Ref<HTMLInputElement>
 }
 
-const CustomerListSearch = (props: CustomerListSearchProps) => {
-    const { onInputChange, ref } = props
-
+const CustomerListSearch = forwardRef<
+    HTMLInputElement,
+    CustomerListSearchProps
+>(({ onInputChange }, ref) => {
     return (
         <DebouceInput
             ref={ref}
@@ -18,6 +18,8 @@ const CustomerListSearch = (props: CustomerListSearchProps) => {
             onChange={(e) => onInputChange(e.target.value)}
         />
     )
-}
+})
+
+CustomerListSearch.displayName = 'CustomerListSearch'
 
 export default CustomerListSearch

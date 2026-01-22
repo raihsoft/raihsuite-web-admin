@@ -150,7 +150,7 @@ export const protectedRoutes: Routes = [
     
     
 
-    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute,...EventsRoute,...SessionRoute,...SessionAttendanceRoute 
+    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute,...EventsRoute,...SessionRoute,...SessionAttendanceRoute ,...FeepaymentListRoute 
 
 ]
 

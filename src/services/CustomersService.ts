@@ -658,3 +658,50 @@ export async function apiSessionAttendance<T, U extends Record<string, unknown>>
         data,
     })
 }
+
+// fee payment APIs
+
+export async function apiGetFeePaymentList<T, U extends Record<string, unknown>>(
+  params: U,
+) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: '/events/fee-payments/',
+    method: 'get',
+    params,
+  })
+}
+
+export async function apiCreateFeePayment<T, U extends Record<string, unknown>>(
+  data: U,
+) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: '/events/fee-payments/',
+    method: 'post',
+    data,
+  })
+}
+
+export async function apiUpdateFeePayment<T, U extends Record<string, unknown>>(
+  id: string,
+  data: U,
+) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: `/events/fee-payments/${id}/`,
+    method: 'patch',
+    data,
+  })
+}
+
+export async function apiDeleteFeePayment(id: string) {
+  return ApiService.fetchDataWithAxios({
+    url: `/events/fee-payments/${id}/`,
+    method: 'delete',
+  })
+}
+
+export async function apiGetFeePaymentDetails<T>(id: string) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: `/events/fee-payments/${id}/`, // single payment
+    method: 'get',
+  })
+}
