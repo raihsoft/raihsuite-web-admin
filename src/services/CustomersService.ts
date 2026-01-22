@@ -623,3 +623,38 @@ export async function apiUpdateSession<T, U extends Record<string, unknown>>(
         data,
     })
 }
+
+// session-attendance
+
+
+export async function apiGetSessionAttendanceList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/session-attendance/',
+        method: 'get',
+        params,
+    })
+}
+
+export async function apiCreateSessionAttendance<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/session-attendance/',
+        method: 'post',
+        data,
+    })
+}
+
+
+export async function apiSessionAttendance<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/session-attendance/${id}/`,
+        method: 'patch',
+        data,
+    })
+}

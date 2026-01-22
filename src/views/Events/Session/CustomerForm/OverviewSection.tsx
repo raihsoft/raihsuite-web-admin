@@ -157,19 +157,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
             {/* Fourth Row: Day & Speaker */}
             <div className="grid md:grid-cols-2 gap-4 mt-4">
-                <FormItem
-                    label="Day"
-                    invalid={Boolean(errors.day)}
-                    errorMessage={errors.day?.message}
-                >
-                    <Controller
-                        name="day"
-                        control={control}
-                        render={({ field }) => (
-                            <Input {...field} type="text" placeholder="Day" />
-                        )}
-                    />
-                </FormItem>
+              
 
                 <FormItem
                     label="Speaker"
@@ -184,11 +172,8 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                         )}
                     />
                 </FormItem>
-            </div>
 
-            {/* Fifth Row: Location */}
-            <div className="grid md:grid-cols-2 gap-4 mt-4">
-                <FormItem
+<FormItem
                     label="Location"
                     invalid={Boolean(errors.location)}
                     errorMessage={errors.location?.message}
@@ -201,6 +186,12 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                         )}
                     />
                 </FormItem>
+
+            </div>
+
+            {/* Fifth Row: Location */}
+            <div className="grid md:grid-cols-2 gap-4 mt-4">
+                
             </div>
         </Card>
     )

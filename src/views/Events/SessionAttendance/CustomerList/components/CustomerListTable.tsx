@@ -92,7 +92,7 @@ const CustomerListTable = () => {
     } = useCustomerList()
 
     const handleEdit = (customer: Customer) => {
-        navigate(`/participants/edit/${customer.id}`)
+        navigate(`/session/edit/${customer.id}`)
     }
 
     const handleViewDetails = (customer: Customer) => {
@@ -131,48 +131,18 @@ const CustomerListTable = () => {
 
     const columns: ColumnDef<Customer>[] = useMemo(
         () => [
-            // {
-            //     header: 'Name',
-            //     accessorKey: 'name',
-            //     cell: (props) => {
-            //         const row = props.row.original
-            //         return <NameColumn row={row} searchQuery={tableData.query as string} />
-            //     },
-            // },
-            {
-                header: 'First Name',
-                accessorKey: 'firstName',
+             {
+                header: 'Session',
+                accessorKey: 'session',
             },
             {
-                header: 'Last Name',
-                accessorKey: 'lastName',
+                header: 'Participant',
+                accessorKey: 'participant',
             },
-            {
-                header: 'Email',
-                accessorKey: 'email',
-            },
-            {
-                header: 'Phone',
-                accessorKey: 'phone',
-            },
-            {
-                header: 'Place',
-                accessorKey: 'place',
-            },
-            {
-                header: 'Event ',      // <-- New column
-                accessorKey: 'event_title',
-                cell: (props) => <span>{props.row.original.event_title}</span>,
-            },
-            {
-            header: 'Refferd By Employee',
-            accessorKey: 'referencedBy',
-            cell: (props) => (
-                <span className="font-medium">
-                    {props.row.original.referencedBy || '-'}
-                </span>
-            ),
-        },
+
+           
+           
+           
 
             {
                 header: 'Action',

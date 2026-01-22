@@ -19,25 +19,11 @@ type CustomerFormProps = {
 } & CommonProps
 
 const validationSchema: ZodType<CustomerFormSchema> = z.object({
-    event: z.string().min(1, { message: 'Event required' }),
+    session: z.string().min(1, { message: 'session required' }),
     // event_title: z.string().min(1, { message: 'Event title required' }),
-    title: z.string().min(1, { message: 'Title required' }),
-    start_datetime: z.string().min(1, { message: 'Start date & time required' }),
-    end_datetime: z.string().min(1, { message: 'End date & time required' }),
-    speaker: z.string().min(1, { message: 'Speaker required' }),
-    location: z.string().min(1, { message: 'Location required' }),
-}).refine(
-    (data) => {
-        if (!data.start_datetime || !data.end_datetime) return true
-        const startDate = new Date(data.start_datetime)
-        const endDate = new Date(data.end_datetime)
-        return endDate > startDate
-    },
-    {
-        message: 'End datetime must be after start datetime',
-        path: ['end_datetime'],
-    },
-)
+    participant: z.string().min(1, { message: 'participant required' }),
+
+})
 
 
 const CustomerForm = (props: CustomerFormProps) => {
@@ -56,13 +42,9 @@ const CustomerForm = (props: CustomerFormProps) => {
     } = useForm<CustomerFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: defaultValues || {
-            event: '',
-            event_title: '',
-            title: '',
-            start_datetime: '',
-            end_datetime: '',
-            speaker: '',
-            location: '',
+            session: '',
+            participant: '',
+
         },
     })
 
