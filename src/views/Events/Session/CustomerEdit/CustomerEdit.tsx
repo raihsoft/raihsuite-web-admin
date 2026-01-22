@@ -58,7 +58,7 @@ const CustomerEdit = () => {
 
             toast.push(
                 <Notification type="success">
-                    Participant updated successfully!
+                  Session updated successfully!
                 </Notification>,
                 { placement: 'top-center' },
             )

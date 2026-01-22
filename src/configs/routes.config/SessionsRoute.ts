@@ -36,7 +36,7 @@ const SessionRoute: Routes = [
             footer: false,
         },
     },
-      {
+    {
         key: 'sessionEdit',
         path: '/session/edit/:id',
         component: lazy(() => import('@/views/Events/Session/CustomerEdit')),
