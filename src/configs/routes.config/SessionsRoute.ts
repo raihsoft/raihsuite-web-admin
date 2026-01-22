@@ -5,13 +5,17 @@ const SessionRoute: Routes = [
     {
         key: 'session',
         path: '/session',
-        component: lazy(() => import('@/views/Events/session/CustomerList')),
+        component: lazy(() =>
+            import('@/views/Events/Session/CustomerList')
+        ),
         authority: [],
     },
     {
         key: 'sessionCreate',
         path: '/session/create',
-        component: lazy(() => import('@/views/Events/session/CustomerCreate')),
+        component: lazy(() =>
+            import('@/views/Events/Session/CustomerCreate')
+        ),
         authority: [],
         meta: {
             header: {
@@ -25,7 +29,9 @@ const SessionRoute: Routes = [
     {
         key: 'sessionDetails',
         path: '/session/:id',
-        component: lazy(() => import('@/views/Events/session/CustomerDetails')),
+        component: lazy(() =>
+            import('@/views/Events/Session/CustomerDetails')
+        ),
         authority: [],
         meta: {
             header: {
@@ -39,7 +45,9 @@ const SessionRoute: Routes = [
     {
         key: 'sessionEdit',
         path: '/session/edit/:id',
-        component: lazy(() => import('@/views/Events/participate/CustomerEdit')),
+        component: lazy(() =>
+            import('@/views/Events/participate/CustomerEdit')
+        ),
         authority: [],
         meta: {
             header: {
@@ -53,6 +61,3 @@ const SessionRoute: Routes = [
 ]
 
 export default SessionRoute
-
-
-
