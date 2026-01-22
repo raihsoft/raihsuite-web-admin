@@ -624,6 +624,19 @@ export async function apiUpdateSession<T, U extends Record<string, unknown>>(
     })
 }
 
+export async function apiDeleteSession(id: string) {
+  return ApiService.fetchDataWithAxios({
+    url: `/events/sessions/${id}/`,
+    method: 'delete',
+  })
+}
+
+export async function apiGetSessionDetails<T>(id: string) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: `/events/sessions/${id}/`, // single session
+    method: 'get',
+  })
+}
 // session-attendance
 
 

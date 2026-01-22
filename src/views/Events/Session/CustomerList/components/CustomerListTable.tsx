@@ -38,7 +38,7 @@ const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string 
         <div className="flex items-center">
             <Link
                 className={`hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100`}
-                to={`/participants/${row.id}`}
+                to={`/session/${row.id}`}
             >
                 {highlightMatch(displayName, searchQuery)}
             </Link>
@@ -96,7 +96,7 @@ const CustomerListTable = () => {
     }
 
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/participants/${customer.id}`)
+        navigate(`/session/${customer.id}`)
     }
 
     // Filter and sort list - show only matches, with exact matches first
