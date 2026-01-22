@@ -5,13 +5,13 @@ const SessionRoute: Routes = [
     {
         key: 'session',
         path: '/session',
-        component: lazy(() => import('@/views/Events/session/CustomerList')),
+        component: lazy(() => import('@/views/Events/Session/CustomerList')),
         authority: [],
     },
     {
         key: 'sessionCreate',
         path: '/session/create',
-        component: lazy(() => import('@/views/Events/session/CustomerCreate')),
+        component: lazy(() => import('@/views/Events/Session/CustomerCreate')),
         authority: [],
         meta: {
             header: {
