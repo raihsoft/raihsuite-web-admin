@@ -159,11 +159,20 @@ const CustomerListTable = () => {
                 header: 'Place',
                 accessorKey: 'place',
             },
-            {
-                header: 'Event ',      // <-- New column
-                accessorKey: 'event_title',
-                cell: (props) => <span>{props.row.original.event_title}</span>,
-            },
+           {
+    header: 'Event',
+    accessorKey: 'event_title',
+    cell: (props) => (
+        <span
+            className="text-gray font-semibold cursor-pointer  "
+            onClick={() =>
+               navigate(`/events/${props.row.original.code}`)
+            }
+        >
+            {props.row.original.event_title}
+        </span>
+    ),
+},
             {
             header: 'Referenced By',
             accessorKey: 'referencedBy',

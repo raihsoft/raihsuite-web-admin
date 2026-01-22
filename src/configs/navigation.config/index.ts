@@ -254,6 +254,16 @@ const navigationConfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
+            {
+                key: 'feepayment',
+                path: '/feepayment',
+                title: 'Fee Payment',
+                translateKey: 'nav.feepayment.item1',
+                icon: 'MdEvent',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
         ],
     },
 

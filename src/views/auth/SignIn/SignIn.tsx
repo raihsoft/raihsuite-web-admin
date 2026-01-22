@@ -29,7 +29,7 @@ export const SignInBase = ({
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
                     <div className="flex flex-col items-center">
                         {/* <Logo type="streamline" mode={mode} imgClass="mx-auto" logoWidth={60} /> */}
-                        <h2 className="mt-4 text-2xl sm:text-3xl font-bold">Welcome back!</h2>
+                        <h2 className="mt-4 text-2xl sm:text-3xl font-bold ">RAIHSUITE - ERP</h2>
                         <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-[340px] text-center">
                             Please enter your credentials to sign in!
                         </p>
