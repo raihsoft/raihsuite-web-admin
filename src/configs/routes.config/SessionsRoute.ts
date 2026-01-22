@@ -22,34 +22,20 @@ const SessionRoute: Routes = [
             footer: false,
         },
     },
-    // {
-    //     key: 'sessionDetails',
-    //     path: '/session/:id',
-    //     component: lazy(() => import('@/views/Events/session/CustomerDetails')),
-    //     authority: [],
-    //     meta: {
-    //         header: {
-    //             title: 'Session Details',
-    //             description: 'View session details and activity.',
-    //             contained: true,
-    //         },
-    //         footer: false,
-    //     },
-    // },
     {
-        key: 'sessionEdit',
-        path: '/session/edit/:id',
-        component: lazy(() => import('@/views/Events/participate/CustomerEdit')),
+        key: 'sessionDetails',
+        path: '/session/:id',
+        component: lazy(() => import('@/views/Events/Session/CustomerDetails')),
         authority: [],
         meta: {
             header: {
-                title: 'Edit session',
-                description: 'Edit session information.',
+                title: 'Session Details',
+                description: 'View session details and activity.',
                 contained: true,
             },
             footer: false,
         },
-    },
+    }
 ]
 
 export default SessionRoute
