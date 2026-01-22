@@ -1,26 +1,22 @@
 import { lazy } from 'react'
 import type { Routes } from '@/@types/routes'
 
-const SessionRoute: Routes = [
+const SessionAttendanceRoute: Routes = [
     {
-        key: 'session',
-        path: '/session',
-        component: lazy(() =>
-            import('@/views/Events/Session/CustomerList')
-        ),
+        key: 'sessionAttendance',
+        path: '/sessionAttendance',
+        component: lazy(() => import('@/views/Events/SessionAttendance/CustomerList')),
         authority: [],
     },
     {
-        key: 'sessionCreate',
-        path: '/session/create',
-        component: lazy(() =>
-            import('@/views/Events/Session/CustomerCreate')
-        ),
+        key: 'sessionAttendance',
+        path: '/sessionAttendance/create',
+        component: lazy(() => import('@/views/Events/SessionAttendance/CustomerCreate')),
         authority: [],
         meta: {
             header: {
                 title: 'Create Session',
-                description: 'Create a new Session.',
+                description: 'Create a new participant.',
                 contained: true,
             },
             footer: false,
@@ -28,10 +24,8 @@ const SessionRoute: Routes = [
     },
     {
         key: 'sessionDetails',
-        path: '/session/:id',
-        component: lazy(() =>
-            import('@/views/Events/Session/CustomerDetails')
-        ),
+        path: '/participants/:id',
+        component: lazy(() => import('@/views/Events/session/CustomerDetails')),
         authority: [],
         meta: {
             header: {
@@ -45,9 +39,7 @@ const SessionRoute: Routes = [
     {
         key: 'sessionEdit',
         path: '/session/edit/:id',
-        component: lazy(() =>
-            import('@/views/Events/participate/CustomerEdit')
-        ),
+        component: lazy(() => import('@/views/Events/participate/CustomerEdit')),
         authority: [],
         meta: {
             header: {
@@ -60,4 +52,7 @@ const SessionRoute: Routes = [
     },
 ]
 
-export default SessionRoute
+export default SessionAttendanceRoute
+
+
+

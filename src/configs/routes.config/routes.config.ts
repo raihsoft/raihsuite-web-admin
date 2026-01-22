@@ -16,6 +16,7 @@ import EventsRoute from './EventsRoute'
 import { s } from '@fullcalendar/core/internal-common'
 import FeepaymentListRoute from './FeepaymentListRoute'
 import SessionRoute from './SessionsRoute'
+import SessionAttendanceRoute from './sessionAttendanceRoute'
 
 export const publicRoutes: Routes = [...authRoute]
 
@@ -149,7 +150,7 @@ export const protectedRoutes: Routes = [
     
     
 
-    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute,...EventsRoute,...SessionRoute,...FeepaymentListRoute
+    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute,...EventsRoute,...SessionRoute,...SessionAttendanceRoute 
 
 ]
 

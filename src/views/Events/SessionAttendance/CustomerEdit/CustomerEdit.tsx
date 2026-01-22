@@ -6,6 +6,7 @@ import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import {
     apiDeleteParticipant,
+    apiSessionAttendance,
     apiUpdateSession,
 } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
@@ -19,8 +20,8 @@ const CustomerEdit = () => {
     const navigate = useNavigate()
 
     const { data, isLoading, mutate } = useSWR(
-        id ? `/session/${id}` : null,
-        () => apiUpdateSession(id as string),
+        id ? `/session-attendance/${id}` : null,
+        () => apiSessionAttendance(id as string),
         { revalidateOnFocus: false },
     )
 
@@ -33,12 +34,9 @@ const CustomerEdit = () => {
 
         return {
 
-            event: String(data.event ?? ''),
-            title: data.title ?? '',
-            start_datetime: data.start_datetime ?? '',
-            end_datetime: data.end_datetime ?? '',
-            speaker: data.speaker ?? '',
-            location: data.location ?? '',
+            session: String(data.session ?? ''),
+            participant: data.participant ?? '',
+
         }
     }
 
@@ -48,12 +46,9 @@ const CustomerEdit = () => {
 
         try {
             await apiUpdateSession(id, {
-                event: values.event,
-                title: values.title,
-                start_datetime: values.start_datetime,
-                end_datetime: values.end_datetime,
-                speaker: values.speaker,
-                location: values.location,
+                session: values.session,
+                participant: values.participant,
+
             })
 
             toast.push(
@@ -68,7 +63,7 @@ const CustomerEdit = () => {
         } catch {
             toast.push(
                 <Notification type="danger">
-                    Failed to update session
+                    Failed to update Session Attendance
                 </Notification>,
                 { placement: 'top-center' },
             )
