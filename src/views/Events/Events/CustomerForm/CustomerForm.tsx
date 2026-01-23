@@ -11,9 +11,13 @@ import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import type { CustomerFormSchema } from './types'
+import type { UseFormSetError } from 'react-hook-form'
 
 type CustomerFormProps = {
-    onFormSubmit: (values: CustomerFormSchema) => void
+    onFormSubmit: (
+        values: CustomerFormSchema, 
+        setError: UseFormSetError<CustomerFormSchema> // ⭐ Add this
+    ) => void
     defaultValues?: CustomerFormSchema
     newCustomer?: boolean
 } & CommonProps
@@ -42,6 +46,7 @@ const CustomerForm = (props: CustomerFormProps) => {
         reset,
         formState: { errors },
         control,
+        setError, // ⭐ Get setError from useForm
     } = useForm<CustomerFormSchema>({
         defaultValues: {
             ...{
@@ -61,7 +66,8 @@ const CustomerForm = (props: CustomerFormProps) => {
     }, [JSON.stringify(defaultValues)])
 
     const onSubmit = (values: CustomerFormSchema) => {
-        onFormSubmit?.(values)
+        // ⭐ Pass setError to onFormSubmit
+        onFormSubmit?.(values, setError)
     }
 
     return (
