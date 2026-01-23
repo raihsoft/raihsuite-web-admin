@@ -13,7 +13,6 @@ const EventsRoute: Routes = [
                 description: 'Events overview.',
                 contained: true,
             },
-            footer: false,
         },
     },
     {

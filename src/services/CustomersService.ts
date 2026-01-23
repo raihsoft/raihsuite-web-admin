@@ -661,7 +661,19 @@ export async function apiCreateSessionAttendance<T, U extends Record<string, unk
 }
 
 
-export async function apiSessionAttendance<T, U extends Record<string, unknown>>(
+
+
+export async function apiUpdateSessionAttendance<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/session-attendance/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+export async function apiUpdateSessionAttendanceDetails<T, U extends Record<string, unknown>>(
     id: string,
     data: U
 ) {

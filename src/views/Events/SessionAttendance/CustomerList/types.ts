@@ -43,6 +43,7 @@ export type GetCustomersListResponse = {
     list: Customer[]
     total: number
     results: Customer[]
+    count:number
     
 }
 

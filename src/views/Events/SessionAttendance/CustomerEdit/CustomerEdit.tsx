@@ -6,8 +6,7 @@ import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import {
     apiDeleteParticipant,
-    apiSessionAttendance,
-    apiUpdateSession,
+    apiUpdateSessionAttendance,
 } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
@@ -21,7 +20,7 @@ const CustomerEdit = () => {
 
     const { data, isLoading, mutate } = useSWR(
         id ? `/session-attendance/${id}` : null,
-        () => apiSessionAttendance(id as string),
+        () => apiUpdateSessionAttendance(id as string),
         { revalidateOnFocus: false },
     )
 
@@ -45,7 +44,7 @@ const CustomerEdit = () => {
         setIsSubmitting(true)
 
         try {
-            await apiUpdateSession(id, {
+            await apiUpdateSessionAttendance(id, {
                 session: values.session,
                 participant: values.participant,
 
@@ -53,11 +52,11 @@ const CustomerEdit = () => {
 
             toast.push(
                 <Notification type="success">
-                    Participant updated successfully!
+                   session Attendance updated successfully!
                 </Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/session')
+            navigate('/sessionAttendance')
 
             mutate()
         } catch {
@@ -84,7 +83,7 @@ const CustomerEdit = () => {
                 </Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/session')
+            navigate('/sessionAttendance')
         } finally {
             setDeleteLoading(false)
             setDeleteConfirmationOpen(false)
