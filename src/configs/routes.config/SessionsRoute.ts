@@ -35,7 +35,21 @@ const SessionRoute: Routes = [
             },
             footer: false,
         },
-    }
+    },
+    {
+        key: 'sessionEdit',
+        path: '/session/edit/:id',
+        component: lazy(() => import('@/views/Events/Session/CustomerEdit')),
+        authority: [],
+        meta: {
+            header: {
+                title: 'Edit Session',
+                description: 'Edit session information.',
+                contained: true,
+            },
+            footer: false,
+        },
+    },
 ]
 
 export default SessionRoute

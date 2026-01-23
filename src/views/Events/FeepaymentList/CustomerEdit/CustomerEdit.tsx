@@ -37,6 +37,7 @@ const CustomerEdit = () => {
             title: data.title ?? '',
             start_datetime: data.start_datetime ?? '',
             end_datetime: data.end_datetime ?? '',
+            day: data.day ?? '',
             speaker: data.speaker ?? '',
             location: data.location ?? '',
         }
@@ -52,13 +53,14 @@ const CustomerEdit = () => {
                 title: values.title,
                 start_datetime: values.start_datetime,
                 end_datetime: values.end_datetime,
+                day: values.day,
                 speaker: values.speaker,
                 location: values.location,
             })
 
             toast.push(
                 <Notification type="success">
-                  Session updated successfully!
+                    Participant updated successfully!
                 </Notification>,
                 { placement: 'top-center' },
             )

@@ -2,27 +2,24 @@ import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
 import useSWR from 'swr'
 import { useParams } from 'react-router-dom'
-import { apiGetSessionDetails } from '@/services/CustomersService'
+import { apiGetFeePaymentDetails } from '@/services/CustomersService'
 
-type Session = {
+type FeePayment = {
   id: string
   tenant: number
-  event: string
-  title: string
-  start_datetime: number
-  end_datetime: number
-  day: number
-  speaker: string
-  location: string
-  event_title: string
+  participant: string
+  fee_amount: string
+  payment_type: string
+  paid_at: string
+  participant_name: string
 }
 
 const FeePaymentDetails = () => {
   const { id } = useParams<{ id: string }>()
 
-  const { data, isLoading, error } = useSWR<Session>(
-    id ? `/events/sessions/${id}` : null,
-    () => apiGetSessionDetails(id!),
+  const { data, isLoading, error } = useSWR<FeePayment>(
+    id ? `/events/fee-payments/${id}` : null,
+    () => apiGetFeePaymentDetails(id!),
     { revalidateOnFocus: false }
   )
 
@@ -36,20 +33,19 @@ const FeePaymentDetails = () => {
 
   return (
     <div className="p-6 ">
-   
+      <Card className="p-8 rounded-2xl shadow-sm">
+        <h2 className="text-2xl font-bold mb-4">{payment.participant_name}</h2>
+
         <Card className="p-6 rounded-xl border border-gray-200">
-          <h3 className="text-lg font-semibold mb-6">Session Details</h3>
+          <h3 className="text-lg font-semibold mb-6">Fee Payment Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Detail label="Event" value={payment.event_title} />
-            <Detail label="Title" value={payment.title} />
-            <Detail label="Start Date" value={new Date(payment.start_datetime).toLocaleString()} />
-            <Detail label="End Date" value={new Date(payment.end_datetime).toLocaleString()} />
-            <Detail label="Day" value={payment.day} />
-            <Detail label="Speaker" value={payment.speaker} />
-            <Detail label="Location" value={payment.location} />
+            <Detail label="Participant Name" value={payment.participant_name} />
+            <Detail label="Fee Amount" value={`₹${payment.fee_amount}`} />
+            <Detail label="Payment Type" value={payment.payment_type} />
+            <Detail label="Paid At" value={new Date(payment.paid_at).toLocaleString()} />
           </div>
         </Card>
-      
+      </Card>
     </div>
   )
 }

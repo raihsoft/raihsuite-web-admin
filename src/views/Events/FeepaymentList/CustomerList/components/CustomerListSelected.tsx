@@ -46,12 +46,12 @@ const CustomerListSelected = () => {
             setSelectAllCustomer([])
 
             toast.push(
-                <Notification type="success">Participants deleted!</Notification>,
+                <Notification type="success">payment deleted!</Notification>,
                 { placement: 'top-center' },
             )
         } catch (err) {
             toast.push(
-                <Notification type="danger">Failed to delete participants</Notification>,
+                <Notification type="danger">Failed to delete payment</Notification>,
                 { placement: 'top-center' },
             )
         } finally {
@@ -92,7 +92,7 @@ const CustomerListSelected = () => {
                                         <span className="font-semibold flex items-center gap-1">
                                             <span className="heading-text">
                                                 {selectedCustomer.length}{' '}
-                                                Participants
+                                                Customers
                                             </span>
                                             <span>selected</span>
                                         </span>

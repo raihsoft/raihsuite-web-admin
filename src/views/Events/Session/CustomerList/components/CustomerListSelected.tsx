@@ -9,7 +9,7 @@ import toast from '@/components/ui/toast'
 import RichTextEditor from '@/components/shared/RichTextEditor'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
-import { apiDeleteParticipant } from '@/services/CustomersService'
+import { apiDeleteSession } from '@/services/CustomersService'
 import { TbChecks } from 'react-icons/tb'
 
 const CustomerListSelected = () => {
@@ -34,31 +34,34 @@ const CustomerListSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = async () => {
-        setDeleteLoading(true)
-        try {
-            // Call API to delete each selected participant
-            await Promise.all(selectedCustomer.map((c) => apiDeleteParticipant(c.id)))
+   const handleConfirmDelete = async () => {
+    setDeleteLoading(true)
+    try {
+        await Promise.all(
+            selectedCustomer.map((c) => apiDeleteSession(c.id))
+        )
 
-            // Refresh list from server
-            await mutate()
+        await mutate()
+        setSelectAllCustomer([])
 
-            setSelectAllCustomer([])
-
-            toast.push(
-                <Notification type="success">Participants deleted!</Notification>,
-                { placement: 'top-center' },
-            )
-        } catch (err) {
-            toast.push(
-                <Notification type="danger">Failed to delete participants</Notification>,
-                { placement: 'top-center' },
-            )
-        } finally {
-            setDeleteLoading(false)
-            setDeleteConfirmationOpen(false)
-        }
+        toast.push(
+            <Notification type="success">
+                Session deleted successfully
+            </Notification>,
+            { placement: 'top-center' },
+        )
+    } catch (err) {
+        toast.push(
+            <Notification type="danger">
+                Failed to delete session
+            </Notification>,
+            { placement: 'top-center' },
+        )
+    } finally {
+        setDeleteLoading(false)
+        setDeleteConfirmationOpen(false)
     }
+}
 
     const handleSend = () => {
         setSendMessageLoading(true)
