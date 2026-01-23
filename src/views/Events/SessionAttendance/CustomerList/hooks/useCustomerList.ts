@@ -31,7 +31,7 @@ export default function useCustomerList() {
         (item, index) => ({
             id: item.id ?? item.pk ?? `tmp-${index}`,
             session: item.session ?? '',
-            participant: item.participant ?? '',
+            participant_name: item.participant_name ?? '',
 
 
             // ✅ THIS IS THE IMPORTANT FIX

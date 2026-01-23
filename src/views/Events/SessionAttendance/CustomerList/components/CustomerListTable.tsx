@@ -92,11 +92,11 @@ const CustomerListTable = () => {
     } = useCustomerList()
 
     const handleEdit = (customer: Customer) => {
-        navigate(`/session/edit/${customer.id}`)
+        navigate(`/session-attendance/edit/${customer.id}`)
     }
 
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/participants/${customer.id}`)
+        navigate(`/session-attendance/${customer.id}`)
     }
 
     // Filter and sort list - show only matches, with exact matches first
@@ -137,7 +137,7 @@ const CustomerListTable = () => {
             },
             {
                 header: 'Participant',
-                accessorKey: 'participant',
+                accessorKey: 'participant_name',
             },
 
            

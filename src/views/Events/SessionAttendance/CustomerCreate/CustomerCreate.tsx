@@ -32,7 +32,7 @@ const CustomerEdit = () => {
             <Notification type="success">Session created!</Notification>,
             { placement: 'top-center' },
         )
-        navigate('/session')
+        navigate('/sessionAttendance')
     } catch (err: any) {
         const data = err?.response?.data
         if (data && typeof data === 'object') {

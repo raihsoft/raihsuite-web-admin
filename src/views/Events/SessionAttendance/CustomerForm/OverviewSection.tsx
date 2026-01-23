@@ -42,10 +42,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                 const options: OptionType[] = list.map((s: any) => ({
                     value: String(s.id), // ✅ UUID
                     label:
-                        s.event_title ??
-                        s.title ??
-                        s.name ??
-                        'Untitled Session',
+                        s.title +s.day
                 }))
 
                 if (mounted) setSessions(options)
@@ -87,7 +84,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                 const options: OptionType[] = list.map((p: any) => ({
                     value: String(p.id),
                     label:
-                        p.name ??
+                        p.participant_name ??
                         p.full_name ??
                         p.email ??
                         'Unnamed Participant',
@@ -145,11 +142,11 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
             {/* -------- Participant -------- */}
             <FormItem
                 label="Participant"
-                invalid={Boolean(errors.participant_name)}
-                errorMessage={errors.participant_name?.message}
+                invalid={Boolean(errors.participant)}
+                errorMessage={errors.participant?.message}
             >
                 <Controller
-                    name="participant_name"
+                    name="participant"
                     control={control}
                     render={({ field }) => (
                         <Select
