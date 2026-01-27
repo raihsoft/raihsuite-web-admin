@@ -12,14 +12,14 @@
 
 
 
-export const apiPrefix = '/accounts'
+export const apiPrefix = '/auth'
 
 const endpointConfig = {
     signIn: `${apiPrefix}/login/`,
     signOut: `${apiPrefix}/logout/`,
     signUp: `${apiPrefix}/register/`,
     forgotPassword: `${apiPrefix}/forgot-password/`,
-    resetPassword: `${apiPrefix}/reset-password/`,
+    resetPassword: `${apiPrefix}/change-password/`,
 }
 
 export default endpointConfig
