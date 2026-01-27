@@ -203,7 +203,7 @@ export async function apiDeleteEnquiries(ids: string[]) {
 // customer activity log
 export async function apiGetCustomerLog<T, U extends Record<string, unknown>>(params: U) {
     return ApiService.fetchDataWithAxios<T>({
-        url: '/customers/log/',
+        url: '/auth/login/',
         method: 'get',
         params,
     })
