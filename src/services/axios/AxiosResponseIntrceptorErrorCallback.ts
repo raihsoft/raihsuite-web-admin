@@ -76,7 +76,7 @@ const AxiosResponseIntrceptorErrorCallback = async (error: AxiosError) => {
       // 🔄 CALL REFRESH TOKEN API
       // (Django SimpleJWT default endpoint)
       // =========================================================
-      const res = await AxiosBase.post("/accounts/refresh/", {
+      const res = await AxiosBase.post("/auth/refresh/", {
         refresh: refreshToken,
       });
 
