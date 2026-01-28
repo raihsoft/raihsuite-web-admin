@@ -4,6 +4,7 @@ import withHeaderItem from '@/utils/hoc/withHeaderItem'
 import { useSessionUser } from '@/store/authStore'
 import { Link } from 'react-router-dom'
 import { PiUserDuotone, PiSignOutDuotone } from 'react-icons/pi'
+import { TbPasswordUser } from "react-icons/tb";
 import { useAuth } from '@/auth'
 import type { JSX } from 'react'
 import { useEffect, useState } from 'react'
@@ -142,7 +143,18 @@ const _UserDropdown = () => {
                 </Dropdown.Item>
             ))}
 
-            <Dropdown.Item eventKey="Sign Out" className="gap-2" onClick={handleSignOut}>
+            <Dropdown.Item eventKey="changePassword" className="px-0">
+                <Link className="flex h-full w-full px-2" to="/change-password">
+                    <span className="flex gap-2 items-center w-full">
+                        <span className="text-xl">
+                            <TbPasswordUser />
+                        </span>
+                        <span>Change Password</span>
+                    </span>
+                </Link>
+            </Dropdown.Item>
+
+            <Dropdown.Item eventKey="signOut" className="gap-2" onClick={handleSignOut}>
                 <span className="text-xl">
                     <PiSignOutDuotone />
                 </span>

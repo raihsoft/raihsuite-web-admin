@@ -19,7 +19,8 @@ const endpointConfig = {
     signOut: `${apiPrefix}/logout/`,
     signUp: `${apiPrefix}/register/`,
     forgotPassword: `${apiPrefix}/forgot-password/`,
-    resetPassword: `${apiPrefix}/change-password/`,
+    resetPassword: `${apiPrefix}/reset-password/`,
+    changePassword: `${apiPrefix}/change-password/`,
 }
 
 export default endpointConfig
