@@ -150,6 +150,21 @@ export const protectedRoutes: Routes = [
     
     
 
+    {
+        key: 'changePassword',
+        path: '/change-password',
+        component: lazy(() => import('@/views/auth/ChangePassword')),
+        authority: [],
+        meta: {
+            header: {
+                title: '',
+                description: 'Change your password.',
+                contained: true,
+            },
+            footer: false,
+        },
+    },
+
     ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute,...EventsRoute,...SessionRoute,...SessionAttendanceRoute ,...FeepaymentListRoute 
 
 ]

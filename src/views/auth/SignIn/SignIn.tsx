@@ -55,7 +55,7 @@ export const SignInBase = ({
                                         className="font-semibold heading-text mt-2 underline"
                                         themeColor={false}
                                     >
-                                        {/* Forgot password */}
+                                        Forgot password
                                     </ActionLink>
                                 </div>
                             }

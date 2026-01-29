@@ -5,6 +5,7 @@ import type {
   SignUpCredential,
   ForgotPassword,
   ResetPassword,
+  ChangePassword,
   SignInResponse,
   SignUpResponse,
 } from '@/@types/auth'
@@ -77,5 +78,14 @@ export async function apiResetPassword<T>(data: ResetPassword) {
     data,
   })
 }
+
+export async function apiChangePassword<T>(data: ChangePassword) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: endpointConfig.changePassword,
+    method: 'post',
+    data,
+  })
+}
+
 
 

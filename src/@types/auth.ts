@@ -33,6 +33,11 @@ export type ResetPassword = {
     password: string
 }
 
+export type ChangePassword = {
+    current_password: string
+    new_password: string
+}
+
 export type AuthRequestStatus = 'success' | 'failed' | ''
 
 export type AuthResult = Promise<{

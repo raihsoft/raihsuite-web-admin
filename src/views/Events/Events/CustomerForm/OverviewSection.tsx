@@ -9,7 +9,6 @@ type OverviewSectionProps = FormSectionBaseProps
 const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
     return (
         <Card>
-            {/* <h4 className="mb-6">Overview</h4> */}
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
                     label="First Name"
@@ -70,12 +69,25 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                 </FormItem>
             </div>
             <div className="grid md:grid-cols-2 gap-4 mt-4">
-                <FormItem label="Phone" invalid={Boolean(errors.phone)} errorMessage={errors.phone?.message}>
+                {/* ⭐ PHONE FIELD - Ensure it shows server errors */}
+                <FormItem 
+                    label="Phone" 
+                    invalid={Boolean(errors.phone)}
+                    errorMessage={errors.phone?.message}
+                >
                     <Controller
                         name="phone"
                         control={control}
                         render={({ field }) => (
-                            <Input type="text" autoComplete="off" placeholder="Phone" {...field} />
+                            <Input 
+                                type="text" 
+                                autoComplete="off" 
+                                placeholder="Phone" 
+                                {...field}
+                                // Add red border for server errors
+                                invalid={Boolean(errors.phone)}
+                                className={errors.phone ? 'border-red-500' : ''}
+                            />
                         )}
                     />
                 </FormItem>
