@@ -35,10 +35,10 @@ export const ChangePasswordBase = ({
                     </>
                 ) : (
                     <>
-                        <h3 className="mb-1">Change your password</h3>
+                        {/* <h3 className="mb-1">Change your password</h3>
                         <p className="font-semibold heading-text">
                             Please enter your old password and set a new password
-                        </p>
+                        </p> */}
                     </>
                 )}
             </div>

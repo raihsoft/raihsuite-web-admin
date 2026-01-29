@@ -8,6 +8,7 @@ export type OverviewFields = {
     event: string
     place?: string
     referred_by?: string
+    fee_amount?: string   
 }
 
 export type AccountField = {

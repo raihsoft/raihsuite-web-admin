@@ -23,6 +23,14 @@ const schema = z
     .object({
         title: z.string().min(1, { message: 'Title required' }),
         code: z.string().min(1, { message: 'Code required' }),
+        fee_amount: z
+    .string()
+    .optional()
+    .transform((val) => (val === '' || val === undefined ? '0' : val))
+    .refine((val) => !isNaN(Number(val)), {
+        message: 'Fee amount must be a number',
+    }),
+
         start_date: z.date({ required_error: 'Start date required' }),
         end_date: z.date({ required_error: 'End date required' }),
     })
@@ -53,6 +61,7 @@ const EventCreate = () => {
         defaultValues: {
             title: '',
             code: '',
+            fee_amount: '',
             start_date: null as unknown as Date,
             end_date: null as unknown as Date,
         },
@@ -66,6 +75,7 @@ const EventCreate = () => {
         const payload = {
             title: values.title,
             code: values.code,
+            fee_amount: values.fee_amount,
             start_date: values.start_date.toISOString(),
             end_date: values.end_date.toISOString(),
         }
@@ -168,6 +178,23 @@ const EventCreate = () => {
               <Input
                 {...field}
                 placeholder="Event code"
+                invalid={Boolean(errors.code)}
+              />
+            )}
+          />
+        </FormItem>
+        <FormItem
+          label="Fee Amount"
+          invalid={Boolean(errors.fee_amount)}
+          errorMessage={errors.fee_amount?.message}
+        >
+          <Controller
+            name="fee_amount"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder="optional fee amount for the event"
                 invalid={Boolean(errors.code)}
               />
             )}
