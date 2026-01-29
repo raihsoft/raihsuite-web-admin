@@ -42,7 +42,9 @@ export default function useCustomerList() {
             email: item.email ?? '',
             phone: item.phone ?? item.phone_number ?? '',
             place: item.place ?? '',
-
+            balance_due: parseFloat(item.balance_due) ,
+            amount_paid: parseFloat(item.amount_paid) ,
+            fee_amount: parseFloat(item.fee_amount) ,
             event_title: item.event_title ?? '',
 
             // ✅ THIS IS THE IMPORTANT FIX

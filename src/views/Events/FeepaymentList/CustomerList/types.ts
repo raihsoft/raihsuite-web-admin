@@ -74,9 +74,10 @@ export type Customer = {
 // types.ts
 export type FeePayment = {
     id?: number
-    participant_name: string
+    _name: string
     fee_amount: string
     payment_type: 'ADVANCE' | 'FULL' | 'PENDING'
     participant_id?: number
-    
+    code?: string
+    participant?: string
 }

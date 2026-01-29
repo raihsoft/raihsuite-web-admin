@@ -11,7 +11,11 @@ type OverviewSectionProps = FormSectionBaseProps & {
     serverPhoneError?: string
 }
 
-const OverviewSection = ({ control, errors, serverPhoneError }: OverviewSectionProps) => {
+const OverviewSection = ({
+    control,
+    errors,
+    serverPhoneError,
+}: OverviewSectionProps) => {
     const [events, setEvents] = useState<{ value: string; label: string }[]>([])
     const [loading, setLoading] = useState(false)
 
@@ -41,12 +45,12 @@ const OverviewSection = ({ control, errors, serverPhoneError }: OverviewSectionP
         }
     }, [])
 
-    // Combine errors: server error takes precedence
     const phoneError = serverPhoneError || errors.phone?.message
     const isPhoneInvalid = Boolean(phoneError)
 
     return (
         <Card>
+            {/* ================= NAME ================= */}
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
                     label="First Name"
@@ -77,6 +81,7 @@ const OverviewSection = ({ control, errors, serverPhoneError }: OverviewSectionP
                 </FormItem>
             </div>
 
+            {/* ================= PLACE + REFERRED ================= */}
             <div className="grid md:grid-cols-2 gap-4 mt-4">
                 <FormItem
                     label="Place"
@@ -107,7 +112,7 @@ const OverviewSection = ({ control, errors, serverPhoneError }: OverviewSectionP
                 </FormItem>
             </div>
 
-            {/* PHONE FIELD - With persistent error */}
+            {/* ================= PHONE + EVENT ================= */}
             <div className="grid md:grid-cols-2 gap-4 mt-4">
                 <FormItem
                     label="Phone Number *"
@@ -123,17 +128,9 @@ const OverviewSection = ({ control, errors, serverPhoneError }: OverviewSectionP
                                 type="tel"
                                 placeholder="Enter phone number"
                                 invalid={isPhoneInvalid}
-                                aria-invalid={isPhoneInvalid}
-                                className={isPhoneInvalid ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}
                             />
                         )}
                     />
-                    {/* Additional error display for visibility */}
-                    {/* {isPhoneInvalid && (
-                        <div className="mt-1 animate-fadeIn">
-                            <p className="text-sm text-red-600 font-medium">{phoneError}</p>
-                        </div>
-                    )} */}
                 </FormItem>
 
                 <FormItem
@@ -168,6 +165,30 @@ const OverviewSection = ({ control, errors, serverPhoneError }: OverviewSectionP
                 </FormItem>
             </div>
 
+            {/* ================= FEE AMOUNT ================= */}
+            <div className="grid md:grid-cols-2 gap-4 mt-4">
+                <FormItem
+                    label="Fee Amount"
+                    invalid={!!errors.fee_amount}
+                    errorMessage={errors.fee_amount?.message}
+                >
+                    <Controller
+                        name="fee_amount"
+                        control={control}
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                type="number"
+                                placeholder="Enter fee amount"
+                                min="0"
+                                step="0.01"
+                            />
+                        )}
+                    />
+                </FormItem>
+            </div>
+
+            {/* ================= EMAIL ================= */}
             <FormItem
                 label="Email"
                 invalid={!!errors.email}

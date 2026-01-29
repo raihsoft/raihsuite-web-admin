@@ -39,6 +39,7 @@ export default function useEventsList() {
             id: item.id ?? item.pk ?? `tmp-${index}`,
             title: item.title || item.name || '',
             code: item.code || item.event_code || '',
+             fee_amount: item.fee_amount,
             start_date: item.start_date || item.start_date_time || item.start || '',
             end_date: item.end_date || item.end_date_time || item.end || '',
         }),

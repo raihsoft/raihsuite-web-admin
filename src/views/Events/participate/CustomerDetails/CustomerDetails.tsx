@@ -66,6 +66,10 @@ const CustomerDetails = () => {
                             value={data.referenced_by ?? data.referred_by ?? '—'}
                         />
                         <Detail
+                            label="Fee Amount"
+                            value={data.fee_amount ?? '—'}
+                        />
+                        <Detail
                             label="Event"
                             value={data.event_title ?? data.event?.title ?? '—'}
                         />

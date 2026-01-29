@@ -41,6 +41,9 @@ const EventDetails = () => {
                         <p className="text-sm text-gray-500 mt-1">
                             Event Code: <span className="font-medium">{data.code}</span>
                         </p>
+                        <p className="text-sm text-gray-500 mt-1">
+                            Fee Amount: <span className="font-medium">{data.fee_amount}</span>
+                        </p>
                     </div>
 
                    

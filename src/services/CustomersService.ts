@@ -496,6 +496,15 @@ export async function apiCreateParticipant<T, U extends Record<string, unknown>>
         data,
     })
 }
+export async function apiParticipantList<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/participants/',
+        method: 'get',
+        data,
+    })
+}
 
 // Update participant by id
 export async function apiUpdateParticipant<T, U extends Record<string, unknown>>(

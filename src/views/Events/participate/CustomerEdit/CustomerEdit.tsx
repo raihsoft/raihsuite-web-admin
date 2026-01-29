@@ -29,6 +29,7 @@ const CustomerEdit = () => {
     const [deleteLoading, setDeleteLoading] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
+    /* ✅ DEFAULT VALUES (INCLUDING fee_amount) */
     const getDefaultValues = (): CustomerFormSchema | undefined => {
         if (!data) return
 
@@ -40,9 +41,11 @@ const CustomerEdit = () => {
             place: data.place ?? '',
             event: String(data.event ?? ''),
             referred_by: data.referred_by ?? '',
+            fee_amount: data.fee_amount ?? '0.00', // ✅ ADDED
         }
     }
 
+    /* ✅ SUBMIT */
     const handleFormSubmit = async (values: CustomerFormSchema) => {
         if (!id) return
         setIsSubmitting(true)
@@ -56,6 +59,7 @@ const CustomerEdit = () => {
                 place: values.place,
                 event: values.event,
                 referred_by: values.referred_by,
+                fee_amount: values.fee_amount, // ✅ SEND TO BACKEND
             })
 
             toast.push(
@@ -64,8 +68,8 @@ const CustomerEdit = () => {
                 </Notification>,
                 { placement: 'top-center' }
             )
-            navigate('/participants')
 
+            navigate('/participants')
             mutate()
         } catch {
             toast.push(
@@ -79,6 +83,7 @@ const CustomerEdit = () => {
         }
     }
 
+    /* DELETE */
     const handleConfirmDelete = async () => {
         if (!id) return
         setDeleteLoading(true)
