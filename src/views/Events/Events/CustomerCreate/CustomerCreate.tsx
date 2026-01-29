@@ -37,10 +37,11 @@ const schema = z
     .refine(
         (data) => data.end_date > data.start_date,
         {
-            message: 'End date must be after start date',
-            path: ['end_date'],
+            message: 'End date  must be after start date',
+            path: ['end_date'], // 👈 shows error under End Date field
         }
     )
+
 
 type FormValues = z.infer<typeof schema>
 
