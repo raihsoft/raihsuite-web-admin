@@ -18,12 +18,21 @@ import { TbTrash } from 'react-icons/tb'
 import { mutate } from 'swr'
 import { useCustomerListStore } from '../CustomerList/store/customerListStore'
 
-const schema = z.object({
-    title: z.string().min(1, { message: 'Title required' }),
-    code: z.string().min(1, { message: 'Code required' }),
-    start_date: z.date({ required_error: 'Start date required' }),
-    end_date: z.date({ required_error: 'End date required' }),
-})
+const schema = z
+    .object({
+        title: z.string().min(1, { message: 'Title required' }),
+        code: z.string().min(1, { message: 'Code required' }),
+        start_date: z.date({ required_error: 'Start date required' }),
+        end_date: z.date({ required_error: 'End date required' }),
+    })
+    .refine(
+        (data) => data.end_date > data.start_date,
+        {
+            message: 'End date  must be after start date',
+            path: ['end_date'], // 👈 shows error under End Date field
+        }
+    )
+
 
 type FormValues = z.infer<typeof schema>
 
@@ -200,6 +209,7 @@ const EventCreate = () => {
                     </div>
                 </BottomStickyBar>
             </form>
+
 
         
             <ConfirmDialog
