@@ -693,6 +693,12 @@ export async function apiUpdateSessionAttendanceDetails<T, U extends Record<stri
     })
 }
 
+export async function apiDeleteSessionAttendance(id: string) {
+  return ApiService.fetchDataWithAxios({
+    url: `/events/session-attendance/${id}/`,
+    method: 'delete',
+  })
+}
 // fee payment APIs
 
 export async function apiGetFeePaymentList<T, U extends Record<string, unknown>>(

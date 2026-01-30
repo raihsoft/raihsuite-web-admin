@@ -3,14 +3,14 @@ import type { Routes } from '@/@types/routes'
 
 const FeepaymentListRoute: Routes = [
     {
-        key: 'Feepayment',
-        path: '/Feepayment',
+        key: 'feepayment',
+        path: '/feepayment',
         component: lazy(() => import('@/views/Events/FeepaymentList/CustomerList')),
         authority: [],
     },
     {
-        key: 'FeepaymentCreate',
-        path: '/Feepayment/create',
+        key: 'feepaymentCreate',
+        path: '/feepayment/create',
         component: lazy(() => import('@/views/Events/FeepaymentList/CustomerCreate')),
         authority: [],
         meta: {
@@ -23,7 +23,7 @@ const FeepaymentListRoute: Routes = [
         },
     },
     {
-  key: 'FeePaymentDetails',
+  key: 'feepaymentDetails',
   path: '/feepayment/details/:id',  // <-- must match navigate() call
   component: lazy(() => import('@/views/Events/FeepaymentList/CustomerDetails')),
   authority: [],
@@ -39,8 +39,8 @@ const FeepaymentListRoute: Routes = [
 
     
     {
-        key: 'FeepaymentListEdit',
-        path: '/FeepaymentList/edit/:id',
+        key: 'feepaymentListEdit',
+        path: '/feepayment/edit/:id',
         component: lazy(() => import('@/views/Events/FeepaymentList/CustomerEdit')),
         authority: [],
         meta: {
@@ -51,7 +51,7 @@ const FeepaymentListRoute: Routes = [
             },
             footer: false,
         },
-    },
+    }
 ]
 
 export default FeepaymentListRoute

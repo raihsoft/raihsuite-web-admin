@@ -9,7 +9,7 @@ import toast from '@/components/ui/toast'
 import RichTextEditor from '@/components/shared/RichTextEditor'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
-import { apiDeleteParticipant } from '@/services/CustomersService'
+import { apiDeleteSessionAttendance } from '@/services/CustomersService'
 import { TbChecks } from 'react-icons/tb'
 
 const CustomerListSelected = () => {
@@ -38,7 +38,7 @@ const CustomerListSelected = () => {
         setDeleteLoading(true)
         try {
             // Call API to delete each selected participant
-            await Promise.all(selectedCustomer.map((c) => apiDeleteParticipant(c.id)))
+            await Promise.all(selectedCustomer.map((c) => apiDeleteSessionAttendance(c.id)))
 
             // Refresh list from server
             await mutate()
@@ -46,12 +46,12 @@ const CustomerListSelected = () => {
             setSelectAllCustomer([])
 
             toast.push(
-                <Notification type="success">Participants deleted!</Notification>,
+                <Notification type="success">Attendance deleted!</Notification>,
                 { placement: 'top-center' },
             )
         } catch (err) {
             toast.push(
-                <Notification type="danger">Failed to delete participants</Notification>,
+                <Notification type="danger">Failed to delete Attendance</Notification>,
                 { placement: 'top-center' },
             )
         } finally {

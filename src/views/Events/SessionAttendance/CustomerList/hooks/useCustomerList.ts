@@ -30,7 +30,7 @@ export default function useCustomerList() {
     const customerList = (Array.isArray(rawList) ? rawList : []).map(
         (item, index) => ({
             id: item.id ?? item.pk ?? `tmp-${index}`,
-            session: item.session ?? '',
+            session_title: item.session_title ?? '',
             participant_name: item.participant_name ?? '',
 
 

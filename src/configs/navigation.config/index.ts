@@ -235,7 +235,7 @@ const navigationConfig: NavigationTree[] = [
                 subMenu: [],
             },
             {
-                key: 'participate',
+                key: 'participants',
                 path: '/participants',
                 title: 'Participants',
                 translateKey: 'nav.participate.item1',
