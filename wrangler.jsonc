@@ -1,8 +1,5 @@
 {
   "name": "raihsuite-web-admin",
   "compatibility_date": "2025-11-22",
-  "pages_build_output_dir": "build",
-  "assets": {
-    "directory": "./build"
-  }
+  "pages_build_output_dir": "build"
 }
