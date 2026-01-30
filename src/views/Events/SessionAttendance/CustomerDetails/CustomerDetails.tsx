@@ -23,29 +23,43 @@ const CustomerDetails = () => {
     if (error || isEmpty(data)) {
         return (
             <div className="h-full flex flex-col items-center justify-center">
-                <p className="text-gray-500">No session Attendance found.</p>
+                <p className="text-gray-500 text-lg">
+                    No session attendance found.
+                </p>
             </div>
         )
     }
 
     return (
-        <Card className="p-8 max-w-3xl mx-auto">
-            <h3 className="text-2xl font-bold mb-6 text-black">
-                session Attendance Details
-            </h3>
+        <div className="px-4 py-10">
+            <Card className="p-10 max-w-5xl mx-auto rounded-2xl shadow-lg border border-gray-200">
+                <h2 className="text-3xl font-bold mb-8 text-gray-900">
+                    Session Attendance Details
+                </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <Detail label="session" value={data.session ?? '—'} />
-                <Detail label="participant name" value={data.participant_name ?? '—'} />
-            </div>
-        </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <Detail
+                        label="Session"
+                        value={data.session_title ?? '—'}
+                    />
+                    <Detail
+                        label="Participant Name"
+                        value={data.participant_name ?? '—'}
+                    />
+                </div>
+            </Card>
+        </div>
     )
 }
 
 const Detail = ({ label, value }: { label: string; value: string }) => (
-    <div>
-        <div className="text-sm text-gray-500">{label}</div>
-        <div className="text-lg font-semibold">{value}</div>
+    <div className="bg-gray-50 p-6 rounded-xl border">
+        <div className="text-sm uppercase tracking-wide text-gray-500 mb-2">
+            {label}
+        </div>
+        <div className="text-2xl font-semibold text-gray-900">
+            {value}
+        </div>
     </div>
 )
 

@@ -9,6 +9,14 @@ const assetsCategoryRoute: Routes = [
         path: `${ASSET_CATEGORY_PREFIX_PATH}/create`,
         component: lazy(() => import('@/views/ASSETS/asset_categories/CustomerCreate/index')),
         authority: [ADMIN, USER],
+         meta: {
+            header: {
+                title: '',
+                description: '',
+                contained: true,
+            },
+            footer: false,
+        },
     },
     {
         key: 'assetCategoryEdit',

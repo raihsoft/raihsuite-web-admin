@@ -9,6 +9,14 @@ const assetsRoute: Routes = [
         path: `${ASSET_PREFIX_PATH}/create`,
         component: lazy(() => import('@/views/ASSETS/asset/CustomerCreate/CustomerCreate')),
         authority: [ADMIN, USER],
+         meta: {
+            header: {
+                title: '',
+                description: '',
+                contained: true,
+            },
+            footer: false,
+        },
     },
     {
         key: 'assetEdit',

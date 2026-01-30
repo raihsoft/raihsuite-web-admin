@@ -107,15 +107,15 @@ const CustomerListTable = () => {
         
         // Filter to include matching names, email, or event title
         const filtered = customerList.filter(customer =>
-            (customer.name || '').toLowerCase().includes(query) ||
-            (customer.email || '').toLowerCase().includes(query) ||
-            (customer.event_title || '').toLowerCase().includes(query)
+            (customer.session_title || '').toLowerCase().includes(query) ||
+            (customer.participant_name || '').toLowerCase().includes(query) 
+           
         )
         
         // Sort to put exact/partial matches first (by name)
         return filtered.sort((a, b) => {
-            const aName = (a.name || '').toLowerCase()
-            const bName = (b.name || '').toLowerCase()
+            const aName = (a.participant_name || '').toLowerCase()
+            const bName = (b.participant_name || '').toLowerCase()
             
             // Exact match comes first
             if (aName === query) return -1
@@ -133,7 +133,7 @@ const CustomerListTable = () => {
         () => [
              {
                 header: 'Session',
-                accessorKey: 'session',
+                accessorKey: 'session_title',
             },
             {
                 header: 'Participant',
