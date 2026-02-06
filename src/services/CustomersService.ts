@@ -745,3 +745,4 @@ export async function apiGetFeePaymentDetails<T>(id: string) {
     method: 'get',
   })
 }
+

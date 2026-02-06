@@ -1,100 +1,73 @@
-import Container from '@/components/shared/Container'
 import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
-import { TbArrowNarrowLeft } from 'react-icons/tb'
-import { FaLayerGroup } from 'react-icons/fa'
-import { useParams, useNavigate } from 'react-router-dom'
-import useSWR from 'swr'
 import { apiGetAssetTypeCategoryById } from '@/services/CustomersService'
+import useSWR from 'swr'
+import { useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
 
 const CustomerDetails = () => {
-    const { id } = useParams()
-    const navigate = useNavigate()
+    const { id } = useParams<{ id: string }>()
 
-    const { data, isLoading } = useSWR(
-        ['/api/asset_type_categories', id as string],
-        ([_, idParam]) => apiGetAssetTypeCategoryById<any>(idParam as string),
-        { revalidateOnFocus: false, revalidateIfStale: false },
+    const { data, isLoading, error } = useSWR(
+        id ? ['/asset_type_categories', id] : null,
+        () => apiGetAssetTypeCategoryById<any>(id!),
+        {
+            revalidateOnFocus: false,
+        }
     )
 
-    const handleBack = () => navigate(-1)
+    if (isLoading) {
+        return <Loading loading />
+    }
+
+    if (error || isEmpty(data)) {
+        return (
+            <div className="h-full flex flex-col items-center justify-center">
+                <p className="text-gray-500">No asset type category found.</p>
+            </div>
+        )
+    }
 
     return (
-        <Loading loading={isLoading}>
-            <Container className="py-8">
+        <div className="h-full w-full p-6">
+            <Card className="h-full w-full p-8 rounded-2xl shadow-sm">
                 {/* Header */}
-                <div className="mb-8">
-                    <button
-                        type="button"
-                        onClick={handleBack}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-6 transition-colors"
-                    >
-                        <TbArrowNarrowLeft className="text-lg" />
-                        Back
-                    </button>
-                    
-                   
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">
+                            {data.name}
+                        </h2>
+                        <p className="text-sm text-gray-500 mt-1">
+                            name: <span className="font-medium">{data.name || '—'}</span>
+                        </p>
+                    </div>
                 </div>
 
-                {data && !isEmpty(data) ? (
-                    <div className="space-y-6">
-                        {/* Main Info Card */}
-                        <Card className="p-6">
-                            <div className="space-y-4">
-                                <div>
-                                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                                        {data.name}
-                                    </h2>
-                                    {data.code && (
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                            Code: <span className="font-medium">{data.code}</span>
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        </Card>
+                {/* Content Section */}
+                <Card className="p-6 rounded-xl border border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-6">
+                        Asset Type Category Information
+                    </h3>
 
-                        {/* Description Card */}
-                        <Card className="p-6">
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-                                Description
-                            </h3>
-                            <div className="bg-gray-50 dark:bg-gray-800/30 rounded-lg p-4">
-                                {data.description ? (
-                                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                                        {data.description}
-                                    </p>
-                                ) : (
-                                    <p className="text-gray-400 dark:text-gray-500 italic">
-                                        No description provided
-                                    </p>
-                                )}
-                            </div>
-                        </Card>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Detail
+                            label="Description"
+                            value={data.description || '—'}
+                        />
                     </div>
-                ) : (
-                    <Card className="p-8 text-center">
-                        <div className="py-12">
-                            <FaLayerGroup className="text-4xl text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                                No Asset Type Category Found
-                            </h3>
-                            <p className="text-gray-500 dark:text-gray-400 mb-6">
-                                The requested category could not be found.
-                            </p>
-                            <button
-                                onClick={handleBack}
-                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-                            >
-                                Return to list
-                            </button>
-                        </div>
-                    </Card>
-                )}
-            </Container>
-        </Loading>
+                </Card>
+            </Card>
+        </div>
     )
 }
+
+const Detail = ({ label, value }: { label: string; value: string }) => (
+    <div>
+        <div className="text-base text-gray-500">{label}</div>
+        <div className="text-xl font-semibold whitespace-pre-wrap">
+            {value}
+        </div>
+    </div>
+)
 
 export default CustomerDetails

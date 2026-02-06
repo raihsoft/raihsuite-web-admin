@@ -194,9 +194,10 @@ const EventCreate = () => {
             control={control}
             render={({ field }) => (
               <Input
+                type='number'
                 {...field}
                 placeholder="optional fee amount for the event"
-                invalid={Boolean(errors.code)}
+                // invalid={Boolean(errors.code)}
               />
             )}
           />

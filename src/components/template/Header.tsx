@@ -1,7 +1,9 @@
+import React, { useEffect } from 'react'
 import classNames from '@/utils/classNames'
 import { HEADER_HEIGHT } from '@/constants/theme.constant'
 import type { ReactNode } from 'react'
 import type { CommonProps } from '@/@types/common'
+import { useNavigationStore } from '@/store/navigationStore'
 
 interface HeaderProps extends CommonProps {
     headerStart?: ReactNode
@@ -20,6 +22,15 @@ const Header = (props: HeaderProps) => {
         container,
         wrapperClass,
     } = props
+
+    const loadAllowedNavigation = useNavigationStore(
+        (state) => state.loadAllowedNavigation,
+    )
+
+    // Automatically load allowed navigation on header mount (always mounted)
+    useEffect(() => {
+        void loadAllowedNavigation()
+    }, [loadAllowedNavigation])
 
     return (
         <header className={classNames('header', className)}>

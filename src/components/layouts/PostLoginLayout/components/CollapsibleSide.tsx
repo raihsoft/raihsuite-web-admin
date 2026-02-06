@@ -4,6 +4,7 @@ import SideNavToggle from '@/components/template/SideNavToggle'
 import MobileNav from '@/components/template/MobileNav'
 import UserProfileDropdown from '@/components//template/UserProfileDropdown'
 import LayoutBase from '@/components//template/LayoutBase'
+import ErrorBoundary from '@/components/template/ErrorBoundary'
 import useResponsive from '@/utils/hooks/useResponsive'
 import { LAYOUT_COLLAPSIBLE_SIDE } from '@/constants/theme.constant'
 import type { CommonProps } from '@/@types/common'
@@ -12,13 +13,18 @@ import { color } from 'framer-motion'
 const CollapsibleSide = ({ children }: CommonProps) => {
     const { larger, smaller } = useResponsive()
 
+    // Debug: show responsive state and whether SideNav will render
+    console.debug('[CollapsibleSide] responsive larger:', larger, 'willRenderSideNav:', !!larger.lg)
+
     return (
         <LayoutBase
             type={LAYOUT_COLLAPSIBLE_SIDE}
             className="app-layout-collapsible-side flex flex-auto flex-col"
         >
             <div className="flex flex-auto min-w-0">
-                {larger.lg && <SideNav />}
+                <ErrorBoundary>
+                    {larger.lg && <SideNav />}
+                </ErrorBoundary>
                 <div className="flex flex-col flex-auto min-h-screen min-w-0 relative w-full">
                     <Header
                         className="shadow dark:shadow-2xl"
