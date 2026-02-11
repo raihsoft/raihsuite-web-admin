@@ -19,7 +19,7 @@ interface ChangePasswordFormProps extends CommonProps {
 type ChangePasswordFormSchema = {
     current_password: string
     new_password: string
-    confirmPassword: string
+    confirm_new_password: string
 }
 
 const validationSchema: ZodType<ChangePasswordFormSchema> = z
@@ -30,13 +30,13 @@ const validationSchema: ZodType<ChangePasswordFormSchema> = z
         new_password: z
             .string({ required_error: 'Please enter your new password' })
             .min(6, 'Password must be at least 6 characters'),
-        confirmPassword: z.string({
+        confirm_new_password: z.string({
             required_error: 'Confirm Password Required',
         }),
     })
-    .refine((data) => data.new_password === data.confirmPassword, {
+    .refine((data) => data.new_password === data.confirm_new_password, {
         message: 'Your passwords do not match',
-        path: ['confirmPassword'],
+        path: ['confirm_new_password'],
     })
     .refine((data) => data.current_password !== data.new_password, {
         message: 'New password must be different from current password',
@@ -45,6 +45,7 @@ const validationSchema: ZodType<ChangePasswordFormSchema> = z
 
 const ChangePasswordForm = (props: ChangePasswordFormProps) => {
     const [isSubmitting, setSubmitting] = useState(false)
+    const [apiError, setApiError] = useState<string | null>(null) // State for API error
 
     const { className, setMessage, setChangeComplete, changeComplete, children } =
         props
@@ -53,28 +54,44 @@ const ChangePasswordForm = (props: ChangePasswordFormProps) => {
         handleSubmit,
         formState: { errors },
         control,
+        setError, // Add setError from react-hook-form
+        clearErrors, // Add clearErrors to clear API errors
     } = useForm<ChangePasswordFormSchema>({
         resolver: zodResolver(validationSchema),
     })
 
     const onChangePassword = async (values: ChangePasswordFormSchema) => {
-        const { current_password, new_password } = values
+        const { current_password, new_password, confirm_new_password } = values
 
         try {
             setSubmitting(true)
+            setApiError(null) // Clear previous API error
+            clearErrors('current_password') // Clear any existing errors on the field
+            
             const resp = await apiChangePassword<boolean>({
                 current_password,
                 new_password,
+                confirm_new_password,
             })
             if (resp) {
                 setChangeComplete?.(true)
             }
-        } catch (error) {
-            setMessage?.(
-                typeof error === 'string'
-                    ? error
-                    : 'Failed to change password',
-            )
+        } catch (error: any) {
+            // Check if the error response contains current_password validation error
+            if (error?.response?.data?.current_password) {
+                // Set error on the current_password field
+                setError('current_password', {
+                    type: 'manual',
+                    message: error.response.data.current_password[0], // Get the first error message
+                })
+            } else {
+                // Handle other errors
+                setMessage?.(
+                    typeof error === 'string'
+                        ? error
+                        : 'Failed to change password',
+                )
+            }
         } finally {
             setSubmitting(false)
         }
@@ -104,6 +121,13 @@ const ChangePasswordForm = (props: ChangePasswordFormProps) => {
                                             autoComplete="current-password"
                                             placeholder="Enter current password"
                                             {...field}
+                                            // Clear API error when user starts typing
+                                            onChange={(e) => {
+                                                field.onChange(e)
+                                                if (errors.current_password?.type === 'manual') {
+                                                    clearErrors('current_password')
+                                                }
+                                            }}
                                         />
                                     )}
                                 />
@@ -129,11 +153,11 @@ const ChangePasswordForm = (props: ChangePasswordFormProps) => {
 
                             <FormItem
                                 label="Confirm New Password"
-                                invalid={!!errors.confirmPassword}
-                                errorMessage={errors.confirmPassword?.message}
+                                invalid={!!errors.confirm_new_password}
+                                errorMessage={errors.confirm_new_password?.message}
                             >
                                 <Controller
-                                    name="confirmPassword"
+                                    name="confirm_new_password"
                                     control={control}
                                     render={({ field }) => (
                                         <PasswordInput

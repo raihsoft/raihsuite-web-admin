@@ -159,7 +159,7 @@ const CustomerListTable = () => {
 
             },
             {
-                header: '',
+                header: 'action',
                 id: 'action',
                 cell: (props) => (
                     <div className="flex items-center gap-3">

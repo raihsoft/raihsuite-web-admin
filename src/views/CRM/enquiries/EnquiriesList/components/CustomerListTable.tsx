@@ -140,15 +140,15 @@ const CustomerListTable = () => {
                 accessorKey: 'email',
             },
             {
-                header: 'Phone',
-                accessorKey: 'phone',
+                header: 'Mobile',
+                accessorKey: 'mobile',
             },
             {
                 header: 'Message',
                 accessorKey: 'message',
             },
             {
-                header: '',
+                header: 'action',
                 id: 'action',
                 cell: (props) => (
                     <div className="flex items-center gap-3">

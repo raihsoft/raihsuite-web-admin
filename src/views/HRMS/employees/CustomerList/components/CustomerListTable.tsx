@@ -180,7 +180,7 @@ const CustomerListTable = () => {
 
             },
             {
-                header: '',
+                header: 'action',
                 id: 'action',
                 cell: (props) => (
                     <ActionColumn

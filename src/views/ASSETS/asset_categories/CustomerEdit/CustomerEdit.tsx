@@ -45,7 +45,7 @@ const CustomerEdit = () => {
                 placement: 'top-center',
             })
             await mutate(['/api/asset_categories', { ...tableData, ...filterData }])
-            navigate('/assets-category')
+            navigate('/assetcategories')
         } catch (error) {
             toast.push(<Notification type="danger">Update failed!</Notification>, {
                 placement: 'top-center',
