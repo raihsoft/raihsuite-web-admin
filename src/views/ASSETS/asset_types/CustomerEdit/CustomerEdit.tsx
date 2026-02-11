@@ -46,7 +46,7 @@ const CustomerEdit = () => {
             })
             // revalidate list
             await mutate(['/api/asset_types', { ...tableData, ...filterData }])
-            navigate('/asset-types')
+            navigate('/assettypes')
         } catch (error) {
             toast.push(<Notification type="danger">Update failed!</Notification>, {
                 placement: 'top-center',

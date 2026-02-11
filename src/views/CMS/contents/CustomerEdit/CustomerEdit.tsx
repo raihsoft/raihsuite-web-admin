@@ -4,16 +4,15 @@ import Button from '@/components/ui/Button'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import { apiGetAssetById, apiUpdateAsset, apiDeleteAsset } from '@/services/CustomersService'
+import { apiGetCustomer } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
-import { mutate } from 'swr'
-import { useCustomerListStore } from '../AssetList/store/customerListStore'
+import sleep from '@/utils/sleep'
 import NoUserFound from '@/assets/svg/NoUserFound'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
 import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
 import type { CustomerFormSchema } from '../CustomerForm'
-import type { Customer } from '../AssetList/types'
+import type { Customer } from '../ContactList/types'
 
 const CustomerEdit = () => {
     const { id } = useParams()
@@ -21,9 +20,9 @@ const CustomerEdit = () => {
     const navigate = useNavigate()
 
     const { data, isLoading } = useSWR(
-        ['/api/assets', id as string],
+        [`/api/customers${id}`, { id: id as string }],
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, idParam]) => apiGetAssetById<Customer>(idParam as string),
+        ([_, params]) => apiGetCustomer<Customer, { id: string }>(params),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
@@ -33,84 +32,46 @@ const CustomerEdit = () => {
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
     const [isSubmiting, setIsSubmiting] = useState(false)
 
-    const tableData = useCustomerListStore((s) => s.tableData)
-    const filterData = useCustomerListStore((s) => s.filterData)
-
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        if (!id) return
-        try {
-            setIsSubmiting(true)
-            const payload: any = {
-                title: values.title,
-                description: values.description,
-                file_type: values.file_type,
-                asset_type_ref: values.asset_type_ref,
-                asset_category: values.asset_category,
-                tags: values.tags,
-            }
-            
-            // Only include file if a new one was actually uploaded (not a string/path)
-            const newFile = values.file as any
-            if (newFile && typeof newFile !== 'string') {
-                payload.file = newFile
-            }
-            
-            console.log('📝 Sending update with payload:', payload)
-            await apiUpdateAsset(id as string, payload)
-            toast.push(<Notification type="success">Changes Saved!</Notification>, {
-                placement: 'top-center',
-            })
-            // revalidate list
-            await mutate(['/api/assets', { ...tableData, ...filterData }])
-            navigate('/assets')
-        } catch (error: any) {
-            console.error('❌ Update error details:', {
-                message: error?.message,
-                status: error?.response?.status,
-                data: error?.response?.data,
-            })
-            toast.push(<Notification type="danger">Update failed!</Notification>, {
-                placement: 'top-center',
-            })
-        } finally {
-            setIsSubmiting(false)
-        }
+        console.log('Submitted values', values)
+        setIsSubmiting(true)
+        await sleep(800)
+        setIsSubmiting(false)
+        toast.push(<Notification type="success">Changes Saved!</Notification>, {
+            placement: 'top-center',
+        })
+        // navigate('/concepts/customers/customer-list')
     }
 
     const getDefaultValues = () => {
         if (data) {
-            const { title, description, file_type, asset_type_ref, asset_category, tags } = data as any
+            const { firstName, lastName, email, personalInfo, img } = data
 
             return {
-                title,
-                description,
-                file_type,
-                asset_type_ref,
-                asset_category,
-                tags,
+                firstName,
+                lastName,
+                email,
+                img,
+                phoneNumber: personalInfo.phoneNumber,
+                dialCode: personalInfo.dialCode,
+                country: personalInfo.country,
+                address: personalInfo.address,
+                city: personalInfo.city,
+                postcode: personalInfo.postcode,
+                tags: [],
             }
         }
 
         return {}
     }
 
-    const handleConfirmDelete = async () => {
-        if (!id) return
-        try {
-            await apiDeleteAsset(id as string)
-            toast.push(<Notification type="success">Asset deleted!</Notification>, {
-                placement: 'top-center',
-            })
-            // revalidate list with current table/filter state
-            await mutate(['/assets', { ...tableData, ...filterData }])
-            navigate('/assets')
-        } catch (error) {
-            toast.push(<Notification type="danger">Delete failed!</Notification>, {
-                placement: 'top-center',
-            })
-        } finally {
-            setDeleteConfirmationOpen(false)
-        }
+    const handleConfirmDelete = () => {
+        setDeleteConfirmationOpen(true)
+        toast.push(
+            <Notification type="success">Customer deleted!</Notification>,
+            { placement: 'top-center' },
+        )
+        // navigate('/concepts/customers/customer-list')
     }
 
     const handleDelete = () => {
@@ -130,7 +91,7 @@ const CustomerEdit = () => {
             {!isLoading && !data && (
                 <div className="h-full flex flex-col items-center justify-center">
                     <NoUserFound height={280} width={280} />
-                    <h3 className="mt-8">No asset found!</h3>
+                    <h3 className="mt-8">No user found!</h3>
                 </div>
             )}
             {!isLoading && data && (
