@@ -1,12 +1,15 @@
 import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
+import Button from '@/components/ui/Button'
+import { TbArrowNarrowLeft } from 'react-icons/tb'
 import { apiGetAssetTypeCategoryById } from '@/services/CustomersService'
 import useSWR from 'swr'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
 
 const CustomerDetails = () => {
     const { id } = useParams<{ id: string }>()
+    const navigate = useNavigate()
 
     const { data, isLoading, error } = useSWR(
         id ? ['/asset_type_categories', id] : null,
@@ -16,29 +19,48 @@ const CustomerDetails = () => {
         }
     )
 
+    const handleBack = () => navigate(-1)
+
     if (isLoading) {
         return <Loading loading />
     }
 
     if (error || isEmpty(data)) {
         return (
-            <div className="h-full flex flex-col items-center justify-center">
+            <div className="min-h-full flex flex-col items-center justify-center p-6">
                 <p className="text-gray-500">No asset type category found.</p>
             </div>
         )
     }
 
     return (
-        <div className="h-full w-full p-6">
-            <Card className="h-full w-full p-8 rounded-2xl shadow-sm">
+        <div className="min-h-full w-full p-6 pb-16">
+            {/* Back Button */}
+            <div className="mb-6">
+                <Button
+                    type="button"
+                    variant="plain"
+                    icon={<TbArrowNarrowLeft />}
+                    onClick={handleBack}
+                >
+                    Back
+                </Button>
+            </div>
+
+            {/* Main Card */}
+            <Card className="w-full p-8 rounded-2xl shadow-sm">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">
                             {data.name}
                         </h2>
+
                         <p className="text-sm text-gray-500 mt-1">
-                            name: <span className="font-medium">{data.name || '—'}</span>
+                            Name:{' '}
+                            <span className="font-medium">
+                                {data.name || '—'}
+                            </span>
                         </p>
                     </div>
                 </div>

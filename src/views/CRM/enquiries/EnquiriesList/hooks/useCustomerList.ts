@@ -38,6 +38,7 @@ export default function useCustomerList() {
             name: customer.name,
             email: customer.email,
             mobile: customer.mobile,
+            created_at: customer.created_at,
             message: customer.message,
             status: 'active',
             totalSpending: 0,

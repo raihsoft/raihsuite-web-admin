@@ -2,11 +2,13 @@ import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
 import { apiGetAssetTypeById } from '@/services/CustomersService'
 import useSWR from 'swr'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
+import { TbArrowNarrowLeft } from 'react-icons/tb'
 
 const AssetTypeDetails = () => {
     const { id } = useParams<{ id: string }>()
+    const navigate = useNavigate()
 
     const { data, isLoading, error } = useSWR(
         id ? ['/asset_types', id] : null,
@@ -15,6 +17,8 @@ const AssetTypeDetails = () => {
             revalidateOnFocus: false,
         }
     )
+
+    const handleBack = () => navigate(-1)
 
     if (isLoading) {
         return <Loading loading />
@@ -29,7 +33,19 @@ const AssetTypeDetails = () => {
     }
 
     return (
-        <div className="h-full w-full p-6">
+        <div className="h-full w-full p-6 pb-20">
+            {/* Back Button */}
+            <div className="mb-4">
+                <button
+                    type="button"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:opacity-70 transition"
+                    onClick={handleBack}
+                >
+                    <TbArrowNarrowLeft className="text-xl" />
+                    Back
+                </button>
+            </div>
+
             <Card className="h-full w-full p-8 rounded-2xl shadow-sm">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
@@ -37,12 +53,14 @@ const AssetTypeDetails = () => {
                         <h2 className="text-2xl font-bold text-gray-900">
                             {data.name}
                         </h2>
+
                         <p className="text-sm text-gray-500 mt-1">
                             Code:{' '}
                             <span className="font-medium">
                                 {data.code || '—'}
                             </span>
                         </p>
+
                         <p className="text-sm text-gray-500 mt-1">
                             File Extension:{' '}
                             <span className="font-medium">

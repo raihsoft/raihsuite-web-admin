@@ -2,12 +2,14 @@ import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
 import { apiGetEvent } from '@/services/CustomersService'
 import useSWR from 'swr'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
 import dayjs from 'dayjs'
+import { TbArrowNarrowLeft } from 'react-icons/tb'
 
 const EventDetails = () => {
     const { id } = useParams<{ id: string }>()
+    const navigate = useNavigate()
 
     const { data, isLoading, error } = useSWR(
         id ? ['/events/events', id] : null,
@@ -16,6 +18,8 @@ const EventDetails = () => {
             revalidateOnFocus: false,
         }
     )
+
+    const handleBack = () => navigate(-1)
 
     if (isLoading) {
         return <Loading loading />
@@ -29,9 +33,21 @@ const EventDetails = () => {
         )
     }
 
- return (
-        <div className="h-full w-full  p-6">
-            <Card className="h-full w-full p-8 rounded-2xl shadow-sm">
+    return (
+        <div className="h-full w-full p-6">
+            {/* Back Button */}
+            <div className="mb-4">
+                <button
+                    type="button"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:opacity-70 transition"
+                    onClick={handleBack}
+                >
+                    <TbArrowNarrowLeft className="text-xl" />
+                    Back
+                </button>
+            </div>
+
+            <Card className="h-full w-full p-8 rounded-2xl shadow-sm ">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
                     <div>
@@ -39,14 +55,16 @@ const EventDetails = () => {
                             {data.title}
                         </h2>
                         <p className="text-sm text-gray-500 mt-1">
-                            Event Code: <span className="font-medium">{data.code}</span>
+                            Event Code:{' '}
+                            <span className="font-medium">{data.code}</span>
                         </p>
                         <p className="text-sm text-gray-500 mt-1">
-                            Fee Amount: <span className="font-medium">{data.fee_amount}</span>
+                            Fee Amount:{' '}
+                            <span className="font-medium">
+                                {data.fee_amount}
+                            </span>
                         </p>
                     </div>
-
-                   
                 </div>
 
                 {/* Content Section */}
@@ -81,13 +99,12 @@ const EventDetails = () => {
             </Card>
         </div>
     )
-
 }
 
 const Detail = ({ label, value }: { label: string; value: string }) => (
     <div>
         <div className="text-base text-gray-500">{label}</div>
-        <div className="text-xl font-semibold">{value}</div>
+        <div className="text-xl font-semibold text-gray-900">{value}</div>
     </div>
 )
 

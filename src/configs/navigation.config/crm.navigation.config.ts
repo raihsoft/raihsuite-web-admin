@@ -15,7 +15,7 @@ const crmNavigationConfig: NavigationTree[] = [
         authority: [],
         subMenu: [
             {
-                key: 'crm.enquiries',
+                key: 'enquiries',
                 path: '/enquiries',
                 title: 'Enquiries',
                 translateKey: 'nav.crm.enquiries',

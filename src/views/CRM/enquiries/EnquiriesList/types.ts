@@ -60,6 +60,7 @@ export type Customer = {
     role: string
     lastOnline: number
     status: string
+    message: string
     personalInfo: PersonalInfo
     orderHistory: OrderHistory[]
     paymentMethod: PaymentMethod[]

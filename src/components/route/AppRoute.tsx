@@ -29,7 +29,17 @@ const AppRoute = <T extends Record<string, unknown>>({
     )
 
     const handleLayoutChange = useCallback(() => {
-        setCurrentRouteKey(routeKey)
+        console.log('Debugging routeKey:', routeKey)
+        if (routeKey === 'hrms.item1' || routeKey.startsWith('employeeDetails')) {
+            console.log('Setting currentRouteKey to hrms.item1')
+            setCurrentRouteKey('hrms.item1')
+        } else if (routeKey === 'enquiries' || routeKey.startsWith('enquiriesDetails')) {
+            console.log('Setting currentRouteKey to crm.enquiries')
+            setCurrentRouteKey('enquiries')
+        } else {
+            console.log('Setting currentRouteKey to', routeKey)
+            setCurrentRouteKey(routeKey)
+        }
 
         if (props.layout && props.layout !== layoutType) {
             setPreviousLayout(layoutType)
@@ -40,7 +50,7 @@ const AppRoute = <T extends Record<string, unknown>>({
             setLayout(previousLayout)
             setPreviousLayout('')
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks
     }, [props.layout, routeKey])
 
     useEffect(() => {

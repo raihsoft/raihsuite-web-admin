@@ -80,11 +80,9 @@
 // }
 
 // export default ForgotPassword
-
 import { useState } from 'react'
 import Alert from '@/components/ui/Alert'
 import Button from '@/components/ui/Button'
-import ActionLink from '@/components/shared/ActionLink'
 import { useNavigate } from 'react-router-dom'
 
 type ForgotPasswordProps = {
@@ -96,7 +94,6 @@ export const ForgotPasswordBase = ({
 }: ForgotPasswordProps) => {
 
     const [showMessage, setShowMessage] = useState(false)
-
     const navigate = useNavigate()
 
     const handleForgotPasswordClick = () => {
@@ -109,6 +106,7 @@ export const ForgotPasswordBase = ({
 
     return (
         <div>
+            {/* Header */}
             <div className="mb-6">
                 <h3 className="mb-2">Forgot Password</h3>
                 <p className="font-semibold heading-text">
@@ -116,21 +114,33 @@ export const ForgotPasswordBase = ({
                 </p>
             </div>
 
+            {/* Alert Message */}
             {showMessage && (
                 <Alert showIcon className="mb-4" type="warning">
-                    Please contact the support team to reset your password.
+                    Please contact the support team to reset your password. <br />
+
+                    <a
+                        href="mailto:contact@raihsoft.com?subject=Forgot Password Request&body=Hi Support Team, I need help resetting my password."
+                        className="text-blue-600 underline font-semibold"
+                    >
+                        contact@raihsoft.com
+                    </a>
                 </Alert>
             )}
 
-            <Button
-                block
-                variant="solid"
-                type="button"
-                onClick={handleForgotPasswordClick}
-            >
-                Forgot Password
-            </Button>
+            {/* Forgot Password Button → Hide After Click */}
+            {!showMessage && (
+                <Button
+                    block
+                    variant="solid"
+                    type="button"
+                    onClick={handleForgotPasswordClick}
+                >
+                    Forgot Password
+                </Button>
+            )}
 
+            {/* Continue Button */}
             <Button
                 block
                 className="mt-3"
@@ -138,19 +148,8 @@ export const ForgotPasswordBase = ({
                 type="button"
                 onClick={handleContinue}
             >
-                Continue to Sign In
+                Continue to Login In
             </Button>
-
-            <div className="mt-4 text-center">
-                <span>Back to </span>
-                <ActionLink
-                    to={signInUrl}
-                    className="heading-text font-bold"
-                    themeColor={false}
-                >
-                    Sign in
-                </ActionLink>
-            </div>
         </div>
     )
 }

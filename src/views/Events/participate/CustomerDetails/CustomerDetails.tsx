@@ -2,11 +2,13 @@ import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
 import { apiGetParticipant } from '@/services/CustomersService'
 import useSWR from 'swr'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
+import { TbArrowNarrowLeft } from 'react-icons/tb'
 
 const CustomerDetails = () => {
     const { id } = useParams<{ id: string }>()
+    const navigate = useNavigate()
 
     const { data, isLoading, error } = useSWR(
         id ? ['/api/events/participants', id] : null,
@@ -15,6 +17,8 @@ const CustomerDetails = () => {
             revalidateOnFocus: false,
         },
     )
+
+    const handleBack = () => navigate(-1)
 
     if (isLoading) {
         return <Loading loading />
@@ -28,8 +32,20 @@ const CustomerDetails = () => {
         )
     }
 
-   return (
-        <div className="h-full w-full p-6">
+    return (
+        <div className="h-full w-full p-6 pb-20">
+            {/* Back Button */}
+            <div className="mb-4">
+                <button
+                    type="button"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:opacity-70 transition"
+                    onClick={handleBack}
+                >
+                    <TbArrowNarrowLeft className="text-xl" />
+                    Back
+                </button>
+            </div>
+
             <Card className="h-full w-full p-8 rounded-2xl shadow-sm">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
@@ -42,8 +58,6 @@ const CustomerDetails = () => {
                             <span className="font-medium">{id}</span>
                         </p>
                     </div>
-
-                 
                 </div>
 
                 {/* Information Section */}

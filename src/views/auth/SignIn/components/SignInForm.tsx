@@ -152,7 +152,7 @@ const SignInForm = (props: SignInFormProps) => {
                     type="submit"
                     className="py-3 text-base"
                 >
-                    {isSubmitting ? 'Signing in...' : 'Sign In'}
+                    {isSubmitting ? 'Signing in...' : 'Login'}
                 </Button>
             </Form>
         </div>
