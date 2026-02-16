@@ -15,7 +15,7 @@ const hrmsNavigationConfig: NavigationTree[] = [
         authority: [],
         subMenu: [
             {
-                key: 'hrms.employees',
+                key: 'hrms.item1',
                 path: '/employees',
                 title: 'Employees',
                 translateKey: 'nav.hrms.employees',

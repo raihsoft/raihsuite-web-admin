@@ -77,6 +77,13 @@ const getTopRouteKey = (
 function useMenuActive(navTree: NavigationTree[], key: string) {
     const activedRoute = useMemo(() => {
         const route = getRouteInfo(navTree, key)
+        if (!route) {
+            // Handle partial matches for dynamic routes
+            const parentRoute = navTree.find((nav) => key.startsWith(nav.path))
+            if (parentRoute) {
+                return { ...parentRoute, key: parentRoute.key }
+            }
+        }
         return route
     }, [navTree, key])
 

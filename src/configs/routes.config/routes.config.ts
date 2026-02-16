@@ -147,8 +147,20 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
 
-    
-    
+    {
+        key: 'hrms.employeeDetails',
+        path: '/employees/:id',
+        component: lazy(() => import('@/views/HRMS/employees/CustomerDetails/CustomerDetails')),
+        authority: [],
+        meta: {
+            header: {
+                title: 'Employee Details',
+                description: 'View employee details.',
+                contained: true,
+            },
+            footer: false,
+        },
+    },
 
     {
         key: 'changePassword',
