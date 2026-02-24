@@ -3,13 +3,13 @@ import type { Routes } from '@/@types/routes'
 
 const participantsRoute: Routes = [
     {
-        key: 'participants',
+        key: 'events.participants',
         path: '/participants',
         component: lazy(() => import('@/views/Events/participate/CustomerList')),
         authority: [],
     },
     {
-        key: 'participantCreate',
+        key: 'events.participantCreate',
         path: '/participants/create',
         component: lazy(() => import('@/views/Events/participate/CustomerCreate')),
         authority: [],
@@ -23,7 +23,7 @@ const participantsRoute: Routes = [
         },
     },
     {
-        key: 'participantDetails',
+        key: 'events.participantDetails',
         path: '/participants/:id',
         component: lazy(() => import('@/views/Events/participate/CustomerDetails')),
         authority: [],

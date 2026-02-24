@@ -3,7 +3,7 @@ import type { Routes } from '@/@types/routes'
 
 const FeepaymentListRoute: Routes = [
     {
-        key: 'feepayment',
+        key: 'events.feepayment',
         path: '/feepayment',
         component: lazy(() => import('@/views/Events/FeepaymentList/CustomerList')),
         authority: [],
