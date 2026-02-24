@@ -115,7 +115,7 @@ const MenuLink = ({
                 <Avatar
                     className={classNames(
                         'bg-white dark:bg-transparent p-2 border-2 border-gray-200 dark:border-gray-600',
-                        active ? 'text-primary' : 'heading-text',
+                        active ? 'text-blue-600' : 'heading-text',
                     )}
                     size={40}
                     icon={icon}
@@ -360,7 +360,7 @@ const TabLayout = ({
                                                     className={classNames(
                                                         'bg-white dark:bg-transparent p-2 border-2 border-gray-200 dark:border-gray-600',
                                                         nav.key === routeKey
-                                                            ? 'text-primary'
+                                                            ? 'text-blue-600'
                                                             : 'heading-text',
                                                     )}
                                                     size={40}

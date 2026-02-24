@@ -106,7 +106,7 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'orderform',
+        key: 'orderform.orders',
         path: '/order',
         component: lazy(
             () => import('@/views/ORDER/orders/CustomerList'),
@@ -114,7 +114,7 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'Organizations',
+        key: 'orderform.organizations',
         path: '/organization',
         component: lazy(
             () => import('@/views/ORDER/organization/CustomerList'),
@@ -122,7 +122,7 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
      {
-        key: 'Zones',
+        key: 'orderform.zones',
         path: '/zone',
         component: lazy(
             () => import('@/views/ORDER/zone/CustomerList'),
@@ -130,16 +130,7 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'Delivery',
-        path: '/delivery',
-        component: lazy(
-            () => import('@/views/ORDER/delivery/CustomerList'),
-        ),
-        authority: [],
-    },
-
-        {
-        key: 'Delivery',
+        key: 'orderform.delivery',
         path: '/delivery',
         component: lazy(
             () => import('@/views/ORDER/delivery/CustomerList'),

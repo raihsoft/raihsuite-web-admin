@@ -91,9 +91,9 @@ const StackedSideNavMini = (props: StackedSideNavMiniProps) => {
     const defaultActiveKeys =
         activeKeys && activeKeys.length > 0
             ? activeKeys
-            : isEmpty(selectedMenu)
-              ? []
-              : [includedRouteTree.key]
+            : includedRouteTree?.key
+              ? [includedRouteTree.key]
+              : []
 
     return (
         <div {...rest}>
@@ -113,6 +113,7 @@ const StackedSideNavMini = (props: StackedSideNavMiniProps) => {
                 <Menu
                     className="px-4 pb-4"
                     defaultActiveKeys={defaultActiveKeys}
+                    defaultCollapseActiveKeys={defaultActiveKeys}
                 >
                     {navigationTree.map((nav) => (
                         <AuthorityCheck

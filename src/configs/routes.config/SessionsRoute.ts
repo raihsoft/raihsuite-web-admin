@@ -3,13 +3,13 @@ import type { Routes } from '@/@types/routes'
 
 const SessionRoute: Routes = [
     {
-        key: 'session',
+        key: 'events.session',
         path: '/session',
         component: lazy(() => import('@/views/Events/Session/CustomerList')),
         authority: [],
     },
     {
-        key: 'sessionCreate',
+        key: 'events.sessionCreate',
         path: '/session/create',
         component: lazy(() => import('@/views/Events/Session/CustomerCreate')),
         authority: [],
@@ -23,7 +23,7 @@ const SessionRoute: Routes = [
         },
     },
     {
-        key: 'sessionDetails',
+        key: 'events.sessionDetails',
         path: '/session/:id',
         component: lazy(() => import('@/views/Events/Session/CustomerDetails')),
         authority: [],

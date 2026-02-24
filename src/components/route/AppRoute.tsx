@@ -2,6 +2,7 @@ import { useEffect, useCallback } from 'react'
 import { useRouteKeyStore } from '@/store/routeKeyStore'
 import { useLocation } from 'react-router-dom'
 import { useThemeStore } from '@/store/themeStore'
+import { getParentRouteKey } from '@/configs/routeParentMapping.config'
 import type { LayoutType } from '@/@types/theme'
 import type { ComponentType } from 'react'
 
@@ -30,16 +31,10 @@ const AppRoute = <T extends Record<string, unknown>>({
 
     const handleLayoutChange = useCallback(() => {
         console.log('Debugging routeKey:', routeKey)
-        if (routeKey === 'hrms.item1' || routeKey.startsWith('employeeDetails')) {
-            console.log('Setting currentRouteKey to hrms.item1')
-            setCurrentRouteKey('hrms.item1')
-        } else if (routeKey === 'enquiries' || routeKey.startsWith('enquiriesDetails')) {
-            console.log('Setting currentRouteKey to crm.enquiries')
-            setCurrentRouteKey('enquiries')
-        } else {
-            console.log('Setting currentRouteKey to', routeKey)
-            setCurrentRouteKey(routeKey)
-        }
+        // Get the parent route key for this route (for detail/edit/create pages)
+        const activeRouteKey = getParentRouteKey(routeKey)
+        console.log('Setting currentRouteKey to', activeRouteKey)
+        setCurrentRouteKey(activeRouteKey)
 
         if (props.layout && props.layout !== layoutType) {
             setPreviousLayout(layoutType)
