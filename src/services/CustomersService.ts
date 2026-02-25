@@ -746,3 +746,14 @@ export async function apiGetFeePaymentDetails<T>(id: string) {
   })
 }
 
+// Check-in participant by QR code
+export async function apiCheckInParticipant<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/participants/check-in/',
+        method: 'post',
+        data,
+    })
+}
+
