@@ -296,14 +296,15 @@ const QRScannerModal = ({
                         <div className="w-full flex items-center gap-3 mb-2">
                             <label className="text-sm text-gray-600">Camera:</label>
                             <select
-                                className="ml-2 p-2 rounded border"
+                                    className="ml-0 sm:ml-2 p-2 rounded border w-full sm:w-auto"
                                 value={selectedDeviceId || ''}
                                 onChange={(e) => {
                                     const v = e.target.value || null
                                     setSelectedDeviceId(v)
                                 }}
-                            >
-                                Allow a blank option to let browser choose
+                                    aria-label="Select camera"
+                                >
+                                    {/* Allow a blank option to let browser choose */}
                                 {cameraDevices.length === 0 && (
                                     <option value="">Default</option>
                                 )}
@@ -314,8 +315,8 @@ const QRScannerModal = ({
                                 ))}
                             </select>
                             <button
-                                type="button"
-                                className="ml-3 px-3 py-2 border rounded text-sm"
+                                    type="button"
+                                    className="ml-0 sm:ml-3 px-3 py-2 border rounded text-sm w-full sm:w-auto"
                                 onClick={async () => {
                                     // Toggle between user and environment if labels are not helpful
                                     try {
@@ -338,8 +339,9 @@ const QRScannerModal = ({
                                         setError('Unable to toggle camera')
                                     }
                                 }}
-                            >
-                                Switch
+                                    aria-label="Switch camera"
+                                >
+                                    Switch
                             </button>
                         </div>
                         <div className="relative w-full bg-black rounded-lg overflow-hidden">
