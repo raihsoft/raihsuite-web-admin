@@ -64,6 +64,16 @@ const eventsNavigationConfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
+            {
+                key: 'events.ticket',
+                path: '/ticket',
+                title: 'Tickets',
+                translateKey: 'nav.events.ticket',
+                icon: 'MdEvent',
+                type: NAV_ITEM_TYPE_ITEM,
+                authority: [],
+                subMenu: [],
+            },
         ],
     },
 ]

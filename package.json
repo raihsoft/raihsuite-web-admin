@@ -45,6 +45,8 @@
     "jsqr": "^1.4.0",
     "lodash": "^4.17.21",
     "marked": "^15.0.3",
+    "qrcode": "^1.5.4",
+    "qrcode.react": "^4.2.0",
     "react": "19.0.0",
     "react-apexcharts": "^1.7.0",
     "react-csv": "^2.2.2",
