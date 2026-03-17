@@ -757,3 +757,49 @@ export async function apiCheckInParticipant<T, U extends Record<string, unknown>
     })
 }
 
+
+// ticket management
+
+export async function apiGetTicketList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/tickets/',
+        method: 'get',
+        params,
+    })
+}
+
+export async function apiCreateTicket<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/tickets/',
+        method: 'post',
+        data,
+    })
+}
+
+export async function apiUpdateTicket<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/tickets/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+export async function apiDeleteTicket(id: string) {
+  return ApiService.fetchDataWithAxios({
+    url: `/events/tickets/${id}/`,
+    method: 'delete',
+  })
+}
+
+export async function apiGetTicketDetails<T>(id: string) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: `/events/tickets/${id}/`,
+    method: 'get',
+  })
+}

@@ -61,6 +61,11 @@ export const routeParentMapping: Record<string, string> = {
     'feepaymentDetails': 'events.feepayment',
     'feepaymentCreate': 'events.feepayment',
     'feepaymentListEdit': 'events.feepayment',
+
+    // Tickets
+    'events.ticketDetails': 'events.ticket',
+    'events.ticketCreate': 'events.ticket',
+    'ticketEdit': 'events.ticket',
 }
 
 /**
