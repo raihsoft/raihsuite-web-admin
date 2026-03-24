@@ -18,12 +18,16 @@ const CustomerCreate = () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
 
     const handleFormSubmit = async (values: CustomerFormSchema) => {
+        console.log('Form values:', values)
+        console.log('Event ID:', values.event_id)
+        console.log('Participant ID:', values.participant_id)
         setIsSubmiting(true)
         try {
             const payload = {
-                event: values.event || '',
-                participant: values.participant || '',
+                event: values.event_id || '',
+                participant: values.participant_id || '',
             }
+            console.log('Payload:', payload)
 
             await apiCreateTicket(payload)
 
@@ -76,8 +80,8 @@ const CustomerCreate = () => {
             <CustomerForm
                 newCustomer
                 defaultValues={{
-                    event: '',
-                    participant: '',
+                    event_id: '',
+                    participant_id: '',
                 }}
                 onFormSubmit={handleFormSubmit}
             >

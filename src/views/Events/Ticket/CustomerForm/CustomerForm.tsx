@@ -18,8 +18,8 @@ type CustomerFormProps = {
 } & CommonProps
 
 const validationSchema: ZodType<CustomerFormSchema> = z.object({
-    event: z.string().optional(),
-    participant: z.string().optional(),
+    event_id: z.string().optional(),
+    participant_id: z.string().optional(),
 })
 
 const CustomerForm = (props: CustomerFormProps) => {
@@ -38,13 +38,13 @@ const CustomerForm = (props: CustomerFormProps) => {
     } = useForm<CustomerFormSchema>({
         resolver: zodResolver(validationSchema),
         defaultValues: defaultValues || {
-            event: '',
-            participant: '',
+            event_id: '',
+            participant_id: '',
         },
     })
 
     useEffect(() => {
-        if (defaultValues && !isEmpty(defaultValues)) {
+        if (defaultValues && Object.values(defaultValues).some(val => val !== '')) {
             reset(defaultValues)
         }
     }, [defaultValues, reset])

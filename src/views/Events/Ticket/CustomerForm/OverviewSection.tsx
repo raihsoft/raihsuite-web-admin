@@ -24,9 +24,9 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                 const list = data?.results ?? data ?? []
 
                 const options = (list || []).map((e: any) => ({
-                    value: e.id ?? e.code ?? String(e.value ?? ''),
+                    value: e.id ?? String(e.value ?? ''),
                     label:
-                        e.event_title ?? e.title ?? e.name ?? 'Untitled Event',
+                        e.event_title ?? e.title ?? e.name ?? e.code ?? 'Untitled Event',
                 }))
 
                 if (mounted) setEvents(options)
@@ -56,7 +56,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                     value: p.id ?? p.pk ?? String(p.value ?? ''),
                     label: p.first_name && p.last_name 
                         ? `${p.first_name} ${p.last_name}` 
-                        : p.name ?? p.email ?? 'Unnamed Participant',
+                        : p.name ?? p.email ?? p.participant_name ?? 'Unnamed Participant',
                 }))
 
                 if (mounted) setParticipants(options)
@@ -79,11 +79,11 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
             <div className="grid md:grid-cols-2 gap-4">
                 <FormItem
                     label="Event"
-                    invalid={Boolean(errors.event)}
-                    errorMessage={errors.event?.message}
+                    invalid={Boolean(errors.event_id)}
+                    errorMessage={errors.event_id?.message}
                 >
                     <Controller
-                        name="event"
+                        name="event_id"
                         control={control}
                         render={({ field }) => (
                             <Select
@@ -97,13 +97,11 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                                 }
                                 value={
                                     events.find(
-                                        (option) =>
-                                            option.label ===
-                                            String(field.value),
-                                    ) ?? null
+                                        (option) => option.value === field.value
+                                    ) || null
                                 }
                                 onChange={(option) =>
-                                    field.onChange(option?.label)
+                                    field.onChange(option?.value || '')
                                 }
                                 isClearable={true}
                                 isLoading={eventsLoading}
@@ -114,11 +112,11 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
                 <FormItem
                     label="Participant"
-                    invalid={Boolean(errors.participant)}
-                    errorMessage={errors.participant?.message}
+                    invalid={Boolean(errors.participant_id)}
+                    errorMessage={errors.participant_id?.message}
                 >
                     <Controller
-                        name="participant"
+                        name="participant_id"
                         control={control}
                         render={({ field }) => (
                             <Select
@@ -132,13 +130,11 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                                 }
                                 value={
                                     participants.find(
-                                        (option) =>
-                                            option.label ===
-                                            String(field.value),
-                                    ) ?? null
+                                        (option) => option.value === field.value
+                                    ) || null
                                 }
                                 onChange={(option) =>
-                                    field.onChange(option?.label)
+                                    field.onChange(option?.value || '')
                                 }
                                 isClearable={true}
                                 isLoading={participantsLoading}
