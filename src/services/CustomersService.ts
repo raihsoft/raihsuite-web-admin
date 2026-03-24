@@ -803,3 +803,15 @@ export async function apiGetTicketDetails<T>(id: string) {
     method: 'get',
   })
 }
+
+// Scan ticket to mark entry status
+// Takes token from QR code to update ticket status
+export async function apiScanTicket<T>(data: {
+    token: string
+}) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/tickets/scan/',
+        method: 'post',
+        data,
+    })
+}
