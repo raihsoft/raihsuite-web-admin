@@ -76,10 +76,10 @@ const CustomerForm = (props: CustomerFormProps) => {
             formData.append('tenant', tenant)
 
             const res = await apiCreateAssetType(formData)
-            console.log('SUCCESS:', res)
+                    // console.log('SUCCESS:', res)
             alert('Created Successfully!')
         } catch (err) {
-            console.error('ERROR:', err)
+            // console.error('ERROR:', err)
             alert('Failed to create item.')
         }
     }

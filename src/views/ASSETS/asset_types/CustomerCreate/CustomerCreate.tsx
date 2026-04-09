@@ -44,11 +44,11 @@ const CustomerEdit = () => {
             )
             navigate('/assettypes')
         } catch (err) {
-            console.error(err)
-            toast.push(
-                <Notification type="danger">Create failed!</Notification>,
-                { placement: 'top-center' },
-            )
+            // console.error(err)
+            // toast.push(
+            //     <Notification type="danger">Create failed!</Notification>,
+            //     { placement: 'top-center' },
+            // )
         } finally {
             setIsSubmiting(false)
         }

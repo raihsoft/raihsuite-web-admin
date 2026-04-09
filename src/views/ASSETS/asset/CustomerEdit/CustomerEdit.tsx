@@ -55,7 +55,7 @@ const CustomerEdit = () => {
                 payload.file = newFile
             }
             
-            console.log('📝 Sending update with payload:', payload)
+            // // console.log('📝 Sending update with payload:', payload)
             await apiUpdateAsset(id as string, payload)
             toast.push(<Notification type="success">Changes Saved!</Notification>, {
                 placement: 'top-center',
@@ -64,11 +64,11 @@ const CustomerEdit = () => {
             await mutate(['/api/assets', { ...tableData, ...filterData }])
             navigate('/assets')
         } catch (error: any) {
-            console.error('❌ Update error details:', {
-                message: error?.message,
-                status: error?.response?.status,
-                data: error?.response?.data,
-            })
+            // console.error('❌ Update error details:', {
+            //     message: error?.message,
+            //     status: error?.response?.status,
+            //     data: error?.response?.data,
+            // })
             toast.push(<Notification type="danger">Update failed!</Notification>, {
                 placement: 'top-center',
             })

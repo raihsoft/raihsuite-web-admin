@@ -21,7 +21,7 @@ const CustomerEdit = () => {
 
     // ✅ Form Submit
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        console.log('🟢 Submitted values:', values)
+        // console.log('🟢 Submitted values:', values)
         setIsSubmitting(true)
         try {
             // Get tenant from localStorage
@@ -49,7 +49,7 @@ const CustomerEdit = () => {
 
             // API CALL to create asset
             await apiCreateAssets(formData)
-            console.log('✅ Asset Created Successfully')
+            // console.log('✅ Asset Created Successfully')
 
             // Show success toast
             toast.push(
@@ -63,7 +63,7 @@ const CustomerEdit = () => {
 
             navigate('/assets')
         } catch (error) {
-            console.error('❌ Error creating asset:', error)
+            // console.error('❌ Error creating asset:', error)
             toast.push(
                 <Notification type="danger">Failed to create asset</Notification>,
                 { placement: 'top-center' }

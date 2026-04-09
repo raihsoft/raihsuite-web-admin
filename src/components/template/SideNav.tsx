@@ -63,8 +63,8 @@ const SideNav = ({
 
     // Debug: log the store value to ensure it contains the expected allowed modules
     useEffect(() => {
-        console.debug('[SideNav] allowedNavigationFromStore:', allowedNavigationFromStore)
-        console.debug('[SideNav] navLoading:', navLoading)
+        // console.debug('[SideNav] allowedNavigationFromStore:', allowedNavigationFromStore)
+        // console.debug('[SideNav] navLoading:', navLoading)
     }, [allowedNavigationFromStore, navLoading])
 
     // If the store value is null -> still loading/initial state or failed to load; do NOT default to full navigation

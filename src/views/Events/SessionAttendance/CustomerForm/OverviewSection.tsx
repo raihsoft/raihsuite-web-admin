@@ -47,7 +47,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
                 if (mounted) setSessions(options)
             } catch (err) {
-                console.error('Failed to load sessions', err)
+                // console.error('Failed to load sessions', err)
             } finally {
                 if (mounted) setLoadingSession(false)
             }
@@ -92,7 +92,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
                 if (mounted) setParticipants(options)
             } catch (err) {
-                console.error('Failed to load participants', err)
+                // console.error('Failed to load participants', err)
             } finally {
                 if (mounted) setLoadingParticipant(false)
             }

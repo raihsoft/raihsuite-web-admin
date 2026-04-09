@@ -37,7 +37,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                 }))
                 setAssetTypeOptions(options)
             } catch (error) {
-                console.error('❌ Error fetching asset types:', error)
+                // console.error('❌ Error fetching asset types:', error)
             }
         }
         fetchAssetTypes()
@@ -55,7 +55,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                 }))
                 setAssetCategoryOptions(options)
             } catch (error) {
-                console.error('❌ Error fetching asset categories:', error)
+                // console.error('❌ Error fetching asset categories:', error)
             }
         }
         fetchAssetCategories()

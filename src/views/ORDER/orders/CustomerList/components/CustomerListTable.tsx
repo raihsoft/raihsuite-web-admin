@@ -223,7 +223,7 @@ const CustomerListTable = () => {
         }
     }
 
-    console.log('customerList', customerList)
+    // console.log('customerList', customerList)
 
     return (
 

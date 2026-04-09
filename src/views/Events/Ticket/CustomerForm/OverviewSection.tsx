@@ -31,7 +31,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
                 if (mounted) setEvents(options)
             } catch (err) {
-                console.error('Failed to load events', err)
+                // console.error('Failed to load events', err)
             } finally {
                 if (mounted) setEventsLoading(false)
             }
@@ -61,7 +61,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
                 if (mounted) setParticipants(options)
             } catch (err) {
-                console.error('Failed to load participants', err)
+                // console.error('Failed to load participants', err)
             } finally {
                 if (mounted) setParticipantsLoading(false)
             }

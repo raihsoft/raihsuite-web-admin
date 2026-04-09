@@ -8,11 +8,11 @@ import { moduleNavigationMap } from './moduleNavigationMap'
  * Uses moduleNavigationMap to map backend module_code to specific navigation files.
  */
 export const getAllowedNavigation = async (): Promise<NavigationTree[]> => {
-    console.debug('[getAllowedNavigation] start')
+    // console.debug('[getAllowedNavigation] start')
 
     const tenantModules = await apiGetTenantModules()
 
-    console.debug('[getAllowedNavigation] tenantModules:', tenantModules)
+    // console.debug('[getAllowedNavigation] tenantModules:', tenantModules)
 
     // Normalize response: some backends return a paginated object { results: [...] }
     const modulesArray: Array<{ module_code: string; is_enabled: boolean }> = Array.isArray(
@@ -24,7 +24,7 @@ export const getAllowedNavigation = async (): Promise<NavigationTree[]> => {
         : []
 
     if (!Array.isArray(modulesArray)) {
-        console.warn('[getAllowedNavigation] Unexpected tenantModules shape:', tenantModules)
+        // console.warn('[getAllowedNavigation] Unexpected tenantModules shape:', tenantModules)
     }
 
     // 1️⃣ Get enabled module codes (normalized to lowercase and deduped)
@@ -36,17 +36,17 @@ export const getAllowedNavigation = async (): Promise<NavigationTree[]> => {
         ),
     )
 
-    console.debug('[getAllowedNavigation] enabledModuleCodes (normalized):', enabledModuleCodes)
+    // console.debug('[getAllowedNavigation] enabledModuleCodes (normalized):', enabledModuleCodes)
 
     if (enabledModuleCodes.length === 0) {
-        console.debug('[getAllowedNavigation] no enabled modules, returning empty array')
+        // console.debug('[getAllowedNavigation] no enabled modules, returning empty array')
         return []
     }
 
     // 2️⃣ For enabled modules that have a mapping, import that module config
     const missingMappings = enabledModuleCodes.filter((code) => !moduleNavigationMap[code])
     if (missingMappings.length > 0) {
-        console.warn('[getAllowedNavigation] no navigation file for modules:', missingMappings)
+        // console.warn('[getAllowedNavigation] no navigation file for modules:', missingMappings)
     }
 
     const loaders = enabledModuleCodes
@@ -56,7 +56,7 @@ export const getAllowedNavigation = async (): Promise<NavigationTree[]> => {
     if (loaders.length === 0) {
         // Fallback: try filtering the merged navigation config by top-level key
         const fallback = navigationConfig.filter((nav) => enabledModuleCodes.includes(nav.key))
-        console.debug('[getAllowedNavigation] loaders empty, fallback:', fallback)
+        // console.debug('[getAllowedNavigation] loaders empty, fallback:', fallback)
         return fallback
     }
 
@@ -73,11 +73,11 @@ export const getAllowedNavigation = async (): Promise<NavigationTree[]> => {
             seen.add(nav.key)
             deduped.push(nav)
         } else {
-            console.debug('[getAllowedNavigation] duplicate top-level module skipped:', nav.key)
+            // console.debug('[getAllowedNavigation] duplicate top-level module skipped:', nav.key)
         }
     }
 
-    console.debug('[getAllowedNavigation] loaded modules deduped result:', deduped)
+    // console.debug('[getAllowedNavigation] loaded modules deduped result:', deduped)
     return deduped
 }
 

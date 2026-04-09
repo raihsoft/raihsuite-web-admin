@@ -46,7 +46,7 @@ const CustomerEdit = () => {
       )
 
     } catch (error) {
-      console.error(error)
+      // console.error(error)
       toast.push(
         <Notification type="danger">Failed to create order!</Notification>,
         { placement: 'top-center' }

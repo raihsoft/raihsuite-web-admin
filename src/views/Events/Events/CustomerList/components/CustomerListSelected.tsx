@@ -51,7 +51,7 @@ const handleConfirmDelete = async () => {
             { placement: 'top-center' }
         )
     } catch (error) {
-        console.error(error)
+        // console.error(error)
         toast.push(
             <Notification type="danger">
                 Failed to delete events

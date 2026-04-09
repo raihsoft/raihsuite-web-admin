@@ -40,6 +40,7 @@ const MenuItem = (props: MenuItemProps) => {
         disabled && disabledClass,
         !disabled && menuItemHoverClass,
         dotIndent && 'items-center gap-2',
+        dotIndent && isActive && 'submenu-active-dot',
         className,
     )
 
@@ -64,6 +65,7 @@ const MenuItem = (props: MenuItemProps) => {
                             className={classNames(
                                 'text-3xl w-[24px]',
                                 !isActive && 'opacity-25',
+                                isActive && dotIndent && 'text-gray-900 dark:text-gray-100',
                             )}
                         />
                     </div>

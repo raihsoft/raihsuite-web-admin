@@ -121,7 +121,7 @@ const CustomerForm = ({
                 }
             })
         } catch (err) {
-            console.error('❌ Form submit error:', err)
+            // console.error('❌ Form submit error:', err)
         }
     }
 

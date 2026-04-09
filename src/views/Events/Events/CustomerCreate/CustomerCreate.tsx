@@ -81,11 +81,11 @@ const EventCreate = () => {
             end_date: values.end_date.toISOString(),
         }
 
-        console.log('📤 Sending payload:', payload)
+        // console.log('📤 Sending payload:', payload)
 
         try {
             const response = await apiCreateEvent(payload)
-            console.log('✅ API Success:', response)
+            // console.log('✅ API Success:', response)
 
             const { tableData, filterData } = useCustomerListStore.getState()
             await mutate(['/api/events/events', { ...tableData, ...filterData }])
@@ -99,7 +99,7 @@ const EventCreate = () => {
 
             navigate('/events')
         } catch (err: any) {
-            console.log('❌ API ERROR:', err)
+            // console.log('❌ API ERROR:', err)
             const errorData = err?.response?.data
 
             if (errorData?.code) {

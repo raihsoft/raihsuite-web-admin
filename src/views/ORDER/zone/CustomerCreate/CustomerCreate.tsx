@@ -38,7 +38,7 @@ const CustomerEdit = () => {
 
     //   navigate('/customers/customer-list')
     } catch (error) {
-      console.error(error)
+      // console.error(error)
       toast.push(
         <Notification type="danger">Failed to create zone!</Notification>,
         { placement: 'top-center' }

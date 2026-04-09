@@ -70,7 +70,7 @@ const _UserDropdown = () => {
                     if (mounted) setTenants([])
                 }
             } catch (error) {
-                console.error('Failed fetching tenants:', error)
+                // console.error('Failed fetching tenants:', error)
                 toast.push(
                     <Notification type="danger">Failed to load tenants</Notification>,
                     { placement: 'top-center' }
@@ -110,25 +110,8 @@ const _UserDropdown = () => {
                 </div>
             </Dropdown.Item>
 
-            {/* CURRENT TENANT */}
-            <Dropdown.Item variant="header">
-                <div className="px-3 pt-1 pb-2">
-                    {tenantLoading ? (
-                        <div className="text-xs text-gray-500 mt-1">
-                            Loading tenant...
-                        </div>
-                    ) : tenants.length === 0 ? (
-                        <div className="text-xs text-gray-500 mt-1">
-                            No tenant found
-                        </div>
-                    ) : (
-                        <div className="flex flex-col gap-1 mt-2">
-                            <div className="text-sm font-medium">{tenants[0].name}</div>
-                            <div className="text-xs text-gray-500">{tenants[0].role}</div>
-                        </div>
-                    )}
-                </div>
-            </Dropdown.Item>
+           
+           
 
             <Dropdown.Item variant="divider" />
 
