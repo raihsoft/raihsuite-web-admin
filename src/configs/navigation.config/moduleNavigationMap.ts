@@ -38,14 +38,14 @@ Object.entries(aliases).forEach(([alias, target]) => {
     const t = target.toLowerCase()
     if (!moduleNavigationMap[a] && moduleNavigationMap[t]) {
         moduleNavigationMap[a] = moduleNavigationMap[t]
-        console.debug(`[moduleNavigationMap] alias '${a}' -> '${t}' registered`)
+        // console.debug(`[moduleNavigationMap] alias '${a}' -> '${t}' registered`)
     } else if (moduleNavigationMap[a]) {
-        console.debug(
-            `[moduleNavigationMap] alias '${a}' skipped because explicit module exists`,
-        )
+        // console.debug(
+        //     `[moduleNavigationMap] alias '${a}' skipped because explicit module exists`,
+        // )
     } else {
         // If desired, warn about missing target mapping
-        console.warn(`Alias target '${t}' for alias '${a}' not found`)
+        // console.warn(`Alias target '${t}' for alias '${a}' not found`)
     }
 })
 

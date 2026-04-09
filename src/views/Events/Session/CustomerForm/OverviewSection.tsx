@@ -32,7 +32,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
                 if (mounted) setEvents(options)
             } catch (err) {
-                console.error('Failed to load events', err)
+                // console.error('Failed to load events', err)
             } finally {
                 if (mounted) setLoading(false)
             }

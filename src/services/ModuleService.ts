@@ -15,7 +15,7 @@ export const apiGetTenantModules = async (): Promise<TenantModule[]> => {
 
     // ApiService.fetchDataWithAxios already resolves with response.data
     // so `res` is the payload (TenantModule[]). Return it and log for debugging.
-    console.debug('[ModuleService] apiGetTenantModules called, response:', res)
+    // console.debug('[ModuleService] apiGetTenantModules called, response:', res)
 
     return res
 }

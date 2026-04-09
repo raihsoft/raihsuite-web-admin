@@ -30,10 +30,8 @@ const AppRoute = <T extends Record<string, unknown>>({
     )
 
     const handleLayoutChange = useCallback(() => {
-        console.log('Debugging routeKey:', routeKey)
         // Get the parent route key for this route (for detail/edit/create pages)
         const activeRouteKey = getParentRouteKey(routeKey)
-        console.log('Setting currentRouteKey to', activeRouteKey)
         setCurrentRouteKey(activeRouteKey)
 
         if (props.layout && props.layout !== layoutType) {

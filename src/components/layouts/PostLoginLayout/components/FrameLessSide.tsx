@@ -18,7 +18,7 @@ const FrameLessSide = ({ children }: CommonProps) => {
     const { larger, smaller } = useResponsive()
 
     // Debug: show responsive state and whether SideNav will render
-    console.debug('[FrameLessSide] responsive larger:', larger, 'willRenderSideNav:', !!larger.lg)
+  
 
     return (
         <LayoutBase

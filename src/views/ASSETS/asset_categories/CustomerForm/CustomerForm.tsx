@@ -83,11 +83,11 @@ const CustomerForm = (props: CustomerFormPropsWithSubmit) => {
 
             // 🚀 API CALL
             const res = await apiCreateAssetCategories(formData)
-            console.log('✅ API Response:', res)
+                    // console.log('✅ API Response:', res)
 
             alert('Customer Created Successfully!')
         } catch (error) {
-            console.error('❌ Create Error:', error)
+            // console.error('❌ Create Error:', error)
             alert('Error creating customer.')
         }
     }

@@ -68,7 +68,7 @@ const CustomerForm = (props: CustomerFormPropsWithSubmit) => {
             return
         }
 
-        console.log('🟢 SUBMITTED VALUES:', values)
+        // console.log('🟢 SUBMITTED VALUES:', values)
 
         try {
             // 🧩 Get tenant from localStorage
@@ -97,11 +97,11 @@ const CustomerForm = (props: CustomerFormPropsWithSubmit) => {
 
             // 🚀 API CALL
             const res = await apiCreateAssets(formData)
-            console.log('✅ Asset Created Successfully:', res)
+            // console.log('✅ Asset Created Successfully:', res)
 
             alert('Asset Created Successfully!')
         } catch (error) {
-            console.error('❌ Asset Create Error:', error)
+            // console.error('❌ Asset Create Error:', error)
             alert('Error creating asset.')
         }
     }

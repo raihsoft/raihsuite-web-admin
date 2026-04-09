@@ -56,7 +56,7 @@ const AssetListSelected = () => {
                 { placement: 'top-center' },
             )
         } catch (error) {
-            console.error('Delete error:', error)
+            // console.error('Delete error:', error)
             toast.push(
                 <Notification type="danger">
                     Failed to delete asset(s)

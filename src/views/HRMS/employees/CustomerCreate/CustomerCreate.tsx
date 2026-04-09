@@ -62,7 +62,7 @@ const CustomerEdit = () => {
 
             navigate('/employees')
         } catch (error) {
-            console.error(error)
+            // console.error(error)
             toast.push(
                 <Notification type="danger">
                     Failed to create employee!

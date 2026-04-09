@@ -79,7 +79,7 @@ const FeePaymentCreate = () => {
     const onSubmit = async (values: FeePaymentFormSchema) => {
         setIsSubmitting(true)
         try {
-            console.log('📤 Payload:', values)
+            // console.log('📤 Payload:', values)
             await apiCreateFeePayment(values)
 
             toast.push(
@@ -91,13 +91,13 @@ const FeePaymentCreate = () => {
 
             navigate('/Feepayment')
         } catch (err) {
-            console.error(err)
-            toast.push(
-                <Notification type="danger">
-                    Failed to create fee payment
-                </Notification>,
-                { placement: 'top-center' }
-            )
+            // console.error(err)
+            // toast.push(
+            //     <Notification type="danger">
+            //         Failed to create fee payment
+            //     </Notification>,
+            //     { placement: 'top-center' }
+            // )
         } finally {
             setIsSubmitting(false)
         }

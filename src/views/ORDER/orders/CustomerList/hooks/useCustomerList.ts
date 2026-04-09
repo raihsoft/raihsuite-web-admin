@@ -26,7 +26,7 @@ export default function useCustomerList(selectOrder: string = '', selectedOrgani
             params.organization__organization_name = selectedOrganization
         }
 
-        console.log("params", params)
+        // console.log("params", params)
         return params
     }
 

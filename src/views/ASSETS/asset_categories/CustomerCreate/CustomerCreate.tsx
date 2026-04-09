@@ -43,7 +43,7 @@ const CustomerEdit = () => {
 
     // ✅ Form Submit (Adapted from your Asset Code)
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        console.log('🟢 Submitted values:', values)
+        // console.log('🟢 Submitted values:', values)
         setIsSubmiting(true)
 
         try {
@@ -89,7 +89,7 @@ const CustomerEdit = () => {
             navigate('/assetcategories')
 
         } catch (error) {
-            console.error('❌ Error saving category:', error)
+                            // console.error('❌ Error saving category:', error)
             toast.push(
                 <Notification type="danger">
                     {isModeEdit ? 'Failed to update category' : 'Failed to create category'}

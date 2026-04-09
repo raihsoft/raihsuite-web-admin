@@ -162,7 +162,7 @@ const handleEdit = (customer: Customer) => {
             setSelectAllCustomer([])
         }
     }
-console.log("customerList", customerList)
+// console.log("customerList", customerList)
     return (
         <DataTable
             selectable
