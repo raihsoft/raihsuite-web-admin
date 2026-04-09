@@ -30,7 +30,7 @@ export const SignInBase = ({
                     <div className="flex flex-col items-center">
                         {/* Logo */}
                         <img
-                            src="/raihsuite-logo.png" // 👈 change path
+                            src="https://media.raihsuite.com/RS0001/web/Gemini_Generated_Image_lltgbilltgbilltg%20(1).png" // 👈 change path
                             alt="Logo"
                             className="h-16 w-16 object-contain mb-2"
                         />
