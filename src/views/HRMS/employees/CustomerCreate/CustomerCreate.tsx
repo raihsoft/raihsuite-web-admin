@@ -34,20 +34,7 @@ const CustomerEdit = () => {
                 website_link: values.website_link,
             }
 
-            let response
-            // If img is a File, upload as multipart/form-data
-            if (values.img && values.img instanceof File) {
-                const formData = new FormData()
-                Object.entries(payload).forEach(([k, v]) => formData.append(k, v as any))
-                formData.append('img', values.img)
-                // Use ApiService directly to avoid typing issues
-                response = await import('@/services/ApiService').then((m) =>
-                    m.default.fetchDataWithAxios({ url: '/hrms/employees/', method: 'post', data: formData } as any),
-                )
-            } else {
-                response = await apiCreateEmployee(payload)
-            }
-            // console.log("Created employee:", response.data)
+            await apiCreateEmployee(payload)
 
             // revalidate employees list
             const { tableData, filterData } = useCustomerListStore.getState()

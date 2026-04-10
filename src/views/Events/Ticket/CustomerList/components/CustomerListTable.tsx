@@ -72,6 +72,10 @@ const CustomerListTable = () => {
                 header: 'token',
                 accessorKey: 'token',
             },
+            {
+                header: 'event_title',
+                accessorKey: 'event_title',
+            },
            
             {
                 header: 'Status',

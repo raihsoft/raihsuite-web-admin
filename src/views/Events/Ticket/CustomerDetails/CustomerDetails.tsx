@@ -4,10 +4,11 @@ import Button from '@/components/ui/Button'
 import useSWR from 'swr'
 import { useParams, useNavigate } from 'react-router-dom'
 import { apiGetTicketDetails } from '@/services/CustomersService'
-import { TbArrowNarrowLeft, TbDownload, TbTicket, TbCalendar, TbUser, TbHash, TbClock } from 'react-icons/tb'
+import { TbArrowNarrowLeft, TbDownload, TbTicket, TbCalendar, TbUser, TbHash, TbClock, TbAB, TbActivity, TbAdCircle, TbAdjustmentsCode } from 'react-icons/tb'
 import { useRef, useEffect, useState } from 'react'
 // @ts-ignore
 import QRCode from 'qrcode'
+import TBody from '@/components/ui/Table/TBody'
 
 type Ticket = {
     id: string
@@ -236,10 +237,11 @@ const TicketDetails = () => {
                             </h2>
                         </div>
                         <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <DetailRow icon={<TbUser />}     label="Participant"  value={ticket.participant_name || '—'} />
-                            <DetailRow icon={<TbHash />}     label="Token"        value={ticket.token || '—'} mono />
-                            <DetailRow icon={<TbCalendar />} label="Created"      value={ticket.created_at ? new Date(ticket.created_at).toLocaleString() : '—'} />
-                            <DetailRow icon={<TbClock />}    label="Updated"      value={ticket.updated_at ? new Date(ticket.updated_at).toLocaleString() : '—'} />
+                            <DetailRow icon={<TBody />}     label="Participant"  value={ticket.participant_name || '—'} />
+                            <DetailRow icon={<TBody />}     label="Event"        value={ticket.event_title || '—'} />
+                            <DetailRow icon={<TBody />}     label="Token"        value={ticket.token || '—'} mono />
+                            <DetailRow icon={<TBody />} label="Created"      value={ticket.created_at ? new Date(ticket.created_at).toLocaleString() : '—'} />
+                            <DetailRow icon={<TBody />}    label="Updated"      value={ticket.updated_at ? new Date(ticket.updated_at).toLocaleString() : '—'} />
                         </div>
                     </Card>
                 </div>
