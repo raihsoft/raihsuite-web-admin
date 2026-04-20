@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom'
 import { PiUserDuotone, PiSignOutDuotone } from 'react-icons/pi'
 import { TbPasswordUser } from "react-icons/tb";
 import { useAuth } from '@/auth'
-import type { JSX } from 'react'
 import { useEffect, useState } from 'react'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
@@ -15,20 +14,12 @@ import {
     apiGetTenantById,
 } from '@/services/CustomersService'
 
-type DropdownList = {
-    label: string
-    path: string
-    icon: JSX.Element
-}
-
-// You can add extra dropdown items here
-const dropdownItemList: DropdownList[] = []
-
 const _UserDropdown = () => {
     const { avatar, email } = useSessionUser((state) => state.user)
     const { signOut } = useAuth()
 
-    const [tenants, setTenants] = useState<any[]>([])
+    // ✅ SINGLE tenant (not array)
+    const [tenant, setTenant] = useState<any | null>(null)
     const [tenantLoading, setTenantLoading] = useState(false)
 
     const handleSignOut = () => {
@@ -42,37 +33,54 @@ const _UserDropdown = () => {
     useEffect(() => {
         let mounted = true
 
-        const fetchTenants = async () => {
+        const fetchTenant = async () => {
             setTenantLoading(true)
+
             try {
-                // 1️⃣ Get memberships
-                const membershipRes = await apiGetTenantMemberships<any, any>()
-                const memberships = Array.isArray(membershipRes)
-                    ? membershipRes
-                    : membershipRes?.results ?? membershipRes?.list ?? []
+                // ✅ PAGINATED RESPONSE
+                const response = await apiGetTenantMemberships<any, any>()
 
-                // 2️⃣ Find only current membership
-                const currentMembership = memberships.find((m: any) => m.is_current)
+              
 
-                if (currentMembership) {
-                    // 3️⃣ Fetch tenant details
-                    const tenantRes = await apiGetTenantById<any>(currentMembership.tenant)
+                const memberships = response?.results || []
 
-                    const tenantData = {
-                        id: tenantRes.id,
-                        name: tenantRes.name,
-                        role: currentMembership.role,
-                        is_current: currentMembership.is_current,
+                if (memberships.length > 0) {
+                    // ✅ find active membership
+                    const activeMembership = memberships.find(
+                        (m: any) => m.is_active
+                    )
+
+                    if (activeMembership) {
+                        // console.log("Active membership:", activeMembership)
+
+                        // ✅ get tenant details
+                        const tenantRes = await apiGetTenantById<any>(
+                            activeMembership.tenant
+                        )
+
+                        // console.log("Tenant response:", tenantRes)
+
+                        if (mounted) {
+                            setTenant({
+                                id: tenantRes.id,
+                                name: tenantRes.name,
+                                role: activeMembership.group,
+                            })
+                        }
+                    } else {
+                        if (mounted) setTenant(null)
                     }
-
-                    if (mounted) setTenants([tenantData])
                 } else {
-                    if (mounted) setTenants([])
+                    if (mounted) setTenant(null)
                 }
+
             } catch (error) {
-                // console.error('Failed fetching tenants:', error)
+                // console.error(error)
+
                 toast.push(
-                    <Notification type="danger">Failed to load tenants</Notification>,
+                    <Notification type="danger">
+                        Failed to load tenant
+                    </Notification>,
                     { placement: 'top-center' }
                 )
             } finally {
@@ -80,12 +88,15 @@ const _UserDropdown = () => {
             }
         }
 
-        fetchTenants()
+        fetchTenant()
 
         return () => {
             mounted = false
         }
     }, [])
+
+    // ✅ DEBUG (you can remove later)
+    // console.log("Rendered tenant:", tenant)
 
     return (
         <Dropdown
@@ -98,7 +109,7 @@ const _UserDropdown = () => {
             }
             placement="bottom-end"
         >
-            {/* USER INFO */}
+            {/* ✅ USER INFO */}
             <Dropdown.Item variant="header">
                 <div className="py-2 px-3 flex items-center gap-3">
                     <Avatar {...avatarProps} />
@@ -106,26 +117,16 @@ const _UserDropdown = () => {
                         <div className="font-bold text-gray-900 dark:text-gray-100">
                             {email || 'No email available'}
                         </div>
+
+                        {/* ✅ FIXED TENANT DISPLAY */}
+                     
                     </div>
                 </div>
             </Dropdown.Item>
 
-           
-           
-
             <Dropdown.Item variant="divider" />
 
-            {dropdownItemList.map((item) => (
-                <Dropdown.Item key={item.label} eventKey={item.label} className="px-0">
-                    <Link className="flex h-full w-full px-2" to={item.path}>
-                        <span className="flex gap-2 items-center w-full">
-                            <span className="text-xl">{item.icon}</span>
-                            <span>{item.label}</span>
-                        </span>
-                    </Link>
-                </Dropdown.Item>
-            ))}
-
+            {/* CHANGE PASSWORD */}
             <Dropdown.Item eventKey="changePassword" className="px-0">
                 <Link className="flex h-full w-full px-2" to="/change-password">
                     <span className="flex gap-2 items-center w-full">
@@ -137,6 +138,7 @@ const _UserDropdown = () => {
                 </Link>
             </Dropdown.Item>
 
+            {/* LOGOUT */}
             <Dropdown.Item eventKey="signOut" className="gap-2" onClick={handleSignOut}>
                 <span className="text-xl">
                     <PiSignOutDuotone />

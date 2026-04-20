@@ -36,3 +36,4 @@ export async function apiGetSearchResult<T>(params: { query: string }) {
         params,
     })
 }
+
