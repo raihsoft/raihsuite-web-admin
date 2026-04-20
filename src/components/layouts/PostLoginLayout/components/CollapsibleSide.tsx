@@ -11,9 +11,11 @@ import { LAYOUT_COLLAPSIBLE_SIDE } from '@/constants/theme.constant'
 import type { CommonProps } from '@/@types/common'
 import {
     apiGetTenantMemberships,
+    apiGetTenantById,
 } from '@/services/CustomersService'
 
 interface Tenant {
+    id: number
     name: string
     role: string
 }
@@ -21,23 +23,59 @@ interface Tenant {
 const CollapsibleSide = ({ children }: CommonProps) => {
     const { larger, smaller } = useResponsive()
 
-    const [tenants, setTenants] = useState<Tenant[]>([])
+    // ✅ use SINGLE tenant (not array)
+    const [tenant, setTenant] = useState<Tenant | null>(null)
     const [tenantLoading, setTenantLoading] = useState(true)
 
-    // ✅ Fetch tenant data
     useEffect(() => {
-        const fetchTenants = async () => {
+        let mounted = true
+
+        const fetchTenant = async () => {
             try {
-                const res = await apiGetTenantMemberships()
-                setTenants((res as Tenant[]) || [])
+                const response = await apiGetTenantMemberships()
+
+                // console.log("Membership response:", response)
+
+                const memberships = response?.results || []
+
+                if (memberships.length > 0) {
+                    const activeMembership = memberships.find(
+                        (m: any) => m.is_active
+                    )
+
+                    if (activeMembership) {
+                        const tenantRes = await apiGetTenantById(
+                            activeMembership.tenant
+                        )
+
+                        // console.log("Tenant response:", tenantRes)
+
+                        if (mounted) {
+                            setTenant({
+                                id: tenantRes.id,
+                                name: tenantRes.name,
+                                role: String(activeMembership.group),
+                            })
+                        }
+                    } else {
+                        if (mounted) setTenant(null)
+                    }
+                } else {
+                    if (mounted) setTenant(null)
+                }
             } catch (err) {
-                console.error('Error fetching tenants:', err)
+                // console.error('Error fetching tenant:', err)
+                if (mounted) setTenant(null)
             } finally {
-                setTenantLoading(false)
+                if (mounted) setTenantLoading(false)
             }
         }
 
-        fetchTenants()
+        fetchTenant()
+
+        return () => {
+            mounted = false
+        }
     }, [])
 
     return (
@@ -51,7 +89,7 @@ const CollapsibleSide = ({ children }: CommonProps) => {
                 </ErrorBoundary>
 
                 <div className="flex flex-col flex-auto min-h-screen min-w-0 relative w-full">
-                    
+
                     {/* ✅ HEADER */}
                     <Header
                         className="shadow dark:shadow-2xl"
@@ -76,30 +114,27 @@ const CollapsibleSide = ({ children }: CommonProps) => {
 
                         headerEnd={
                             <div className="flex items-center gap-4">
-                                
+
                                 {/* ✅ Tenant Info */}
                                 <div className="px-3 pt-1 pb-2 text-right">
                                     {tenantLoading ? (
                                         <div className="text-xs text-gray-500">
                                             Loading tenant...
                                         </div>
-                                    ) : !tenants || tenants.length === 0 || !tenants[0] ? (
-                                        <div className="text-xs text-gray-500">
-                                            No tenant found
-                                        </div>
-                                    ) : (
+                                    ) : tenant ? (
                                         <div className="flex flex-col">
                                             <div className="text-sm font-medium">
-                                                {tenants[0].name || 'Unknown Tenant'}
+                                                {tenant.name}
                                             </div>
-                                            <div className="text-xs text-gray-500">
-                                                {tenants[0].role || 'Unknown Role'}
-                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-xs text-gray-500">
+                                            No tenant found
                                         </div>
                                     )}
                                 </div>
 
-                                {/* 🔥 Divider (optional but clean) */}
+                                {/* Divider */}
                                 <div className="h-8 w-px bg-gray-300 dark:bg-gray-600"></div>
 
                                 {/* ✅ User Profile */}
