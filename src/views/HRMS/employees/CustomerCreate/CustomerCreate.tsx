@@ -8,9 +8,9 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { TbTrash } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 import type { CustomerFormSchema } from '../CustomerForm'
-import { apiCreateEmployee } from '@/services/CustomersService' // import POST API
+import { apiCreateEmployee } from '@/services/CustomersService'
 import { mutate } from 'swr'
-import { useCustomerListStore } from '../CustomerList/store/customerListStore' 
+import { useCustomerListStore } from '../CustomerList/store/customerListStore'
 
 const CustomerEdit = () => {
     const navigate = useNavigate()
@@ -21,7 +21,6 @@ const CustomerEdit = () => {
         try {
             setIsSubmiting(true)
 
-            // payload map if needed
             const payload = {
                 name: values.name,
                 email_link: values.email_link,
@@ -36,7 +35,7 @@ const CustomerEdit = () => {
 
             await apiCreateEmployee(payload)
 
-            // revalidate employees list
+            // refresh list
             const { tableData, filterData } = useCustomerListStore.getState()
             await mutate(['/api/employees', { ...tableData, ...filterData }])
 
@@ -48,14 +47,60 @@ const CustomerEdit = () => {
             )
 
             navigate('/employees')
-        } catch (error) {
-            // console.error(error)
+
+        } catch (error: any) {
+            console.error("API Error:", error)
+
+            let errorMessages: string[] = []
+
+            // ✅ Handle backend validation errors
+            if (error?.response?.data) {
+                const data = error.response.data
+
+                const fieldLabels: Record<string, string> = {
+                    facebook_link: "Facebook",
+                    youtube_link: "YouTube",
+                    instagram_link: "Instagram",
+                    linkedin_link: "LinkedIn",
+                    website_link: "Website",
+                    email_link: "Email",
+                    name: "Name",
+                    designation: "Designation",
+                    organization: "Organization",
+                }
+
+                Object.keys(data).forEach((field) => {
+                    const messages = data[field]
+
+                    if (Array.isArray(messages)) {
+                        messages.forEach((msg) => {
+                            const label = fieldLabels[field] || field
+                            errorMessages.push(`${label}: ${msg}`)
+                        })
+                    } else if (typeof messages === 'string') {
+                        const label = fieldLabels[field] || field
+                        errorMessages.push(`${label}: ${messages}`)
+                    }
+                })
+            }
+
+            // fallback
+            if (errorMessages.length === 0) {
+                errorMessages.push('Failed to create employee!')
+            }
+
+            // ✅ Show all errors in toast
             toast.push(
                 <Notification type="danger">
-                    Failed to create employee!
+                    <div className="space-y-1">
+                        {errorMessages.map((msg, i) => (
+                            <div key={i}>{msg}</div>
+                        ))}
+                    </div>
                 </Notification>,
                 { placement: 'top-center' },
             )
+
         } finally {
             setIsSubmiting(false)
         }
@@ -123,6 +168,7 @@ const CustomerEdit = () => {
                     </div>
                 </Container>
             </CustomerForm>
+
             <ConfirmDialog
                 isOpen={discardConfirmationOpen}
                 type="danger"
