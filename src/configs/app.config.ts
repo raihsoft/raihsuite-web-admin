@@ -33,10 +33,9 @@ export type AppConfig = {
     activeNavTranslation: boolean
 }
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 const appConfig = {
-  apiPrefix: BASE_URL,
+  apiPrefix: import.meta.env.VITE_API_BASE_URL || '',
   authenticatedEntryPath: '/',
   unAuthenticatedEntryPath: '/sign-in',
   locale: 'en',
