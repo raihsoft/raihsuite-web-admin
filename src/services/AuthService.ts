@@ -5,6 +5,7 @@ import type {
   SignUpCredential,
   ForgotPassword,
   ResetPassword,
+  ChangePassword,
   SignInResponse,
   SignUpResponse,
 } from '@/@types/auth'
@@ -30,7 +31,7 @@ export async function apiSignIn(data: SignInCredential) {
   if (res.user && res.user.tenant_id) {
     localStorage.setItem('tenant', res.user.tenant_id.toString())
   } else {
-    console.warn('⚠️ Tenant ID missing in response')
+    // console.warn('⚠️ Tenant ID missing in response')
   }
 
   // 🔹 Store session user if needed
@@ -77,5 +78,14 @@ export async function apiResetPassword<T>(data: ResetPassword) {
     data,
   })
 }
+
+export async function apiChangePassword<T>(data: ChangePassword) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: endpointConfig.changePassword,
+    method: 'post',
+    data,
+  })
+}
+
 
 

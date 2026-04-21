@@ -7,6 +7,7 @@ import useCustomerList from '../hooks/useCustomerList'
 import { Link, useNavigate } from 'react-router-dom'
 import cloneDeep from 'lodash/cloneDeep'
 import { TbPencil, TbEye } from 'react-icons/tb'
+import { HiOutlineUser } from 'react-icons/hi'
 import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
 import type { TableQueries } from '@/@types/common'
@@ -123,16 +124,22 @@ const CustomerListTable = () => {
 
     const columns: ColumnDef<Customer>[] = useMemo(
         () => [
-               {
-                // header: 'Photo',
-                accessorKey: 'img',
-                cell: (props) => (
-                    <Link to={`/employee-details/${props.row.original.id}`}>
-                        <Avatar size={40} shape="circle" src={props.row.original.img} />
-                    </Link>
-                ),
+            //    {
+            //     // header: 'Photo',
+            //     accessorKey: 'img',
+            //     cell: (props) => (
+            //         <Link to={`/employee-details/${props.row.original.id}`}>
+            //             <Avatar 
+            //                 size={40} 
+            //                 shape="circle" 
+            //                 src={props.row.original.img}
+            //                 icon={!props.row.original.img ? <HiOutlineUser /> : undefined}
+            //                 className={!props.row.original.img ? 'bg-gray-200 dark:bg-gray-700' : ''}
+            //             />
+            //         </Link>
+            //     ),
 
-            },
+            // },
             {
                 header: 'Name',
                 accessorKey: 'name',
@@ -180,7 +187,7 @@ const CustomerListTable = () => {
 
             },
             {
-                header: '',
+                header: 'action',
                 id: 'action',
                 cell: (props) => (
                     <ActionColumn
@@ -241,7 +248,7 @@ const CustomerListTable = () => {
             setSelectAllCustomer([])
         }
     }
-console.log("customerList", customerList)
+// console.log("customerList", customerList)
     return (
         <DataTable
             selectable

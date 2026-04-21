@@ -1,6 +1,4 @@
 import { useMemo } from 'react'
-import Avatar from '@/components/ui/Avatar'
-import Tag from '@/components/ui/Tag'
 import Tooltip from '@/components/ui/Tooltip'
 import DataTable from '@/components/shared/DataTable'
 import useCustomerList from '../hooks/useCustomerList'
@@ -11,65 +9,55 @@ import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
 import type { TableQueries } from '@/@types/common'
 
-const statusColor: Record<string, string> = {
-    active: 'bg-emerald-200 dark:bg-emerald-200 text-gray-900 dark:text-gray-900',
-    blocked: 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900',
+/**
+ * 🔥 Reusable truncated cell with tooltip
+ */
+const EllipsisCell = ({
+    value,
+    maxWidth = '200px',
+}: {
+    value: string
+    maxWidth?: string
+}) => {
+    if (!value) return '-'
+
+    return (
+        <Tooltip title={value}>
+            <div
+                className="truncate"
+                style={{ maxWidth }}
+            >
+                {value}
+            </div>
+        </Tooltip>
+    )
 }
 
 const NameColumn = ({ row, searchQuery }: { row: any; searchQuery?: string }) => {
     const highlightMatch = (text: string, query?: string) => {
-        if (!query || query.length === 0) return text
-        
+        if (!query) return text
+
         const regex = new RegExp(`(${query})`, 'gi')
         const parts = text.split(regex)
-        
-        return parts.map((part, i) => 
+
+        return parts.map((part, i) =>
             regex.test(part) ? (
-                <mark key={i} className="bg-yellow-300 font-bold">{part}</mark>
+                <mark key={i} className="bg-yellow-300 font-bold">
+                    {part}
+                </mark>
             ) : (
                 part
             )
         )
     }
-    
+
     return (
         <Link
-            className={`hover:text-primary font-semibold text-gray-900 dark:text-gray-100`}
+            className="hover:text-primary font-semibold text-gray-900 dark:text-gray-100"
             to={`/assets/${row.id}`}
         >
             {highlightMatch(row.title, searchQuery)}
         </Link>
-    )
-}
-
-const ActionColumn = ({
-    onEdit,
-    onViewDetail,
-}: {
-    onEdit: () => void
-    onViewDetail: () => void
-}) => {
-    return (
-        <div className="flex items-center gap-3">
-            <Tooltip title="Edit">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onEdit}
-                >
-                    <TbPencil />
-                </div>
-            </Tooltip>
-            <Tooltip title="View">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onViewDetail}
-                >
-                    <TbEye />
-                </div>
-            </Tooltip>
-        </div>
     )
 }
 
@@ -87,30 +75,28 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
-    // Filter and sort list - show only matches, with exact matches first
+    /**
+     * 🔎 Filter + sort
+     */
     const filteredAndSortedList = useMemo(() => {
         const query = (tableData.query as string || '').toLowerCase().trim()
-        
-        if (!query || query.length === 0) return customerList
-        
-        // Filter to only include matching titles
+
+        if (!query) return customerList
+
         const filtered = customerList.filter(customer =>
             customer.title.toLowerCase().includes(query)
         )
-        
-        // Sort to put exact/partial matches first
+
         return filtered.sort((a, b) => {
             const aTitle = a.title.toLowerCase()
             const bTitle = b.title.toLowerCase()
-            
-            // Exact match comes first
+
             if (aTitle === query) return -1
             if (bTitle === query) return 1
-            
-            // Starts with query comes next
+
             if (aTitle.startsWith(query) && !bTitle.startsWith(query)) return -1
             if (!aTitle.startsWith(query) && bTitle.startsWith(query)) return 1
-            
+
             return 0
         })
     }, [customerList, tableData.query])
@@ -123,50 +109,71 @@ const CustomerListTable = () => {
         navigate(`/assets/${customer.id}`)
     }
 
+    /**
+     * 📊 Columns
+     */
     const columns: ColumnDef<any>[] = useMemo(
         () => [
             {
                 header: 'Title',
                 accessorKey: 'title',
-                cell: (props) => <NameColumn row={props.row.original} searchQuery={tableData.query as string} />
+                cell: (props) => (
+                    <NameColumn
+                        row={props.row.original}
+                        searchQuery={tableData.query as string}
+                    />
+                ),
             },
             {
                 header: 'File Extension',
                 accessorKey: 'file_extension',
+                cell: (props) => (
+                    <EllipsisCell value={props.row.original.file_extension} maxWidth="120px" />
+                ),
             },
             {
-                header: 'file',
+                header: 'File',
                 accessorKey: 'file',
+                cell: (props) => (
+                    <EllipsisCell value={props.row.original.file} />
+                ),
             },
             {
                 header: 'Asset Type Ref',
                 accessorKey: 'asset_type_ref',
-
+                cell: (props) => (
+                    <EllipsisCell value={props.row.original.asset_type_ref} />
+                ),
             },
-                        {
+            {
                 header: 'Asset Category',
                 accessorKey: 'asset_category',
-
+                cell: (props) => (
+                    <EllipsisCell value={props.row.original.asset_category} />
+                ),
             },
-             {
+            {
                 header: 'Tags',
                 accessorKey: 'tags',
-
+                cell: (props) => (
+                    <EllipsisCell value={props.row.original.tags} />
+                ),
             },
             {
                 header: 'Description',
                 accessorKey: 'description',
-
+                cell: (props) => (
+                    <EllipsisCell value={props.row.original.description} maxWidth="250px" />
+                ),
             },
             {
-                header: '',
+                header: 'Action',
                 id: 'action',
                 cell: (props) => (
                     <div className="flex items-center gap-3">
                         <Tooltip title="Edit">
                             <div
-                                className={`text-xl cursor-pointer select-none font-semibold`}
-                                role="button"
+                                className="text-xl cursor-pointer font-semibold"
                                 onClick={() => handleEdit(props.row.original)}
                             >
                                 <TbPencil />
@@ -174,8 +181,7 @@ const CustomerListTable = () => {
                         </Tooltip>
                         <Tooltip title="View">
                             <div
-                                className={`text-xl cursor-pointer select-none font-semibold`}
-                                role="button"
+                                className="text-xl cursor-pointer font-semibold"
                                 onClick={() => handleViewDetails(props.row.original)}
                             >
                                 <TbEye />
@@ -185,10 +191,12 @@ const CustomerListTable = () => {
                 ),
             },
         ],
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [],
+        [tableData.query]
     )
 
+    /**
+     * ⚙️ Table handlers
+     */
     const handleSetTableData = (data: TableQueries) => {
         setTableData(data)
         if (selectedCustomer.length > 0) {
@@ -221,8 +229,7 @@ const CustomerListTable = () => {
 
     const handleAllRowSelect = (checked: boolean, rows: Row<any>[]) => {
         if (checked) {
-            const originalRows = rows.map((row) => row.original)
-            setSelectAllCustomer(originalRows)
+            setSelectAllCustomer(rows.map((r) => r.original))
         } else {
             setSelectAllCustomer([])
         }
@@ -234,8 +241,6 @@ const CustomerListTable = () => {
             columns={columns}
             data={filteredAndSortedList}
             noData={!isLoading && filteredAndSortedList.length === 0}
-            skeletonAvatarColumns={[0]}
-            skeletonAvatarProps={{ width: 28, height: 28 }}
             loading={isLoading}
             pagingData={{
                 total: customerListTotal,

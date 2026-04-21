@@ -51,7 +51,7 @@ const CustomerListSelected = () => {
                 { placement: 'top-center' },
             )
         } catch (err: any) {
-            console.error('Delete failed:', err.response?.data || err.message)
+            // console.error('Delete failed:', err.response?.data || err.message)
             toast.push(
                 <Notification type="danger">
                     Failed to delete customers

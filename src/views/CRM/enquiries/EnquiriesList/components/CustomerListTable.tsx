@@ -6,14 +6,16 @@ import DataTable from '@/components/shared/DataTable'
 import useCustomerList from '../hooks/useCustomerList'
 import { Link, useNavigate } from 'react-router-dom'
 import cloneDeep from 'lodash/cloneDeep'
-import { TbPencil, TbEye } from 'react-icons/tb'
+import { TbEye } from 'react-icons/tb'
 import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
 import type { TableQueries } from '@/@types/common'
 
-const statusColor: Record<string, string> = {
-    active: 'bg-emerald-200 dark:bg-emerald-200 text-gray-900 dark:text-gray-900',
-    blocked: 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900',
+const truncateText = (text: string, maxLength = 40) => {
+    if (!text) return ''
+    return text.length > maxLength
+        ? text.substring(0, maxLength) + '...'
+        : text
 }
 
 const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string }) => {
@@ -34,42 +36,11 @@ const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string 
     
     return (
         <Link
-            className={`hover:text-primary font-semibold text-gray-900 dark:text-gray-100`}
+            className="hover:text-primary font-semibold text-gray-900 dark:text-gray-100"
             to={`/concepts/customers/customer-details/${row.id}`}
         >
             {highlightMatch(row.name, searchQuery)}
         </Link>
-    )
-}
-
-const ActionColumn = ({
-    onEdit,
-    onViewDetail,
-}: {
-    onEdit: () => void
-    onViewDetail: () => void
-}) => {
-    return (
-        <div className="flex items-center gap-3">
-            {/* <Tooltip title="Edit">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onEdit}
-                >
-                    <TbPencil />
-                </div>
-            </Tooltip> */}
-            <Tooltip title="View">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onViewDetail}
-                >
-                    <TbEye />
-                </div>
-            </Tooltip>
-        </div>
     )
 }
 
@@ -87,37 +58,23 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
-    // Filter and sort list - show only matches, with exact matches first
+    // ✅ Latest first sorting + search filter
     const filteredAndSortedList = useMemo(() => {
+        let list = [...customerList]
+
+        // Latest first (based on created_at)
+        list.sort((a, b) => {
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        })
+
         const query = (tableData.query as string || '').toLowerCase().trim()
-        
-        if (!query || query.length === 0) return customerList
-        
-        // Filter to only include matching names
-        const filtered = customerList.filter(customer =>
+
+        if (!query) return list
+
+        return list.filter(customer =>
             customer.name.toLowerCase().includes(query)
         )
-        
-        // Sort to put exact/partial matches first
-        return filtered.sort((a, b) => {
-            const aName = a.name.toLowerCase()
-            const bName = b.name.toLowerCase()
-            
-            // Exact match comes first
-            if (aName === query) return -1
-            if (bName === query) return 1
-            
-            // Starts with query comes next
-            if (aName.startsWith(query) && !bName.startsWith(query)) return -1
-            if (!aName.startsWith(query) && bName.startsWith(query)) return 1
-            
-            return 0
-        })
     }, [customerList, tableData.query])
-
-    const handleEdit = (customer: Customer) => {
-        navigate(`/enquiries/${customer.id}/edit`)
-    }
 
     const handleViewDetails = (customer: Customer) => {
         navigate(`/enquiries/${customer.id}`)
@@ -128,33 +85,44 @@ const CustomerListTable = () => {
             {
                 header: 'Name',
                 accessorKey: 'name',
-                cell: (props) => (
-                    <NameColumn
-                        row={props.row.original}
-                        searchQuery={tableData.query as string}
-                    />
-                ),
+                // cell: (props) => (
+                //     <NameColumn
+                //         row={props.row.original}
+                //         searchQuery={tableData.query as string}
+                //     />
+                // ),
             },
             {
                 header: 'Email',
                 accessorKey: 'email',
             },
             {
-                header: 'Phone',
-                accessorKey: 'phone',
+                header: 'Mobile',
+                accessorKey: 'mobile',
+            },
+            {
+                header: 'Date',
+                accessorKey: 'created_at',
             },
             {
                 header: 'Message',
                 accessorKey: 'message',
+                cell: (props) => (
+                    <Tooltip title={props.row.original.message}>
+                        <span>
+                            {truncateText(props.row.original.message, 20)}
+                        </span>
+                    </Tooltip>
+                ),
             },
             {
-                header: '',
+                header: 'Action',
                 id: 'action',
                 cell: (props) => (
                     <div className="flex items-center gap-3">
                         <Tooltip title="View">
                             <div
-                                className={`text-xl cursor-pointer select-none font-semibold`}
+                                className="text-xl cursor-pointer font-semibold"
                                 role="button"
                                 onClick={() => handleViewDetails(props.row.original)}
                             >
@@ -164,10 +132,8 @@ const CustomerListTable = () => {
                     </div>
                 ),
             },
-
         ],
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [],
+        [tableData.query],
     )
 
     const handleSetTableData = (data: TableQueries) => {
@@ -210,28 +176,41 @@ const CustomerListTable = () => {
     }
 
     return (
-        <DataTable
-            selectable
-            columns={columns}
-            data={filteredAndSortedList}
-            noData={!isLoading && filteredAndSortedList.length === 0}
-            skeletonAvatarColumns={[0]}
-            skeletonAvatarProps={{ width: 28, height: 28 }}
-            loading={isLoading}
-            pagingData={{
-                total: customerListTotal,
-                pageIndex: tableData.pageIndex as number,
-                pageSize: tableData.pageSize as number,
-            }}
-            checkboxChecked={(row) =>
-                selectedCustomer.some((selected) => selected.id === row.id)
-            }
-            onPaginationChange={handlePaginationChange}
-            onSelectChange={handleSelectChange}
-            onSort={handleSort}
-            onCheckBoxChange={handleRowSelect}
-            onIndeterminateCheckBoxChange={handleAllRowSelect}
-        />
+        <>
+            {/* ✅ Total + Showing Count */}
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">
+                    Total Enquiries: {customerListTotal}
+                </h3>
+
+                {/* <span className="text-sm text-gray-500">
+                    Showing: {filteredAndSortedList.length}
+                </span> */}
+            </div>
+
+            <DataTable
+                selectable
+                columns={columns}
+                data={filteredAndSortedList}
+                noData={!isLoading && filteredAndSortedList.length === 0}
+                skeletonAvatarColumns={[0]}
+                skeletonAvatarProps={{ width: 28, height: 28 }}
+                loading={isLoading}
+                pagingData={{
+                    total: customerListTotal,
+                    pageIndex: tableData.pageIndex as number,
+                    pageSize: tableData.pageSize as number,
+                }}
+                checkboxChecked={(row) =>
+                    selectedCustomer.some((selected) => selected.id === row.id)
+                }
+                onPaginationChange={handlePaginationChange}
+                onSelectChange={handleSelectChange}
+                onSort={handleSort}
+                onCheckBoxChange={handleRowSelect}
+                onIndeterminateCheckBoxChange={handleAllRowSelect}
+            />
+        </>
     )
 }
 

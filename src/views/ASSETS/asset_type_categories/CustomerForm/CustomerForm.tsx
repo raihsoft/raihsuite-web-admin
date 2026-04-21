@@ -70,7 +70,7 @@ const CustomerForm = (props: CustomerFormProps) => {
             await apiCreateAssetTypeCategory(formData)
             alert('Created Successfully!')
         } catch (err) {
-            console.error('ERROR:', err)
+            // console.error('ERROR:', err)
             alert('Failed to create item.')
         }
     }

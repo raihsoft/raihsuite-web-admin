@@ -70,7 +70,7 @@ export default function useCustomerList() {
         ([, params]) => apiGetOrganizations<GetCustomersListResponse, TableQueries>(params),
         { revalidateOnFocus: false }
     )
-console.log(data,"sssssssssss")
+// console.log(data,"sssssssssss")
     // Map API response to table-friendly structure
 const customerList = data?.results?.map((customer: any, index: number) => ({
     id: customer.id ?? index,

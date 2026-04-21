@@ -203,7 +203,7 @@ export async function apiDeleteEnquiries(ids: string[]) {
 // customer activity log
 export async function apiGetCustomerLog<T, U extends Record<string, unknown>>(params: U) {
     return ApiService.fetchDataWithAxios<T>({
-        url: '/customers/log/',
+        url: '/auth/login/',
         method: 'get',
         params,
     })
@@ -371,7 +371,9 @@ export async function apiDeleteAssetCategory(id: string) {
 
 
 
-// ✅ Asset Type
+// ✅ Asset 
+
+
 export async function apiGetAssetType<T, U extends Record<string, unknown>>(params: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/asset/asset_types/',
@@ -392,7 +394,7 @@ export async function apiGetAssetTypeCategory<T, U extends Record<string, unknow
     return ApiService.fetchDataWithAxios<T>({
         url: '/asset/asset_type_categories/',
         method: 'get',
-        params, // ✅ query params only for GET
+        params, 
     })
 }
 
@@ -427,7 +429,7 @@ export async function apiCreateAssetTypeCategory<T, U extends Record<string, unk
 export async function apiEditAssetTypeCategory<T, U extends Record<string, unknown>>(id: string, data: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: `/asset/asset_type_categories/${id}/`,
-        method: 'put', // ✅ use put instead of non-standard "edit"
+        method: 'put', 
         data,
     })
 }
@@ -494,6 +496,15 @@ export async function apiCreateParticipant<T, U extends Record<string, unknown>>
         data,
     })
 }
+export async function apiParticipantList<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/participants/',
+        method: 'get',
+        data,
+    })
+}
 
 // Update participant by id
 export async function apiUpdateParticipant<T, U extends Record<string, unknown>>(
@@ -501,7 +512,7 @@ export async function apiUpdateParticipant<T, U extends Record<string, unknown>>
     data: U
 ) {
     return ApiService.fetchDataWithAxios<T>({
-        url: `/events/participants/${id}/`, // replace with your actual endpoint
+        url: `/events/participants/${id}/`,
         method: 'patch',
         data,
     })
@@ -509,7 +520,7 @@ export async function apiUpdateParticipant<T, U extends Record<string, unknown>>
 
 export async function apiGetParticipant<T>(id: string) {
     return ApiService.fetchDataWithAxios<T>({
-        url: `/events/participants/${id}/`, // endpoint for a single participant
+        url: `/events/participants/${id}/`, 
         method: 'get',
     })
 }
@@ -558,7 +569,7 @@ export async function apiUpdateEvent<T, U extends Record<string, unknown>>(
     data: U,
 ) {
     return ApiService.fetchDataWithAxios<T>({
-        url: `/events/events/${code}/`, // ✅ use code instead of id
+        url: `/events/events/${code}/`, 
         method: 'patch',
         data,
     })
@@ -568,7 +579,7 @@ export async function apiUpdateEvent<T, U extends Record<string, unknown>>(
 // Delete event
 export async function apiDeleteEvent(code: string) {
     return ApiService.fetchDataWithAxios({
-        url: `/events/events/${code}/`,   // ✅ use code here
+        url: `/events/events/${code}/`,   
         method: 'delete',
     })
 }
@@ -586,3 +597,221 @@ export async function apiGetTenantById<T, U = Record<string, unknown>>(id: numbe
 }
 
 
+
+// session management
+
+export async function apiGetSessionList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/sessions/',
+        method: 'get',
+        params,
+    })
+}
+
+
+export async function apiCreateSession<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/sessions/',
+        method: 'post',
+        data,
+    })
+}
+
+
+export async function apiUpdateSession<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/sessions/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+export async function apiDeleteSession(id: string) {
+  return ApiService.fetchDataWithAxios({
+    url: `/events/sessions/${id}/`,
+    method: 'delete',
+  })
+}
+
+export async function apiGetSessionDetails<T>(id: string) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: `/events/sessions/${id}/`, // single session
+    method: 'get',
+  })
+}
+// session-attendance
+
+
+export async function apiGetSessionAttendanceList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/session-attendance/',
+        method: 'get',
+        params,
+    })
+}
+
+export async function apiCreateSessionAttendance<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/session-attendance/',
+        method: 'post',
+        data,
+    })
+}
+
+
+
+
+export async function apiUpdateSessionAttendance<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/session-attendance/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+export async function apiUpdateSessionAttendanceDetails<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/session-attendance/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+export async function apiDeleteSessionAttendance(id: string) {
+  return ApiService.fetchDataWithAxios({
+    url: `/events/session-attendance/${id}/`,
+    method: 'delete',
+  })
+}
+// fee payment APIs
+
+export async function apiGetFeePaymentList<T, U extends Record<string, unknown>>(
+  params: U,
+) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: '/events/fee-payments/',
+    method: 'get',
+    params,
+  })
+}
+
+export async function apiCreateFeePayment<T, U extends Record<string, unknown>>(
+  data: U,
+) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: '/events/fee-payments/',
+    method: 'post',
+    data,
+  })
+}
+
+export async function apiUpdateFeePayment<T, U extends Record<string, unknown>>(
+  id: string,
+  data: U,
+) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: `/events/fee-payments/${id}/`,
+    method: 'patch',
+    data,
+  })
+}
+
+export async function apiDeleteFeePayment(id: string) {
+  return ApiService.fetchDataWithAxios({
+    url: `/events/fee-payments/${id}/`,
+    method: 'delete',
+  })
+}
+
+export async function apiGetFeePaymentDetails<T>(id: string) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: `/events/fee-payments/${id}/`, // single payment
+    method: 'get',
+  })
+}
+
+// Check-in participant by QR code
+export async function apiCheckInParticipant<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/participants/check-in/',
+        method: 'post',
+        data,
+    })
+}
+
+
+// ticket management
+
+export async function apiGetTicketList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/tickets/',
+        method: 'get',
+        params,
+    })
+}
+
+export async function apiCreateTicket<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/tickets/',
+        method: 'post',
+        data,
+    })
+}
+
+export async function apiUpdateTicket<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/events/tickets/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+export async function apiDeleteTicket(id: string) {
+  return ApiService.fetchDataWithAxios({
+    url: `/events/tickets/${id}/`,
+    method: 'delete',
+  })
+}
+
+export async function apiGetTicketDetails<T>(id: string) {
+  return ApiService.fetchDataWithAxios<T>({
+    url: `/events/tickets/${id}/`,
+    method: 'get',
+  })
+}
+
+// Scan ticket to mark entry status
+// Takes token from QR code to update ticket status
+export async function apiScanTicket<T>(data: {
+    token: string
+}) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/events/tickets/scan/',
+        method: 'post',
+        data,
+    })
+}

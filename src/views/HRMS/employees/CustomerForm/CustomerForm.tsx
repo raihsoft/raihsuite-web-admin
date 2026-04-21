@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import Container from '@/components/shared/Container'
 import BottomStickyBar from '@/components/template/BottomStickyBar'
 import OverviewSection from './OverviewSection'
-import ProfileImageSection from './ProfileImageSection'
 // import AddressSection from './AddressSection'
 // import TagsSection from './TagsSection'
 // import AccountSection from './AccountSection'
@@ -82,15 +81,9 @@ const CustomerForm = (props: CustomerFormProps) => {
             onSubmit={handleSubmit(onSubmit)}
         >
             <Container>
-                <div className="flex flex-col md:flex-row gap-4">
-                    <div className="gap-4 flex flex-col flex-auto">
-                        <OverviewSection control={control} errors={errors} />
-                        {/* <AddressSection control={control} errors={errors} /> */}
-                    </div>
-                    <div className="md:w-[370px] gap-4 flex flex-col">
-                        <ProfileImageSection control={control} errors={errors} />
-                        {/* other right-side sections (tags/account) can go here */}
-                    </div>
+                <div className="flex flex-col gap-4">
+                    <OverviewSection control={control} errors={errors} />
+                    {/* <AddressSection control={control} errors={errors} /> */}
                 </div>
             </Container>
             <BottomStickyBar>{children}</BottomStickyBar>

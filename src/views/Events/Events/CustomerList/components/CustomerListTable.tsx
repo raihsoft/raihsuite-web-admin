@@ -178,7 +178,7 @@ const CustomerListTable = () => {
                 accessorKey: 'phone',
             },
             {
-                header: '',
+                header: 'action',
                 id: 'action',
                 cell: (props) => (
                     <ActionColumn

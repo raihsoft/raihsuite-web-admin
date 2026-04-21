@@ -13,6 +13,7 @@ type EventRow = {
     title: string
     start_date?: string
     end_date?: string
+    fee_amount?: string | number // string from backend
 }
 
 const ActionColumn = ({
@@ -80,6 +81,14 @@ const EventsTable = () => {
         () => [
             { header: 'Title', accessorKey: 'title' },
             { header: 'Code', accessorKey: 'code' },
+            {
+                header: 'Fee Amount',
+                accessorKey: 'fee_amount',
+                cell: (props) =>
+                    props.row.original.fee_amount
+                        ? Number(props.row.original.fee_amount).toFixed(2)
+                        : '',
+            },
             {
                 header: 'Start Date',
                 accessorKey: 'start_date',

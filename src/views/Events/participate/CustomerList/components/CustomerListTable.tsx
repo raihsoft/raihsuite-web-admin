@@ -130,42 +130,67 @@ const CustomerListTable = () => {
     }, [customerList, tableData.query])
 
     const columns: ColumnDef<Customer>[] = useMemo(
-        () => [
-            // {
-            //     header: 'Name',
-            //     accessorKey: 'name',
-            //     cell: (props) => {
-            //         const row = props.row.original
-            //         return <NameColumn row={row} searchQuery={tableData.query as string} />
-            //     },
-            // },
-            {
-                header: 'First Name',
-                accessorKey: 'firstName',
-            },
-            {
-                header: 'Last Name',
-                accessorKey: 'lastName',
-            },
-            {
-                header: 'Email',
-                accessorKey: 'email',
-            },
-            {
-                header: 'Phone',
-                accessorKey: 'phone',
-            },
-            {
-                header: 'Place',
-                accessorKey: 'place',
-            },
-            {
-                header: 'Event ',      // <-- New column
-                accessorKey: 'event_title',
-                cell: (props) => <span>{props.row.original.event_title}</span>,
-            },
-            {
-            header: 'Referenced By',
+    () => [
+        {
+            header: 'First Name',
+            accessorKey: 'firstName',
+        },
+        {
+            header: 'Last Name',
+            accessorKey: 'lastName',
+        },
+        {
+            header: 'Email',
+            accessorKey: 'email',
+        },
+        {
+            header: 'Phone',
+            accessorKey: 'phone',
+        },
+        {
+            header: 'Place',
+            accessorKey: 'place',
+        },
+        {
+            header: 'Event',
+            accessorKey: 'event_title',
+            cell: (props) => (
+                <span
+                    className="text-gray font-semibold cursor-pointer"
+                    onClick={() =>
+                        navigate(`/events/${props.row.original.code}`)
+                    }
+                >
+                    {props.row.original.event_title}
+                </span>
+            ),
+        },
+        {
+            header: 'Fee Amount',
+            accessorKey: 'fee_amount',
+            cell: (props) =>
+                props.row.original.fee_amount !== undefined
+                    ? Number(props.row.original.fee_amount).toFixed(2)
+                    : '-',
+        },
+        {
+            header: 'Amount Paid',
+            accessorKey: 'amount_paid',
+            cell: (props) =>
+                props.row.original.amount_paid !== undefined
+                    ? Number(props.row.original.amount_paid).toFixed(2)
+                    : '-',
+        },
+        {
+            header: 'Balance Due',
+            accessorKey: 'balance_due',
+            cell: (props) =>
+                props.row.original.balance_due !== undefined
+                    ? Number(props.row.original.balance_due).toFixed(2)
+                    : '-',
+        },
+        {
+            header: 'Referred By Employee',
             accessorKey: 'referencedBy',
             cell: (props) => (
                 <span className="font-medium">
@@ -173,23 +198,23 @@ const CustomerListTable = () => {
                 </span>
             ),
         },
+        {
+            header: 'Action',
+            id: 'action',
+            cell: (props) => (
+                <ActionColumn
+                    onEdit={() => handleEdit(props.row.original)}
+                    onViewDetail={() =>
+                        handleViewDetails(props.row.original)
+                    }
+                />
+            ),
+        },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+)
 
-            {
-                header: '',
-                id: 'action',
-                cell: (props) => (
-                    <ActionColumn
-                        onEdit={() => handleEdit(props.row.original)}
-                        onViewDetail={() =>
-                            handleViewDetails(props.row.original)
-                        }
-                    />
-                ),
-            },
-        ],
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [],
-    )
 
     const handleSetTableData = (data: TableQueries) => {
         setTableData(data)

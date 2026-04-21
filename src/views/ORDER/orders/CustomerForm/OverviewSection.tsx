@@ -101,7 +101,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                 setZones(zoneOptions)
                 setOrganizations(organizationOptions)
             } catch (err) {
-                console.error('Failed to fetch zones and organizations:', err)
+                // console.error('Failed to fetch zones and organizations:', err)
             } finally {
                 setLoadingZones(false)
             }

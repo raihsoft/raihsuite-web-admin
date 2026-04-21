@@ -17,6 +17,9 @@ const FrameLessSide = ({ children }: CommonProps) => {
 
     const { larger, smaller } = useResponsive()
 
+    // Debug: show responsive state and whether SideNav will render
+  
+
     return (
         <LayoutBase
             adaptiveCardActive
@@ -75,14 +78,16 @@ const FrameLessSide = ({ children }: CommonProps) => {
             )}
         >
             <div className="flex flex-auto min-w-0">
-                {larger.lg && (
-                    <SideNav
-                        background={false}
-                        className={classNames('dark pt-6')}
-                        contentClass="h-[calc(100vh-8rem)]"
-                        mode="dark"
-                    />
-                )}
+                <ErrorBoundary>
+                    {larger.lg && (
+                        <SideNav
+                            background={false}
+                            className={classNames('dark pt-6')}
+                            contentClass="h-[calc(100vh-8rem)]"
+                            mode="dark"
+                        />
+                    )}
+                </ErrorBoundary>
                 <FrameLessGap className="min-h-screen min-w-0 relative w-full">
                     <div className="bg-white dark:bg-gray-900 flex flex-col flex-1 h-full rounded-2xl">
                         <Header

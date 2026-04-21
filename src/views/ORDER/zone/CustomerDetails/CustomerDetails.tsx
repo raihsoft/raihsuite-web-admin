@@ -23,7 +23,7 @@ const CustomerDetails = () => {
             revalidateIfStale: false,
         },
     )
-console.log(data,'dddddddddd')
+// console.log(data,'dddddddddd')
     return (
         <Loading loading={isLoading}>
             {!isEmpty(data) && (

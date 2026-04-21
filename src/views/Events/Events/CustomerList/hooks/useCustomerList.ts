@@ -30,6 +30,7 @@ export default function useCustomerList() {
         startDate: item.start_date,
         endDate: item.end_date,
         place: item.place || '',
+        feeAmount: parseFloat(item.fee_amount), 
     }))
 
 

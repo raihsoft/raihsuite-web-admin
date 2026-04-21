@@ -28,10 +28,24 @@ export const SignInBase = ({
             <div className="mx-auto w-full max-w-md">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
                     <div className="flex flex-col items-center">
-                        {/* <Logo type="streamline" mode={mode} imgClass="mx-auto" logoWidth={60} /> */}
-                        <h2 className="mt-4 text-2xl sm:text-3xl font-bold">Welcome back!</h2>
+                        {/* Logo */}
+                        <img
+                            src="https://media.raihsuite.com/RS0001/web/Gemini_Generated_Image_lltgbilltgbilltg%20(1).png" // 👈 change path
+                            alt="Logo"
+                            className="h-16 w-16 object-contain mb-2"
+                        />
+
+                        {/* Title */}
+                        <h2
+                            className="mt-2 text-2xl sm:text-3xl font-bold"
+                            style={{ color: "#691c81" }}
+                        >
+                            Raihsuite - ERP
+                        </h2>
+
+                        {/* Subtitle */}
                         <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-[340px] text-center">
-                            Please enter your credentials to sign in!
+                            Please enter your credentials to login!
                         </p>
                     </div>
 
@@ -55,7 +69,7 @@ export const SignInBase = ({
                                         className="font-semibold heading-text mt-2 underline"
                                         themeColor={false}
                                     >
-                                        {/* Forgot password */}
+                                        Forgot password?
                                     </ActionLink>
                                 </div>
                             }

@@ -25,6 +25,7 @@ const schema = z.object({
     code: z.string().optional(),
     start_date: z.date().optional(),
     end_date: z.date().optional(),
+    fee_amount: z.coerce.number().optional(), // ✅ added fee_amount
 })
 
 type FormValues = z.infer<typeof schema>
@@ -74,6 +75,7 @@ const CustomerEdit = () => {
             code: event.code || '',
             start_date: event.start_date ? new Date(event.start_date) : undefined,
             end_date: event.end_date ? new Date(event.end_date) : undefined,
+            fee_amount: event.fee_amount ? Number(event.fee_amount) : 0, // ✅ map fee_amount
         })
     }, [resp, code, reset])
 
@@ -88,6 +90,7 @@ const CustomerEdit = () => {
                 code: values.code,
                 start_date: values.start_date ? values.start_date.toISOString() : null,
                 end_date: values.end_date ? values.end_date.toISOString() : null,
+                fee_amount: values.fee_amount, // ✅ include fee_amount
             })
 
             toast.push(
@@ -137,15 +140,12 @@ const CustomerEdit = () => {
     return (
         <>
             <form onSubmit={handleSubmit(onSubmit)}>
-                {/* ================= CONTENT ================= */}
                 <div className="pb-24">
                     <Container>
                         <div className="max-w-6xl mx-auto mt-6">
                             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 space-y-8">
                                 <div>
-                                    <h4 className="text-xl font-semibold">
-                                        Event Details
-                                    </h4>
+                                    <h4 className="text-xl font-semibold">Event Details</h4>
                                     <p className="text-sm text-gray-500 mt-1">
                                         Update event information below
                                     </p>
@@ -153,40 +153,43 @@ const CustomerEdit = () => {
 
                                 {/* Title */}
                                 <div>
-                                    <label className="label font-medium">
-                                        Event Title
-                                    </label>
+                                    <label className="label font-medium">Event Title</label>
                                     <Controller
                                         name="title"
                                         control={control}
                                         render={({ field }) => (
-                                            <Input
-                                                {...field}
-                                                className="h-12"
-                                                placeholder="Enter event title"
-                                            />
+                                            <Input {...field} className="h-12" placeholder="Enter event title" />
                                         )}
                                     />
                                     {errors.title && (
-                                        <p className="text-sm text-error mt-1">
-                                            {errors.title.message}
-                                        </p>
+                                        <p className="text-sm text-error mt-1">{errors.title.message}</p>
                                     )}
                                 </div>
 
                                 {/* Code */}
                                 <div>
-                                    <label className="label font-medium">
-                                        Event Code
-                                    </label>
+                                    <label className="label font-medium">Event Code</label>
                                     <Controller
                                         name="code"
                                         control={control}
                                         render={({ field }) => (
+                                            <Input {...field} className="h-12" placeholder="Unique event code" />
+                                        )}
+                                    />
+                                </div>
+
+                                {/* Fee Amount */}
+                                <div>
+                                    <label className="label font-medium">Fee Amount</label>
+                                    <Controller
+                                        name="fee_amount"
+                                        control={control}
+                                        render={({ field }) => (
                                             <Input
                                                 {...field}
+                                                type="number"
                                                 className="h-12"
-                                                placeholder="Unique event code"
+                                                placeholder="Enter fee amount"
                                             />
                                         )}
                                     />
@@ -195,9 +198,7 @@ const CustomerEdit = () => {
                                 {/* Dates */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div>
-                                        <label className="label font-medium">
-                                            Start Date
-                                        </label>
+                                        <label className="label font-medium">Start Date</label>
                                         <Controller
                                             name="start_date"
                                             control={control}
@@ -213,9 +214,7 @@ const CustomerEdit = () => {
                                     </div>
 
                                     <div>
-                                        <label className="label font-medium">
-                                            End Date
-                                        </label>
+                                        <label className="label font-medium">End Date</label>
                                         <Controller
                                             name="end_date"
                                             control={control}
@@ -236,22 +235,10 @@ const CustomerEdit = () => {
                 </div>
 
                 {/* ================= FIXED BOTTOM BAR ================= */}
-                <div
-                    className="
-                        fixed bottom-0 z-20
-                        bg-white dark:bg-gray-900
-                        border-t border-gray-200 dark:border-gray-700
-                        w-full
-                        lg:left-64 lg:w-[calc(100%-16rem)]
-                    "
-                >
+                <div className="fixed bottom-0 z-20 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 w-full lg:left-64 lg:w-[calc(100%-16rem)]">
                     <Container>
                         <div className="flex items-center justify-between py-4">
-                            <Button
-                                variant="plain"
-                                icon={<TbArrowNarrowLeft />}
-                                onClick={() => navigate(-1)}
-                            >
+                            <Button variant="plain" icon={<TbArrowNarrowLeft />} onClick={() => navigate(-1)}>
                                 Back
                             </Button>
 
@@ -267,12 +254,7 @@ const CustomerEdit = () => {
                                     Delete
                                 </Button>
 
-                                <Button
-                                    variant="solid"
-                                    type="submit"
-                                    loading={isSubmitting}
-                                    className="min-w-[110px]"
-                                >
+                                <Button variant="solid" type="submit" loading={isSubmitting} className="min-w-[110px]">
                                     Save
                                 </Button>
                             </div>
@@ -290,8 +272,7 @@ const CustomerEdit = () => {
                 onConfirm={handleConfirmDelete}
                 confirmButtonProps={{ loading: deleteLoading }}
             >
-                Are you sure you want to remove this event? This action can’t be
-                undone.
+                Are you sure you want to remove this event? This action can’t be undone.
             </ConfirmDialog>
         </>
     )

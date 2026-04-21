@@ -11,6 +11,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
 import { apiDeleteEmployee } from '@/services/CustomersService'
 import { TbChecks } from 'react-icons/tb'
+import { CgProfile } from "react-icons/cg";
 
 const CustomerListSelected = () => {
     const {
@@ -57,7 +58,7 @@ const CustomerListSelected = () => {
             { placement: 'top-center' },
         )
     } catch (error) {
-        console.error('Delete error:', error)
+        // console.error('Delete error:', error)
         toast.push(
             <Notification type="danger">
                 Failed to delete employee(s)
@@ -170,7 +171,13 @@ const CustomerListSelected = () => {
                 >
                     {selectedCustomer.map((customer) => (
                         <Tooltip key={customer.id} title={customer.name}>
-                            <Avatar size={30} src={customer.img} alt="" />
+                            <Avatar 
+                                size={30} 
+                                src={customer.img} 
+                                alt=""
+                                icon={!customer.img ? <CgProfile /> : undefined}
+                                className={!customer.img ?  'bg-gray-200 dark:bg-gray-700' : ''}
+                            />
                         </Tooltip>
                     ))}
                 </Avatar.Group>

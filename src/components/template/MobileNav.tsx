@@ -9,6 +9,8 @@ import appConfig from '@/configs/app.config'
 import { useThemeStore } from '@/store/themeStore'
 import { useRouteKeyStore } from '@/store/routeKeyStore'
 import { useSessionUser } from '@/store/authStore'
+import { useNavigationStore } from '@/store/navigationStore'
+import Loading from '@/components/shared/Loading'
 
 const VerticalMenuContent = lazy(
     () => import('@/components/template/VerticalMenuContent'),
@@ -44,6 +46,11 @@ const MobileNav = ({
 
     const userAuthority = useSessionUser((state) => state.user.authority)
 
+    const allowedNavigationFromStore = useNavigationStore((state) => state.allowedNavigation)
+    const navLoading = useNavigationStore((state) => state.loading)
+    // When store is null, use empty array to avoid flash; skeleton will be shown while loading
+    const navigationTree = allowedNavigationFromStore === null ? [] : allowedNavigationFromStore
+
     return (
         <>
             <div className="text-2xl" onClick={handleOpenDrawer}>
@@ -58,11 +65,12 @@ const MobileNav = ({
                 onClose={handleDrawerClose}
                 onRequestClose={handleDrawerClose}
             >
-                <Suspense fallback={<></>}>
+                <Suspense fallback={<Loading loading={true} className="w-full" />}>
                     {isOpen && (
                         <VerticalMenuContent
                             collapsed={false}
-                            navigationTree={navigationConfig}
+                            navigationTree={navigationTree}
+                            loading={navLoading}
                             routeKey={currentRouteKey}
                             userAuthority={userAuthority as string[]}
                             direction={direction}

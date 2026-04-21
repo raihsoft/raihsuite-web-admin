@@ -51,7 +51,7 @@ const handleConfirmDelete = async () => {
             { placement: 'top-center' }
         )
     } catch (error) {
-        console.error(error)
+        // console.error(error)
         toast.push(
             <Notification type="danger">
                 Failed to delete events
@@ -85,7 +85,7 @@ const handleConfirmDelete = async () => {
                     </span>
                     <span className="font-semibold flex items-center gap-1">
                         <span className="heading-text">
-                            {selectedCustomer.length} Customers
+                            {selectedCustomer.length} Events
                         </span>
                         <span>selected</span>
                     </span>

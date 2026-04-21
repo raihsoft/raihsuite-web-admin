@@ -23,6 +23,7 @@ export interface VerticalMenuContentProps {
     direction?: Direction
     translationSetup?: boolean
     userAuthority: string[]
+    loading?: boolean
 }
 
 const { MenuGroup } = Menu
@@ -36,7 +37,21 @@ const VerticalMenuContent = (props: VerticalMenuContentProps) => {
         direction = themeConfig.direction,
         translationSetup,
         userAuthority,
+        loading = false,
     } = props
+
+    // If navigation is still loading and there are no items yet, render a stable skeleton
+    if (loading && navigationTree.length === 0) {
+        return (
+            <div className="px-4 pb-4">
+                {[...Array(6)].map((_, i) => (
+                    <div key={i} className="py-2">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse" />
+                    </div>
+                ))}
+            </div>
+        )
+    }
 
     const { t } = useTranslation(!translationSetup)
 
@@ -134,10 +149,18 @@ const VerticalMenuContent = (props: VerticalMenuContentProps) => {
         <Menu
             className="px-4 pb-4"
             sideCollapsed={collapsed}
-            defaultActiveKeys={activedRoute?.key ? [activedRoute.key] : []}
-            defaultExpandedKeys={defaulExpandKey}
+            defaultActiveKeys={
+                activedRoute?.key ? [activedRoute.key] : []
+            }
+            defaultExpandedKeys={
+                activedRoute?.parentKey
+                    ? [activedRoute.parentKey, activedRoute.key]
+                    : defaulExpandKey
+            }
             defaultCollapseActiveKeys={
-                activedRoute?.parentKey ? [activedRoute.parentKey] : []
+                activedRoute?.parentKey
+                    ? [activedRoute.parentKey]
+                    : []
             }
         >
             {renderNavigation(navigationTree, 0)}

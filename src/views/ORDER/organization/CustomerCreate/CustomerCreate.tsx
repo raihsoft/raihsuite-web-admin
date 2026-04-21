@@ -38,7 +38,7 @@ const CustomerCreate = () => {
       )
 
     } catch (error) {
-      console.error(error)
+      // console.error(error)
       toast.push(
         <Notification type="danger">Failed to create organization!</Notification>,
         { placement: 'top-center' }

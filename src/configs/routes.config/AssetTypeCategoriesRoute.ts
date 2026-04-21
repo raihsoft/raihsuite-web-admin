@@ -9,6 +9,14 @@ const employeeRoute: Routes = [
         path: `${ASSET_TYPE_CATEGORIES_PREFIX_PATH}/create`,
         component: lazy(() => import('@/views/ASSETS/asset_type_categories/CustomerCreate/CustomerCreate')),
         authority: [ADMIN, USER],
+         meta: {
+            header: {
+                title: '',
+                description: '',
+                contained: true,
+            },
+            footer: false,
+        },
     },
     {
         key: "assetTypeCategoriesEdit",

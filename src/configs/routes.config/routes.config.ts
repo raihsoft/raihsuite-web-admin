@@ -13,6 +13,11 @@ import assetTypeCategories from './AssetTypeCategoriesRoute'
 import participantsRoute from './ParticipantsRoute'
 import eventsRoute from './EventsRoute'
 import EventsRoute from './EventsRoute'
+import { s } from '@fullcalendar/core/internal-common'
+import FeepaymentListRoute from './FeepaymentListRoute'
+import SessionRoute from './SessionsRoute'
+import SessionAttendanceRoute from './sessionAttendanceRoute'
+import TicketsRoute from './TicketsRoute'
 
 export const publicRoutes: Routes = [...authRoute]
 
@@ -102,7 +107,7 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'orderform',
+        key: 'orderform.orders',
         path: '/order',
         component: lazy(
             () => import('@/views/ORDER/orders/CustomerList'),
@@ -110,7 +115,7 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'Organizations',
+        key: 'orderform.organizations',
         path: '/organization',
         component: lazy(
             () => import('@/views/ORDER/organization/CustomerList'),
@@ -118,7 +123,7 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
      {
-        key: 'Zones',
+        key: 'orderform.zones',
         path: '/zone',
         component: lazy(
             () => import('@/views/ORDER/zone/CustomerList'),
@@ -126,7 +131,7 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
-        key: 'Delivery',
+        key: 'orderform.delivery',
         path: '/delivery',
         component: lazy(
             () => import('@/views/ORDER/delivery/CustomerList'),
@@ -134,19 +139,37 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
 
-        {
-        key: 'Delivery',
-        path: '/delivery',
-        component: lazy(
-            () => import('@/views/ORDER/delivery/CustomerList'),
-        ),
+    {
+        key: 'hrms.employeeDetails',
+        path: '/employees/:id',
+        component: lazy(() => import('@/views/HRMS/employees/CustomerDetails/CustomerDetails')),
         authority: [],
+        meta: {
+            header: {
+                title: 'Employee Details',
+                description: 'View employee details.',
+                contained: true,
+            },
+            footer: false,
+        },
     },
 
-    
-    
+    {
+        key: 'changePassword',
+        path: '/change-password',
+        component: lazy(() => import('@/views/auth/ChangePassword')),
+        authority: [],
+        meta: {
+            header: {
+                title: '',
+                description: 'Change your password.',
+                contained: true,
+            },
+            footer: false,
+        },
+    },
 
-    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute,...EventsRoute
+    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute,...EventsRoute,...SessionRoute,...SessionAttendanceRoute,...TicketsRoute,...FeepaymentListRoute 
 
 ]
 

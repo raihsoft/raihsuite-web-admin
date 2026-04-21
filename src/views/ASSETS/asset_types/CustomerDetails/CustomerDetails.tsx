@@ -1,73 +1,100 @@
-import Container from '@/components/shared/Container'
 import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
-import { TbArrowNarrowLeft } from 'react-icons/tb'
-import { FaFileAlt } from 'react-icons/fa'
-import { useParams, useNavigate } from 'react-router-dom'
-import useSWR from 'swr'
 import { apiGetAssetTypeById } from '@/services/CustomersService'
+import useSWR from 'swr'
+import { useParams, useNavigate } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
+import { TbArrowNarrowLeft } from 'react-icons/tb'
 
-const CustomerDetails = () => {
-    const { id } = useParams()
+const AssetTypeDetails = () => {
+    const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
 
-    const { data, isLoading } = useSWR(
-        ['/api/asset_types', id as string],
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, idParam]) => apiGetAssetTypeById<any>(idParam as string),
-        { revalidateOnFocus: false, revalidateIfStale: false },
+    const { data, isLoading, error } = useSWR(
+        id ? ['/asset_types', id] : null,
+        () => apiGetAssetTypeById<any>(id!),
+        {
+            revalidateOnFocus: false,
+        }
     )
 
     const handleBack = () => navigate(-1)
 
+    if (isLoading) {
+        return <Loading loading />
+    }
+
+    if (error || isEmpty(data)) {
+        return (
+            <div className="h-full flex flex-col items-center justify-center">
+                <p className="text-gray-500">No asset type found.</p>
+            </div>
+        )
+    }
+
     return (
-        <Loading loading={isLoading}>
-            <Container>
-                <div className="flex items-center justify-between px-8">
-                    <button
-                        type="button"
-                        className="btn-plain"
-                        onClick={handleBack}
-                    >
-                        <TbArrowNarrowLeft /> Back
-                    </button>
+        <div className="h-full w-full p-6 pb-20">
+            {/* Back Button */}
+            <div className="mb-4">
+                <button
+                    type="button"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:opacity-70 transition"
+                    onClick={handleBack}
+                >
+                    <TbArrowNarrowLeft className="text-xl" />
+                    Back
+                </button>
+            </div>
+
+            <Card className="h-full w-full p-8 rounded-2xl shadow-sm">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">
+                            {data.name}
+                        </h2>
+
+                        <p className="text-sm text-gray-500 mt-1">
+                            Code:{' '}
+                            <span className="font-medium">
+                                {data.code || '—'}
+                            </span>
+                        </p>
+
+                        <p className="text-sm text-gray-500 mt-1">
+                            File Extension:{' '}
+                            <span className="font-medium">
+                                {data.file_extension || '—'}
+                            </span>
+                        </p>
+                    </div>
                 </div>
 
-                <div className="p-6 md:p-8">
-                    <h3 className="text-3xl font-semibold mb-4">Asset Type Details</h3>
+                {/* Content Section */}
+                <Card className="p-6 rounded-xl border border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-6">
+                        Asset Type Information
+                    </h3>
 
-                    {data && !isEmpty(data) ? (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div className="lg:col-span-1">
-                                <Card className="h-full">
-                                    <div className="p-6">
-                                        <h4 className="text-2xl font-semibold mb-2">{data.name}</h4>
-                                        <div className="flex items-center gap-3 text-base text-gray-700 dark:text-gray-300 mb-2">
-                                            <FaFileAlt className="text-lg text-gray-500" />
-                                            <span className="text-sm">{data.file_extension || '—'}</span>
-                                        </div>
-                                        <div className="text-sm text-gray-600">Code: <span className="font-medium text-gray-900">{data.code || '—'}</span></div>
-                                    </div>
-                                </Card>
-                            </div>
-
-                            <div className="lg:col-span-2 space-y-6">
-                                <Card>
-                                    <div className="p-6">
-                                        <h4 className="text-lg font-semibold mb-3">Description</h4>
-                                        <p className="text-lg text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{data.description || '—'}</p>
-                                    </div>
-                                </Card>
-                            </div>
-                        </div>
-                    ) : (
-                        <p className="mt-4 text-sm text-gray-600">No data found.</p>
-                    )}
-                </div>
-            </Container>
-        </Loading>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Detail
+                            label="Description"
+                            value={data.description || '—'}
+                        />
+                    </div>
+                </Card>
+            </Card>
+        </div>
     )
 }
 
-export default CustomerDetails
+const Detail = ({ label, value }: { label: string; value: string }) => (
+    <div>
+        <div className="text-base text-gray-500">{label}</div>
+        <div className="text-xl font-semibold whitespace-pre-wrap">
+            {value}
+        </div>
+    </div>
+)
+
+export default AssetTypeDetails

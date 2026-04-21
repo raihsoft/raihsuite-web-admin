@@ -49,7 +49,7 @@ const AxiosResponseIntrceptorErrorCallback = async (error: AxiosError) => {
 
     const refreshToken = localStorage.getItem("refresh_token");
     if (!refreshToken) {
-      console.log("❌ No refresh token → force logout.");
+      // console.log("❌ No refresh token → force logout.");
       logoutUser();
       return Promise.reject(error);
     }
@@ -76,7 +76,7 @@ const AxiosResponseIntrceptorErrorCallback = async (error: AxiosError) => {
       // 🔄 CALL REFRESH TOKEN API
       // (Django SimpleJWT default endpoint)
       // =========================================================
-      const res = await AxiosBase.post("/accounts/refresh/", {
+      const res = await AxiosBase.post("/auth/refresh/", {
         refresh: refreshToken,
       });
 
@@ -98,7 +98,7 @@ const AxiosResponseIntrceptorErrorCallback = async (error: AxiosError) => {
 
       return AxiosBase(originalRequest);
     } catch (refreshError) {
-      console.error("❌ Refresh failed → logging out...", refreshError);
+      // console.error("❌ Refresh failed → logging out...", refreshError);
 
       processQueue(refreshError, null);
       isRefreshing = false;

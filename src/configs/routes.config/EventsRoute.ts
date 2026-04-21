@@ -3,7 +3,7 @@ import type { Routes } from '@/@types/routes'
 
 const EventsRoute: Routes = [
     {
-        key: 'events',
+        key: 'events.list',
         path: '/events',
         component: lazy(() => import('@/views/Events/Events/EventsOverview')),
         authority: [],
@@ -13,7 +13,6 @@ const EventsRoute: Routes = [
                 description: 'Events overview.',
                 contained: true,
             },
-            footer: false,
         },
     },
     {

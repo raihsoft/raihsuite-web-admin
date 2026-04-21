@@ -60,7 +60,7 @@ const CollapsedItem = ({
                     {children}
                 </Tooltip>
             ) : (
-                <Dropdown.Item active={currentKey === nav.key}>
+                <Dropdown.Item active={currentKey === nav.key || currentKey?.startsWith(nav.key)}>
                     {nav.path ? (
                         <Link
                             className="h-full w-full flex items-center outline-none"
@@ -98,7 +98,7 @@ const DefaultItem = (props: DefaultItemProps) => {
 
     return (
         <AuthorityCheck userAuthority={userAuthority} authority={nav.authority}>
-            <MenuItem key={nav.key} eventKey={nav.key} dotIndent={indent}>
+            <MenuItem key={nav.key} eventKey={nav.key} dotIndent={indent} className={indent ? 'submenu-item' : ''}>
                 <Link
                     to={nav.path}
                     className="flex items-center gap-2 h-full w-full"

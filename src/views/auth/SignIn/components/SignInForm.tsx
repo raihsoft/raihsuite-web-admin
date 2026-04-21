@@ -90,7 +90,7 @@ const SignInForm = (props: SignInFormProps) => {
         } catch (err) {
             // Unexpected errors — show generic message but do not reload
             setMessage?.('Sign in failed. Please try again.')
-            console.error('Sign in error', err)
+            // console.error('Sign in error', err)
         } finally {
             setSubmitting(false)
         }
@@ -152,7 +152,7 @@ const SignInForm = (props: SignInFormProps) => {
                     type="submit"
                     className="py-3 text-base"
                 >
-                    {isSubmitting ? 'Signing in...' : 'Sign In'}
+                    {isSubmitting ? 'Signing in...' : 'Login'}
                 </Button>
             </Form>
         </div>
