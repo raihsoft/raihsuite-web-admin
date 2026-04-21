@@ -1,6 +1,4 @@
 import { useMemo } from 'react'
-import Avatar from '@/components/ui/Avatar'
-import Tag from '@/components/ui/Tag'
 import Tooltip from '@/components/ui/Tooltip'
 import DataTable from '@/components/shared/DataTable'
 import useCustomerList from '../hooks/useCustomerList'
@@ -11,65 +9,52 @@ import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
 import type { TableQueries } from '@/@types/common'
 
-const statusColor: Record<string, string> = {
-    active: 'bg-emerald-200 dark:bg-emerald-200 text-gray-900 dark:text-gray-900',
-    blocked: 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900',
+/**
+ * 🔥 Reusable truncated cell
+ */
+const EllipsisCell = ({
+    value,
+    maxWidth = '200px',
+}: {
+    value?: string
+    maxWidth?: string
+}) => {
+    if (!value) return '-'
+
+    return (
+        <Tooltip title={value}>
+            <div className="truncate" style={{ maxWidth }}>
+                {value}
+            </div>
+        </Tooltip>
+    )
 }
 
 const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string }) => {
     const highlightMatch = (text: string, query?: string) => {
-        if (!query || query.length === 0) return text
-        
+        if (!query) return text
+
         const regex = new RegExp(`(${query})`, 'gi')
         const parts = text.split(regex)
-        
-        return parts.map((part, i) => 
+
+        return parts.map((part, i) =>
             regex.test(part) ? (
-                <mark key={i} className="bg-yellow-300 font-bold">{part}</mark>
+                <mark key={i} className="bg-yellow-300 font-bold">
+                    {part}
+                </mark>
             ) : (
                 part
             )
         )
     }
-    
+
     return (
         <Link
-            className={`hover:text-primary font-semibold text-gray-900 dark:text-gray-100`}
+            className="hover:text-primary font-semibold text-gray-900 dark:text-gray-100"
             to={`/assets-category/${row.id}`}
         >
             {highlightMatch(row.name, searchQuery)}
         </Link>
-    )
-}
-
-const ActionColumn = ({
-    onEdit,
-    onViewDetail,
-}: {
-    onEdit: () => void
-    onViewDetail: () => void
-}) => {
-    return (
-        <div className="flex items-center gap-3">
-            <Tooltip title="Edit">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onEdit}
-                >
-                    <TbPencil />
-                </div>
-            </Tooltip>
-            <Tooltip title="View">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onViewDetail}
-                >
-                    <TbEye />
-                </div>
-            </Tooltip>
-        </div>
     )
 }
 
@@ -95,62 +80,76 @@ const CustomerListTable = () => {
         navigate(`/assets-category/${customer.id}`)
     }
 
-    // Filter and sort list - show only matches, with exact matches first
+    /**
+     * 🔎 Filter + sort
+     */
     const filteredAndSortedList = useMemo(() => {
         const query = (tableData.query as string || '').toLowerCase().trim()
-        
-        if (!query || query.length === 0) return customerList
-        
-        // Filter to only include matching names
+
+        if (!query) return customerList
+
         const filtered = customerList.filter(customer =>
             customer.name.toLowerCase().includes(query)
         )
-        
-        // Sort to put exact/partial matches first
+
         return filtered.sort((a, b) => {
             const aName = a.name.toLowerCase()
             const bName = b.name.toLowerCase()
-            
-            // Exact match comes first
+
             if (aName === query) return -1
             if (bName === query) return 1
-            
-            // Starts with query comes next
+
             if (aName.startsWith(query) && !bName.startsWith(query)) return -1
             if (!aName.startsWith(query) && bName.startsWith(query)) return 1
-            
+
             return 0
         })
     }, [customerList, tableData.query])
 
+    /**
+     * 📊 Columns
+     */
     const columns: ColumnDef<Customer>[] = useMemo(
         () => [
             {
                 header: 'Name',
                 accessorKey: 'name',
-                cell: (props) => <NameColumn row={props.row.original} searchQuery={tableData.query as string} />
+                cell: (props) => (
+                    <NameColumn
+                        row={props.row.original}
+                        searchQuery={tableData.query as string}
+                    />
+                ),
             },
             {
                 header: 'Code',
                 accessorKey: 'code',
+                cell: (props) => (
+                    <EllipsisCell value={props.row.original.code} maxWidth="120px" />
+                ),
             },
             {
                 header: 'Title',
                 accessorKey: 'title',
+                cell: (props) => (
+                    <EllipsisCell value={props.row.original.title} maxWidth="180px" />
+                ),
             },
             {
                 header: 'Description',
                 accessorKey: 'description',
+                cell: (props) => (
+                    <EllipsisCell value={props.row.original.description} maxWidth="250px" />
+                ),
             },
             {
-                header: 'action',
+                header: 'Action',
                 id: 'action',
                 cell: (props) => (
                     <div className="flex items-center gap-3">
                         <Tooltip title="Edit">
                             <div
-                                className={`text-xl cursor-pointer select-none font-semibold`}
-                                role="button"
+                                className="text-xl cursor-pointer font-semibold"
                                 onClick={() => handleEdit(props.row.original)}
                             >
                                 <TbPencil />
@@ -158,8 +157,7 @@ const CustomerListTable = () => {
                         </Tooltip>
                         <Tooltip title="View">
                             <div
-                                className={`text-xl cursor-pointer select-none font-semibold`}
-                                role="button"
+                                className="text-xl cursor-pointer font-semibold"
                                 onClick={() => handleViewDetails(props.row.original)}
                             >
                                 <TbEye />
@@ -169,10 +167,12 @@ const CustomerListTable = () => {
                 ),
             },
         ],
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [],
+        [tableData.query]
     )
 
+    /**
+     * ⚙️ Table handlers
+     */
     const handleSetTableData = (data: TableQueries) => {
         setTableData(data)
         if (selectedCustomer.length > 0) {
@@ -205,8 +205,7 @@ const CustomerListTable = () => {
 
     const handleAllRowSelect = (checked: boolean, rows: Row<Customer>[]) => {
         if (checked) {
-            const originalRows = rows.map((row) => row.original)
-            setSelectAllCustomer(originalRows)
+            setSelectAllCustomer(rows.map((row) => row.original))
         } else {
             setSelectAllCustomer([])
         }
@@ -218,8 +217,6 @@ const CustomerListTable = () => {
             columns={columns}
             data={filteredAndSortedList}
             noData={!isLoading && filteredAndSortedList.length === 0}
-            skeletonAvatarColumns={[0]}
-            skeletonAvatarProps={{ width: 28, height: 28 }}
             loading={isLoading}
             pagingData={{
                 total: customerListTotal,
