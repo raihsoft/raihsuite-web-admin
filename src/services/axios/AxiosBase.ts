@@ -8,7 +8,7 @@ const AxiosBase = axios.create({
     timeout: 60000,
     baseURL: import.meta.env.VITE_API_BASE_URL,
 })
-
+console.log("🔥 AXIOS BASE URL:", import.meta.env.VITE_API_BASE_URL)
 AxiosBase.interceptors.request.use(
     (config) => {
         return AxiosRequestIntrceptorConfigCallback(config)
