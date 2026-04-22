@@ -33,14 +33,15 @@ export type AppConfig = {
     activeNavTranslation: boolean
 }
 
-const appConfig: AppConfig = {
-    apiPrefix: 'https://staging-api.raihsuite.com/v1',   // ✅ FIX: Added trailing slash
-    authenticatedEntryPath: '/',
-    unAuthenticatedEntryPath: '/sign-in',
-    locale: 'en',
-    accessTokenPersistStrategy: 'localStorage',
-    enableMock: false,
-    activeNavTranslation: false,
+
+const appConfig = {
+  apiPrefix: import.meta.env.VITE_API_BASE_URL || '',
+  authenticatedEntryPath: '/',
+  unAuthenticatedEntryPath: '/sign-in',
+  locale: 'en',
+  accessTokenPersistStrategy: 'localStorage',
+  enableMock: false,
+  activeNavTranslation: false,
 }
 
 export default appConfig
