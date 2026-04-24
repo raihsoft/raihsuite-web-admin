@@ -44,7 +44,8 @@ export default function useCustomerList() {
             totalSpending: 0,
         })) ?? []
 
-    const customerListTotal = data?.count ?? 0
+    // Handle multiple possible field names for total count from backend
+    const customerListTotal = data?.count ?? data?.total ?? data?.total_count ?? 0
 
     return {
         customerList,
