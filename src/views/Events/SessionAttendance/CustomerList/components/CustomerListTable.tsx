@@ -201,28 +201,26 @@ const CustomerListTable = () => {
     }
 
     return (
-        <DataTable
-            selectable
-            columns={columns}
-            data={filteredAndSortedList}
-            noData={!isLoading && filteredAndSortedList.length === 0}
-            skeletonAvatarColumns={[0]}
-            skeletonAvatarProps={{ width: 28, height: 28 }}
-            loading={isLoading}
-            pagingData={{
-                total: customerListTotal,
-                pageIndex: tableData.pageIndex as number,
-                pageSize: tableData.pageSize as number,
-            }}
-            checkboxChecked={(row) =>
-                selectedCustomer.some((selected) => selected.id === row.id)
-            }
-            onPaginationChange={handlePaginationChange}
-            onSelectChange={handleSelectChange}
-            onSort={handleSort}
-            onCheckBoxChange={handleRowSelect}
-            onIndeterminateCheckBoxChange={handleAllRowSelect}
-        />
+<DataTable
+    selectable
+    columns={columns}
+    data={customerList}   // ✅ FIXED
+    noData={!isLoading && customerList.length === 0}
+    loading={isLoading}
+    pagingData={{
+        total: customerListTotal,
+        pageIndex: tableData.pageIndex as number,
+        pageSize: tableData.pageSize as number,
+    }}
+    checkboxChecked={(row) =>
+        selectedCustomer.some((selected) => selected.id === row.id)
+    }
+    onPaginationChange={handlePaginationChange}
+    onSelectChange={handleSelectChange}
+    onSort={handleSort}
+    onCheckBoxChange={handleRowSelect}
+    onIndeterminateCheckBoxChange={handleAllRowSelect}
+/>
     )
 }
 

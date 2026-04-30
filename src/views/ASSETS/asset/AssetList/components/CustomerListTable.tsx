@@ -9,55 +9,15 @@ import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
 import type { TableQueries } from '@/@types/common'
 
-/**
- * 🔥 Reusable truncated cell with tooltip
- */
-const EllipsisCell = ({
-    value,
-    maxWidth = '200px',
-}: {
-    value: string
-    maxWidth?: string
-}) => {
+const EllipsisCell = ({ value, maxWidth = '200px' }: any) => {
     if (!value) return '-'
 
     return (
         <Tooltip title={value}>
-            <div
-                className="truncate"
-                style={{ maxWidth }}
-            >
+            <div className="truncate" style={{ maxWidth }}>
                 {value}
             </div>
         </Tooltip>
-    )
-}
-
-const NameColumn = ({ row, searchQuery }: { row: any; searchQuery?: string }) => {
-    const highlightMatch = (text: string, query?: string) => {
-        if (!query) return text
-
-        const regex = new RegExp(`(${query})`, 'gi')
-        const parts = text.split(regex)
-
-        return parts.map((part, i) =>
-            regex.test(part) ? (
-                <mark key={i} className="bg-yellow-300 font-bold">
-                    {part}
-                </mark>
-            ) : (
-                part
-            )
-        )
-    }
-
-    return (
-        <Link
-            className="hover:text-primary font-semibold text-gray-900 dark:text-gray-100"
-            to={`/assets/${row.id}`}
-        >
-            {highlightMatch(row.title, searchQuery)}
-        </Link>
     )
 }
 
@@ -75,60 +35,39 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
-    /**
-     * 🔎 Filter + sort
-     */
-    const filteredAndSortedList = useMemo(() => {
-        const query = (tableData.query as string || '').toLowerCase().trim()
-
-        if (!query) return customerList
-
-        const filtered = customerList.filter(customer =>
-            customer.title.toLowerCase().includes(query)
-        )
-
-        return filtered.sort((a, b) => {
-            const aTitle = a.title.toLowerCase()
-            const bTitle = b.title.toLowerCase()
-
-            if (aTitle === query) return -1
-            if (bTitle === query) return 1
-
-            if (aTitle.startsWith(query) && !bTitle.startsWith(query)) return -1
-            if (!aTitle.startsWith(query) && bTitle.startsWith(query)) return 1
-
-            return 0
-        })
-    }, [customerList, tableData.query])
-
-    const handleEdit = (customer: Customer) => {
-        navigate(`/asset-edit/${customer.id}`)
+    // =========================
+    // EDIT / VIEW
+    // =========================
+    const handleEdit = (row: Customer) => {
+        navigate(`/asset-edit/${row.id}`)
     }
 
-    const handleViewDetails = (customer: Customer) => {
-        navigate(`/assets/${customer.id}`)
+    const handleViewDetails = (row: Customer) => {
+        navigate(`/assets/${row.id}`)
     }
 
-    /**
-     * 📊 Columns
-     */
+    // =========================
+    // COLUMNS
+    // =========================
     const columns: ColumnDef<any>[] = useMemo(
         () => [
             {
                 header: 'Title',
                 accessorKey: 'title',
                 cell: (props) => (
-                    <NameColumn
-                        row={props.row.original}
-                        searchQuery={tableData.query as string}
-                    />
+                    <Link
+                        className="hover:text-primary font-semibold"
+                        to={`/assets/${props.row.original.id}`}
+                    >
+                        {props.row.original.title}
+                    </Link>
                 ),
             },
             {
                 header: 'File Extension',
                 accessorKey: 'file_extension',
                 cell: (props) => (
-                    <EllipsisCell value={props.row.original.file_extension} maxWidth="120px" />
+                    <EllipsisCell value={props.row.original.file_extension} />
                 ),
             },
             {
@@ -139,14 +78,7 @@ const CustomerListTable = () => {
                 ),
             },
             {
-                header: 'Asset Type Ref',
-                accessorKey: 'asset_type_ref',
-                cell: (props) => (
-                    <EllipsisCell value={props.row.original.asset_type_ref} />
-                ),
-            },
-            {
-                header: 'Asset Category',
+                header: 'Category',
                 accessorKey: 'asset_category',
                 cell: (props) => (
                     <EllipsisCell value={props.row.original.asset_category} />
@@ -173,15 +105,16 @@ const CustomerListTable = () => {
                     <div className="flex items-center gap-3">
                         <Tooltip title="Edit">
                             <div
-                                className="text-xl cursor-pointer font-semibold"
+                                className="text-xl cursor-pointer"
                                 onClick={() => handleEdit(props.row.original)}
                             >
                                 <TbPencil />
                             </div>
                         </Tooltip>
+
                         <Tooltip title="View">
                             <div
-                                className="text-xl cursor-pointer font-semibold"
+                                className="text-xl cursor-pointer"
                                 onClick={() => handleViewDetails(props.row.original)}
                             >
                                 <TbEye />
@@ -191,41 +124,42 @@ const CustomerListTable = () => {
                 ),
             },
         ],
-        [tableData.query]
+        []
     )
 
-    /**
-     * ⚙️ Table handlers
-     */
+    // =========================
+    // TABLE HANDLERS
+    // =========================
     const handleSetTableData = (data: TableQueries) => {
         setTableData(data)
+
         if (selectedCustomer.length > 0) {
             setSelectAllCustomer([])
         }
     }
 
     const handlePaginationChange = (page: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageIndex = page
-        handleSetTableData(newTableData)
+        const newData = cloneDeep(tableData)
+        newData.pageIndex = page
+        handleSetTableData(newData)
     }
 
     const handleSelectChange = (value: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageSize = Number(value)
-        newTableData.pageIndex = 1
-        handleSetTableData(newTableData)
+        const newData = cloneDeep(tableData)
+        newData.pageSize = Number(value)
+        newData.pageIndex = 1
+        handleSetTableData(newData)
     }
 
     const handleSort = (sort: OnSortParam) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.sort = sort
-        handleSetTableData(newTableData)
+        const newData = cloneDeep(tableData)
+        newData.sort = sort
+        handleSetTableData(newData)
     }
 
-    const handleRowSelect = (checked: boolean, row: any) => {
-        setSelectedCustomer(checked, row)
-    }
+const handleRowSelect = (checked: boolean, row: Customer) => {
+    setSelectedCustomer(checked, row)
+}
 
     const handleAllRowSelect = (checked: boolean, rows: Row<any>[]) => {
         if (checked) {
@@ -239,8 +173,8 @@ const CustomerListTable = () => {
         <DataTable
             selectable
             columns={columns}
-            data={filteredAndSortedList}
-            noData={!isLoading && filteredAndSortedList.length === 0}
+            data={customerList}   // ✅ IMPORTANT FIX
+            noData={!isLoading && customerList.length === 0}
             loading={isLoading}
             pagingData={{
                 total: customerListTotal,
@@ -248,7 +182,7 @@ const CustomerListTable = () => {
                 pageSize: tableData.pageSize as number,
             }}
             checkboxChecked={(row) =>
-                selectedCustomer.some((selected) => selected.id === row.id)
+                selectedCustomer.some((s) => s.id === row.id)
             }
             onPaginationChange={handlePaginationChange}
             onSelectChange={handleSelectChange}

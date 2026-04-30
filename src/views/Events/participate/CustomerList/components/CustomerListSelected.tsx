@@ -18,7 +18,7 @@ const CustomerListSelected = () => {
         customerList,
         mutate,
         customerListTotal,
-        setSelectAllCustomer,
+        setSelectedCustomer,
     } = useCustomerList()
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
@@ -34,44 +34,76 @@ const CustomerListSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = async () => {
-        setDeleteLoading(true)
-        try {
-            // Call API to delete each selected participant
-            await Promise.all(selectedCustomer.map((c) => apiDeleteParticipant(c.id)))
+const handleConfirmDelete = async () => {
+    if (!selectedCustomer?.length) return
 
-            // Refresh list from server
-            await mutate()
+    setDeleteLoading(true)
 
-            setSelectAllCustomer([])
-
-            toast.push(
-                <Notification type="success">Participants deleted!</Notification>,
-                { placement: 'top-center' },
+    try {
+        await Promise.allSettled(
+            selectedCustomer.map((c) =>
+                apiDeleteParticipant(c.id)
             )
-        } catch (err) {
-            toast.push(
-                <Notification type="danger">Failed to delete participants</Notification>,
-                { placement: 'top-center' },
-            )
-        } finally {
-            setDeleteLoading(false)
-            setDeleteConfirmationOpen(false)
-        }
+        )
+
+        setSelectedCustomer([])   // ✅ FIX
+
+        await mutate()
+
+        toast.push(
+            <Notification type="success">
+                Participants deleted!
+            </Notification>,
+            { placement: 'top-center' },
+        )
+    } catch (err) {
+        console.error('DELETE ERROR:', err)
+
+        toast.push(
+            <Notification type="danger">
+                Failed to delete participants
+            </Notification>,
+            { placement: 'top-center' },
+        )
+    } finally {
+        setDeleteLoading(false)
+        setDeleteConfirmationOpen(false)
     }
+}
 
-    const handleSend = () => {
-        setSendMessageLoading(true)
+const handleSend = () => {
+    if (!selectedCustomer?.length) return
+
+    setSendMessageLoading(true)
+
+    try {
         setTimeout(() => {
             toast.push(
-                <Notification type="success">Message sent!</Notification>,
+                <Notification type="success">
+                    Message sent!
+                </Notification>,
                 { placement: 'top-center' },
             )
+
             setSendMessageLoading(false)
             setSendMessageDialogOpen(false)
-            setSelectAllCustomer([])
+
+            // safe reset
+            setSelectedCustomer([])
         }, 500)
+    } catch (err) {
+        console.error(err)
+
+        setSendMessageLoading(false)
+
+        toast.push(
+            <Notification type="danger">
+                Failed to send message
+            </Notification>,
+            { placement: 'top-center' },
+        )
     }
+}
 
     return (
         <>

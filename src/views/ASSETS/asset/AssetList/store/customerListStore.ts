@@ -4,7 +4,7 @@ import type { Customer, Filter } from '../types'
 
 export const initialTableData: TableQueries = {
     pageIndex: 1,
-    pageSize: 10,
+    pageSize: 20,
     query: '',
     sort: {
         order: '',

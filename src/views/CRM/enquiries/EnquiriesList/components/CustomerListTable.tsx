@@ -58,23 +58,23 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
-    // ✅ Latest first sorting + search filter
-    const filteredAndSortedList = useMemo(() => {
-        let list = [...customerList]
+    // ✅ Latest first sorting + search filter - only applied to current page data from API
+const filteredAndSortedList = useMemo(() => {
+    const query = (tableData.query as string || '').toLowerCase().trim()
 
-        // Latest first (based on created_at)
-        list.sort((a, b) => {
-            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        })
+    // ❌ DO NOT SORT HERE (backend already sends newest first)
+    let list = [...customerList]
 
-        const query = (tableData.query as string || '').toLowerCase().trim()
+    // only filter
+    if (!query) return list
 
-        if (!query) return list
+    return list.filter(customer =>
+        customer.name?.toLowerCase().includes(query)
+    )
+}, [customerList, tableData.query])
 
-        return list.filter(customer =>
-            customer.name.toLowerCase().includes(query)
-        )
-    }, [customerList, tableData.query])
+    // ✅ Get the final data to display - use filtered/sorted list for current page
+    const displayData = filteredAndSortedList
 
     const handleViewDetails = (customer: Customer) => {
         navigate(`/enquiries/${customer.id}`)
