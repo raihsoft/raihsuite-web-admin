@@ -39,7 +39,7 @@ const CustomerDetails = () => {
                 <div className="px-6 md:px-10 pb-10 max-w-6xl mx-auto">
                     {data && !isEmpty(data) ? (
                         <Card className="rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
-                            
+
                             {/* Bigger spacing */}
                             <div className="p-10 space-y-8">
 
@@ -115,6 +115,49 @@ const CustomerDetails = () => {
                                 {/* Divider */}
                                 <div className="border-t border-gray-200 dark:border-gray-800" />
 
+                                {/* Custom Data */}
+                                {data.custom_data && (
+                                    <div className="space-y-5">
+                                        <h4 className="text-base text-gray-500">Additional Details</h4>
+
+                                        {data.custom_data.parent_name && (
+                                            <div className="flex flex-col sm:flex-row sm:justify-between">
+                                                <span className="text-gray-500 text-sm">Parent Name</span>
+                                                <span className="font-medium text-lg">
+                                                    {data.custom_data.parent_name}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {data.custom_data.full_address && (
+                                            <div className="flex flex-col sm:flex-row sm:justify-between">
+                                                <span className="text-gray-500 text-sm">Address</span>
+                                                <span className="font-medium text-lg">
+                                                    {data.custom_data.full_address}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {data.custom_data.current_institution && (
+                                            <div className="flex flex-col sm:flex-row sm:justify-between">
+                                                <span className="text-gray-500 text-sm">Current Institution</span>
+                                                <span className="font-medium text-lg">
+                                                    {data.custom_data.current_institution}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {data.custom_data.desired_course && (
+                                            <div className="flex flex-col sm:flex-row sm:justify-between">
+                                                <span className="text-gray-500 text-sm">Desired Course</span>
+                                                <span className="font-medium text-lg">
+                                                    {data.custom_data.desired_course}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* Message */}
                                 <div>
                                     <h4 className="text-base text-gray-500 mb-3">
@@ -124,6 +167,7 @@ const CustomerDetails = () => {
                                         {data.message || '—'}
                                     </div>
                                 </div>
+
 
                             </div>
                         </Card>
