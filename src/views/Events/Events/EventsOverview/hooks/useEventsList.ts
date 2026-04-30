@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { apiGetEvents } from '@/services/CustomersService'
 import useSWR from 'swr'
 import { useCustomerListStore } from '@/views/Events/Events/CustomerList/store/customerListStore'
@@ -9,6 +10,7 @@ export type EventItem = {
     code?: string
     start_date?: string
     end_date?: string
+    fee_amount?: string | number
 }
 
 export default function useEventsList() {
@@ -22,30 +24,46 @@ export default function useEventsList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
+    // ✅ FIX: convert pagination
+    const limit = tableData.pageSize
+    const offset = (tableData.pageIndex - 1) * tableData.pageSize
+
+    const swrKey = [
+        '/api/events/events',
+        {
+            limit,
+            offset,
+            ordering: '-created_at', // optional
+            ...filterData,
+        },
+    ] as const
+
     const { data, error, isLoading, mutate } = useSWR(
-        ['/api/events/events', { ...tableData, ...filterData }],
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) => apiGetEvents<any, TableQueries>(params),
+        swrKey,
+        ([_, params]) => apiGetEvents<any, any>(params),
         {
             revalidateOnFocus: false,
         },
     )
 
-    // Normalize response
-    const rawList: any[] = data?.list ?? data?.results ?? data ?? []
+    // ✅ normalize response
+    const rawList: any[] = Array.isArray(data?.results)
+        ? data.results
+        : []
 
-    const eventsList: EventItem[] = (Array.isArray(rawList) ? rawList : []).map(
-        (item: any, index: number) => ({
-            id: item.id ?? item.pk ?? `tmp-${index}`,
-            title: item.title || item.name || '',
-            code: item.code || item.event_code || '',
-             fee_amount: item.fee_amount,
-            start_date: item.start_date || item.start_date_time || item.start || '',
-            end_date: item.end_date || item.end_date_time || item.end || '',
-        }),
-    )
+    const eventsList: EventItem[] = useMemo(() => {
+        return rawList.map((item: any, index: number) => ({
+            id: item.id ?? `tmp-${index}`,
+            title: item.title || '',
+            code: item.code || '',
+            fee_amount: item.fee_amount,
+            start_date: item.start_date || '',
+            end_date: item.end_date || '',
+        }))
+    }, [rawList])
 
-    const eventsTotal = data?.total ?? data?.count ?? (Array.isArray(rawList) ? rawList.length : 0)
+    // ✅ correct total
+    const eventsTotal = data?.count ?? 0
 
     return {
         eventsList,
@@ -60,6 +78,5 @@ export default function useEventsList() {
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
-        
     }
 }

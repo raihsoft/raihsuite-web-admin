@@ -9,9 +9,6 @@ import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
 import type { TableQueries } from '@/@types/common'
 
-/**
- * 🔥 Reusable truncated cell
- */
 const EllipsisCell = ({
     value,
     maxWidth = '200px',
@@ -30,7 +27,13 @@ const EllipsisCell = ({
     )
 }
 
-const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string }) => {
+const NameColumn = ({
+    row,
+    searchQuery,
+}: {
+    row: Customer
+    searchQuery?: string
+}) => {
     const highlightMatch = (text: string, query?: string) => {
         if (!query) return text
 
@@ -80,35 +83,9 @@ const CustomerListTable = () => {
         navigate(`/assets-category/${customer.id}`)
     }
 
-    /**
-     * 🔎 Filter + sort
-     */
-    const filteredAndSortedList = useMemo(() => {
-        const query = (tableData.query as string || '').toLowerCase().trim()
+    // ✅ IMPORTANT FIX: NO FRONTEND FILTERING
+    const tableList = useMemo(() => customerList, [customerList])
 
-        if (!query) return customerList
-
-        const filtered = customerList.filter(customer =>
-            customer.name.toLowerCase().includes(query)
-        )
-
-        return filtered.sort((a, b) => {
-            const aName = a.name.toLowerCase()
-            const bName = b.name.toLowerCase()
-
-            if (aName === query) return -1
-            if (bName === query) return 1
-
-            if (aName.startsWith(query) && !bName.startsWith(query)) return -1
-            if (!aName.startsWith(query) && bName.startsWith(query)) return 1
-
-            return 0
-        })
-    }, [customerList, tableData.query])
-
-    /**
-     * 📊 Columns
-     */
     const columns: ColumnDef<Customer>[] = useMemo(
         () => [
             {
@@ -155,6 +132,7 @@ const CustomerListTable = () => {
                                 <TbPencil />
                             </div>
                         </Tooltip>
+
                         <Tooltip title="View">
                             <div
                                 className="text-xl cursor-pointer font-semibold"
@@ -170,11 +148,9 @@ const CustomerListTable = () => {
         [tableData.query]
     )
 
-    /**
-     * ⚙️ Table handlers
-     */
     const handleSetTableData = (data: TableQueries) => {
         setTableData(data)
+
         if (selectedCustomer.length > 0) {
             setSelectAllCustomer([])
         }
@@ -215,8 +191,8 @@ const CustomerListTable = () => {
         <DataTable
             selectable
             columns={columns}
-            data={filteredAndSortedList}
-            noData={!isLoading && filteredAndSortedList.length === 0}
+            data={tableList}   // ✅ FIXED HERE
+            noData={!isLoading && tableList.length === 0}
             loading={isLoading}
             pagingData={{
                 total: customerListTotal,

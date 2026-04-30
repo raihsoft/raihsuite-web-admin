@@ -30,30 +30,19 @@ const EllipsisCell = ({
     )
 }
 
-const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string }) => {
-    const highlightMatch = (text: string, query?: string) => {
-        if (!query) return text
-
-        const regex = new RegExp(`(${query})`, 'gi')
-        const parts = text.split(regex)
-
-        return parts.map((part, i) =>
-            regex.test(part) ? (
-                <mark key={i} className="bg-yellow-300 font-bold">
-                    {part}
-                </mark>
-            ) : (
-                part
-            )
-        )
-    }
-
+const NameColumn = ({
+    row,
+    searchQuery,
+}: {
+    row: Customer
+    searchQuery?: string
+}) => {
     return (
         <Link
             className="hover:text-primary font-semibold text-gray-900 dark:text-gray-100"
             to={`/asset-types/${row.id}`}
         >
-            {highlightMatch(row.name, searchQuery)}
+            {row.name}
         </Link>
     )
 }
@@ -64,28 +53,21 @@ const ActionColumn = ({
 }: {
     onEdit: () => void
     onViewDetail: () => void
-}) => {
-    return (
-        <div className="flex items-center gap-3">
-            <Tooltip title="Edit">
-                <div
-                    className="text-xl cursor-pointer font-semibold"
-                    onClick={onEdit}
-                >
-                    <TbPencil />
-                </div>
-            </Tooltip>
-            <Tooltip title="View">
-                <div
-                    className="text-xl cursor-pointer font-semibold"
-                    onClick={onViewDetail}
-                >
-                    <TbEye />
-                </div>
-            </Tooltip>
-        </div>
-    )
-}
+}) => (
+    <div className="flex items-center gap-3">
+        <Tooltip title="Edit">
+            <div className="text-xl cursor-pointer font-semibold" onClick={onEdit}>
+                <TbPencil />
+            </div>
+        </Tooltip>
+
+        <Tooltip title="View">
+            <div className="text-xl cursor-pointer font-semibold" onClick={onViewDetail}>
+                <TbEye />
+            </div>
+        </Tooltip>
+    </div>
+)
 
 const CustomerListTable = () => {
     const navigate = useNavigate()
@@ -101,6 +83,12 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
+    /**
+     * ⚠️ IMPORTANT:
+     * DO NOT filter frontend data → breaks pagination
+     */
+    const tableList = useMemo(() => customerList, [customerList])
+
     const handleEdit = (customer: Customer) => {
         navigate(`/assettypes-edit/${customer.id}`)
     }
@@ -110,30 +98,51 @@ const CustomerListTable = () => {
     }
 
     /**
-     * 🔎 Filter + sort
+     * ⚙️ SAFE table update (important fix)
      */
-    const filteredAndSortedList = useMemo(() => {
-        const query = (tableData.query as string || '').toLowerCase().trim()
+    const handleSetTableData = (data: TableQueries) => {
+        setTableData(data)
 
-        if (!query) return customerList
+        // reset selection on page change
+        if (selectedCustomer.length > 0) {
+            setSelectAllCustomer([])
+            setSelectedCustomer([])
+        }
+    }
 
-        const filtered = customerList.filter(customer =>
-            customer.name.toLowerCase().includes(query)
-        )
+    /**
+     * 📄 Pagination FIX (most important)
+     */
+    const handlePaginationChange = (page: number) => {
+        const newData = cloneDeep(tableData)
+        newData.pageIndex = page
+        handleSetTableData(newData)
+    }
 
-        return filtered.sort((a, b) => {
-            const aName = a.name.toLowerCase()
-            const bName = b.name.toLowerCase()
+    const handleSelectChange = (value: number) => {
+        const newData = cloneDeep(tableData)
+        newData.pageSize = Number(value)
+        newData.pageIndex = 1
+        handleSetTableData(newData)
+    }
 
-            if (aName === query) return -1
-            if (bName === query) return 1
+    const handleSort = (sort: OnSortParam) => {
+        const newData = cloneDeep(tableData)
+        newData.sort = sort
+        handleSetTableData(newData)
+    }
 
-            if (aName.startsWith(query) && !bName.startsWith(query)) return -1
-            if (!aName.startsWith(query) && bName.startsWith(query)) return 1
+    const handleRowSelect = (checked: boolean, row: Customer) => {
+        setSelectedCustomer(checked, row)
+    }
 
-            return 0
-        })
-    }, [customerList, tableData.query])
+    const handleAllRowSelect = (checked: boolean, rows: Row<Customer>[]) => {
+        if (checked) {
+            setSelectAllCustomer(rows.map((r) => r.original))
+        } else {
+            setSelectAllCustomer([])
+        }
+    }
 
     /**
      * 📊 Columns
@@ -185,65 +194,29 @@ const CustomerListTable = () => {
         [tableData.query]
     )
 
-    /**
-     * ⚙️ Table handlers
-     */
-    const handleSetTableData = (data: TableQueries) => {
-        setTableData(data)
-        if (selectedCustomer.length > 0) {
-            setSelectAllCustomer([])
-        }
-    }
-
-    const handlePaginationChange = (page: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageIndex = page
-        handleSetTableData(newTableData)
-    }
-
-    const handleSelectChange = (value: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageSize = Number(value)
-        newTableData.pageIndex = 1
-        handleSetTableData(newTableData)
-    }
-
-    const handleSort = (sort: OnSortParam) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.sort = sort
-        handleSetTableData(newTableData)
-    }
-
-    const handleRowSelect = (checked: boolean, row: Customer) => {
-        setSelectedCustomer(checked, row)
-    }
-
-    const handleAllRowSelect = (checked: boolean, rows: Row<Customer>[]) => {
-        if (checked) {
-            setSelectAllCustomer(rows.map((row) => row.original))
-        } else {
-            setSelectAllCustomer([])
-        }
-    }
-
     return (
         <DataTable
             selectable
             columns={columns}
-            data={filteredAndSortedList}
-            noData={!isLoading && filteredAndSortedList.length === 0}
+            data={tableList}
+
+            noData={!isLoading && tableList.length === 0}
             loading={isLoading}
+
             pagingData={{
                 total: customerListTotal,
                 pageIndex: tableData.pageIndex as number,
                 pageSize: tableData.pageSize as number,
             }}
+
             checkboxChecked={(row) =>
-                selectedCustomer.some((selected) => selected.id === row.id)
+                selectedCustomer.some((s) => s.id === row.id)
             }
+
             onPaginationChange={handlePaginationChange}
             onSelectChange={handleSelectChange}
             onSort={handleSort}
+
             onCheckBoxChange={handleRowSelect}
             onIndeterminateCheckBoxChange={handleAllRowSelect}
         />

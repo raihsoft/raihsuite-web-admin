@@ -1,3 +1,4 @@
+import { useMemo, useRef, useEffect } from 'react'
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import type { TableQueries } from '@/@types/common'
@@ -15,12 +16,18 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
-    // IMPORTANT — Use pageIndex instead of page  
+    const originalTotalRef = useRef(0)
+
+    // 🔥 OFFSET FIX
+    const offset = (tableData.pageIndex - 1) * tableData.pageSize
+    const limit = tableData.pageSize
+
     const swrKey = [
         '/api/enquiries',
         {
-            page: tableData.pageIndex,
-            pageSize: tableData.pageSize,
+            offset,
+            limit,
+            ordering: '-created_at',
             ...filterData,
         },
     ] as const
@@ -28,11 +35,39 @@ export default function useCustomerList() {
     const { data, error, isLoading, mutate } = useSWR(
         swrKey,
         ([, params]) =>
-            apiGetEnquiries<GetCustomersListResponse, TableQueries>(params),
-        { revalidateOnFocus: false }
+            apiGetEnquiries<GetCustomersListResponse, any>(params),
+        {
+            revalidateOnFocus: false,
+            shouldRetryOnError: false,
+        }
+        
     )
+    
+    useEffect(() => {
+    if (!data?.results) return
 
-    const customerList =
+    console.log("========== API DEBUG ==========")
+    console.log("PAGE:", tableData.pageIndex)
+    console.log(
+        "created_at list:",
+        data.results.map((i: any) => i.created_at)
+    )
+}, [data, tableData.pageIndex])
+
+    const apiTotal =
+        data?.count ?? data?.total ?? data?.total_count ?? 0
+
+    useEffect(() => {
+        if (apiTotal > 0 && originalTotalRef.current === 0) {
+            originalTotalRef.current = apiTotal
+        }
+    }, [apiTotal])
+
+
+const customerList = useMemo(() => {
+    if (error?.response?.status === 404) return []
+
+    return (
         data?.results?.map((customer: any, index: number) => ({
             id: customer.id ?? index,
             name: customer.name,
@@ -43,9 +78,41 @@ export default function useCustomerList() {
             status: 'active',
             totalSpending: 0,
         })) ?? []
+    )
+}, [data?.results, error])
 
-    // Handle multiple possible field names for total count from backend
-    const customerListTotal = data?.count ?? data?.total ?? data?.total_count ?? 0
+    const customerListTotal = useMemo(() => {
+        if (error?.response?.status === 404) {
+            return originalTotalRef.current
+        }
+        return apiTotal
+    }, [apiTotal, error])
+
+    // 🔥 SAFE PAGE FIX (NO 403, NO EMPTY PAGE LOOP)
+    useEffect(() => {
+        const maxPage = Math.ceil(customerListTotal / tableData.pageSize)
+
+        if (tableData.pageIndex > maxPage && maxPage > 0) {
+            setTableData((prev: TableQueries) => ({
+                ...prev,
+                pageIndex: maxPage,
+            }))
+        }
+    }, [customerListTotal, tableData.pageIndex, tableData.pageSize, setTableData])
+
+    // reset page on filter change
+    const prevFilterRef = useRef(filterData)
+
+    useEffect(() => {
+        if (prevFilterRef.current !== filterData) {
+            prevFilterRef.current = filterData
+
+            setTableData((prev: TableQueries) => ({
+                ...prev,
+                pageIndex: 1,
+            }))
+        }
+    }, [filterData, setTableData])
 
     return {
         customerList,
@@ -59,6 +126,6 @@ export default function useCustomerList() {
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
-        mutate, // <-- added
+        mutate,
     }
 }

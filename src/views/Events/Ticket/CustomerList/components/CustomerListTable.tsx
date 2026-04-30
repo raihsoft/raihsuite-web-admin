@@ -1,13 +1,11 @@
 import { useMemo } from 'react'
-import DataTable from '@/components/shared/DataTable'
+import CommonTable from '@/components/shared/CommonTable'
 import useTicketList from '../hooks/useTicketList'
 import { useNavigate } from 'react-router-dom'
-import cloneDeep from 'lodash/cloneDeep'
 import { TbPencil, TbEye } from 'react-icons/tb'
 import Tooltip from '@/components/ui/Tooltip'
-import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
+import type { ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Ticket } from '../types'
-import type { TableQueries } from '@/@types/common'
 
 const ActionColumn = ({
     onEdit,
@@ -15,32 +13,23 @@ const ActionColumn = ({
 }: {
     onEdit: () => void
     onViewDetail: () => void
-}) => {
-    return (
-        <div className="flex items-center gap-3">
-            <Tooltip title="Edit">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onEdit}
-                >
-                    <TbPencil />
-                </div>
-            </Tooltip>
-            <Tooltip title="View">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onViewDetail}
-                >
-                    <TbEye />
-                </div>
-            </Tooltip>
-        </div>
-    )
-}
+}) => (
+    <div className="flex items-center gap-3">
+        <Tooltip title="Edit">
+            <div className="text-xl cursor-pointer" onClick={onEdit}>
+                <TbPencil />
+            </div>
+        </Tooltip>
 
-const CustomerListTable = () => {
+        <Tooltip title="View">
+            <div className="text-xl cursor-pointer" onClick={onViewDetail}>
+                <TbEye />
+            </div>
+        </Tooltip>
+    </div>
+)
+
+const TicketListTable = () => {
     const navigate = useNavigate()
 
     const {
@@ -49,34 +38,33 @@ const CustomerListTable = () => {
         tableData,
         isLoading,
         setTableData,
-        setSelectAllTicket,
-        setSelectedTicket,
         selectedTicket,
+        setSelectedTicket,
+        setSelectAllTicket,
     } = useTicketList()
 
-    const handleEdit = (ticket: Ticket) => {
-        navigate(`/ticket/edit/${ticket.id}`)
-    }
+    // =========================
+    // SAFE DATA
+    // =========================
+    const data = useMemo(() => ticketList, [ticketList])
 
-    const handleViewDetails = (ticket: Ticket) => {
-        navigate(`/ticket/${ticket.id}`)
-    }
-
+    // =========================
+    // Columns
+    // =========================
     const columns: ColumnDef<Ticket>[] = useMemo(
         () => [
             {
-                header: 'participant_name',
+                header: 'Participant',
                 accessorKey: 'participant_name',
             },
             {
-                header: 'token',
+                header: 'Token',
                 accessorKey: 'token',
             },
             {
-                header: 'event_title',
+                header: 'Event',
                 accessorKey: 'event_title',
             },
-           
             {
                 header: 'Status',
                 accessorKey: 'status',
@@ -86,78 +74,42 @@ const CustomerListTable = () => {
                 id: 'action',
                 cell: (props) => (
                     <ActionColumn
-                        onEdit={() => handleEdit(props.row.original)}
+                        onEdit={() =>
+                            navigate(`/ticket/edit/${props.row.original.id}`)
+                        }
                         onViewDetail={() =>
-                            handleViewDetails(props.row.original)
+                            navigate(`/ticket/${props.row.original.id}`)
                         }
                     />
                 ),
             },
         ],
-        [],
+        [navigate]
     )
 
-    const handleSetTableData = (data: TableQueries) => {
-        setTableData(data)
-        if (selectedTicket.length > 0) {
-            setSelectAllTicket([])
-        }
-    }
-
-    const handlePaginationChange = (page: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageIndex = page
-        handleSetTableData(newTableData)
-    }
-
-    const handleSelectChange = (value: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageSize = Number(value)
-        newTableData.pageIndex = 1
-        handleSetTableData(newTableData)
-    }
-
-    const handleSort = (sort: OnSortParam) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.sort = sort
-        handleSetTableData(newTableData)
-    }
-
-    const handleRowSelect = (checked: boolean, row: Ticket) => {
-        setSelectedTicket(checked, row)
-    }
-
-    const handleAllRowSelect = (checked: boolean, rows: Row<Ticket>[]) => {
-        if (checked) {
-            const originalRows = rows.map((row) => row.original)
-            setSelectAllTicket(originalRows)
-        } else {
-            setSelectAllTicket([])
-        }
+    // =========================
+    // SAFE checkbox check
+    // =========================
+    const checkboxChecked = (row: Ticket) => {
+        if (!row?.id) return false
+        return selectedTicket.some((t) => t?.id === row.id)
     }
 
     return (
-        <DataTable
-            selectable
-            columns={columns}
-            data={ticketList}
-            noData={!isLoading && ticketList.length === 0}
+        <CommonTable
+            data={data}
+            total={ticketListTotal}
             loading={isLoading}
-            pagingData={{
-                total: ticketListTotal,
-                pageIndex: tableData.pageIndex as number,
-                pageSize: tableData.pageSize as number,
-            }}
-            checkboxChecked={(row) =>
-                selectedTicket.some((selected) => selected.id === row.id)
-            }
-            onPaginationChange={handlePaginationChange}
-            onSelectChange={handleSelectChange}
-            onSort={handleSort}
-            onCheckBoxChange={handleRowSelect}
-            onIndeterminateCheckBoxChange={handleAllRowSelect}
+            tableData={tableData}
+            setTableData={setTableData}
+            selectedItems={selectedTicket}
+            setSelectedItems={setSelectedTicket}
+            columns={columns}
+            selectable={true}
+            checkboxChecked={checkboxChecked}
+            pageSizes={[10, 20, 50, 100]}
         />
     )
 }
 
-export default CustomerListTable
+export default TicketListTable

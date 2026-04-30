@@ -26,14 +26,14 @@ export const initialFilterData = {
 export type CustomersListState = {
     tableData: TableQueries
     filterData: Filter
-    selectedCustomer: Partial<Customer>[]
+    selectedCustomer: string[]   // ✅ ONLY IDs
 }
 
 type CustomersListAction = {
     setFilterData: (payload: Filter) => void
     setTableData: (payload: TableQueries) => void
-    setSelectedCustomer: (checked: boolean, customer: Customer) => void
-    setSelectAllCustomer: (customer: Customer[]) => void
+
+    setSelectedCustomer: (ids: string[]) => void
 }
 
 const initialState: CustomersListState = {
@@ -46,25 +46,14 @@ export const useCustomerListStore = create<
     CustomersListState & CustomersListAction
 >((set) => ({
     ...initialState,
-    setFilterData: (payload) => set(() => ({ filterData: payload })),
-    setTableData: (payload) => set(() => ({ tableData: payload })),
-    setSelectedCustomer: (checked, row) =>
-        set((state) => {
-            const prevData = state.selectedCustomer
-            if (checked) {
-                return { selectedCustomer: [...prevData, ...[row]] }
-            } else {
-                if (
-                    prevData.some((prevCustomer) => row.id === prevCustomer.id)
-                ) {
-                    return {
-                        selectedCustomer: prevData.filter(
-                            (prevCustomer) => prevCustomer.id !== row.id,
-                        ),
-                    }
-                }
-                return { selectedCustomer: prevData }
-            }
-        }),
-    setSelectAllCustomer: (row) => set(() => ({ selectedCustomer: row })),
+
+    setFilterData: (payload) =>
+        set(() => ({ filterData: payload })),
+
+    setTableData: (payload) =>
+        set(() => ({ tableData: payload })),
+
+    // ✅ SIMPLE + SAFE
+    setSelectedCustomer: (customers) =>
+        set(() => ({ selectedCustomer: customers })),
 }))

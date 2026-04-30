@@ -2,7 +2,6 @@ import { apiGetEventsList } from '@/services/CustomersService'
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import type { GetCustomersListResponse } from '../types'
-import type { TableQueries } from '@/@types/common'
 
 export default function useCustomerList() {
     const {
@@ -15,51 +14,106 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
+    // =========================
+    // Pagination
+    // =========================
+    const pageIndex = tableData.pageIndex ?? 1
+    const pageSize = tableData.pageSize ?? 10
+
+    const offset = (pageIndex - 1) * pageSize
+
+    // =========================
+    // FIX: stable SWR key (NO OFFSET HERE)
+    // =========================
+    const swrKey = [
+        'participants',
+        pageIndex,
+        pageSize,
+        tableData.query || '',
+        JSON.stringify(filterData || {}),
+    ]
+
+    // =========================
+    // FIX: fetcher uses latest params
+    // =========================
+    const fetcher = () =>
+        apiGetEventsList<GetCustomersListResponse, any>({
+            limit: pageSize,
+            offset,
+            search: tableData.query || '',
+            ...filterData,
+        })
+
     const { data, error, isLoading, mutate } = useSWR(
-        ['/api/events/participants', { ...tableData, ...filterData }],
-        ([_, params]) =>
-            apiGetEventsList<GetCustomersListResponse, TableQueries>(params),
+        swrKey,
+        fetcher,
         {
             revalidateOnFocus: false,
-        },
+            keepPreviousData: true,
+        }
     )
 
-    // Normalize API response shape
-    const rawList: any[] = data?.list ?? data?.results ?? data ?? []
+    // =========================
+    // Normalize response
+    // =========================
+    const rawList: any[] = data?.results ?? data?.list ?? []
 
     const customerList = (Array.isArray(rawList) ? rawList : []).map(
         (item, index) => ({
             id: item.id ?? item.pk ?? `tmp-${index}`,
 
-            firstName: item.first_name ?? item.firstName ?? '',
-            lastName: item.last_name ?? item.lastName ?? '',
+            firstName: item.first_name ?? '',
+            lastName: item.last_name ?? '',
 
             name:
                 item.name ||
-                item.full_name ||
                 `${item.first_name ?? ''} ${item.last_name ?? ''}`.trim(),
 
             email: item.email ?? '',
-            phone: item.phone ?? item.phone_number ?? '',
+            phone: item.phone ?? '',
             place: item.place ?? '',
-            balance_due: parseFloat(item.balance_due) ,
-            amount_paid: parseFloat(item.amount_paid) ,
-            fee_amount: parseFloat(item.fee_amount) ,
-            event_title: item.event_title ?? '',
 
-            // ✅ THIS IS THE IMPORTANT FIX
-            referencedBy:
-                item.referred_by ??
-                item.referenced_by ??
-                item.referencedBy ??
-                '',
-        }),
+            fee_amount: Number(item.fee_amount ?? 0),
+            amount_paid: Number(item.amount_paid ?? 0),
+            balance_due: Number(item.balance_due ?? 0),
+
+            event_title: item.event_title ?? '',
+        })
     )
 
     const customerListTotal =
-        data?.total ??
         data?.count ??
-        (Array.isArray(rawList) ? rawList.length : 0)
+        data?.total ??
+        0
+
+    // =========================
+    // FIX: selection reset helper
+    // =========================
+    const clearSelection = () => {
+        setSelectedCustomer([])
+        setSelectAllCustomer([])
+    }
+
+    // =========================
+    // FIX: page size change resets page
+    // =========================
+    const updatePageSize = (size: number) => {
+        setTableData({
+            ...tableData,
+            pageSize: size,
+            pageIndex: 1,
+        })
+    }
+
+    // =========================
+    // FIX: page change
+    // =========================
+    const updatePageIndex = (page: number) => {
+        setTableData({
+            ...tableData,
+            pageIndex: page,
+        })
+    }
 
     return {
         customerList,
@@ -74,5 +128,8 @@ export default function useCustomerList() {
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
+        clearSelection,
+        updatePageSize,
+        updatePageIndex,
     }
 }

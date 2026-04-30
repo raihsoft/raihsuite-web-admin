@@ -68,4 +68,8 @@ export type Customer = {
     paymentMethod: PaymentMethod[]
     subscription: Subscription[]
     totalSpending: number
+    fee_amount: number
+    amount_paid: number
+    balance_due: number
+
 }

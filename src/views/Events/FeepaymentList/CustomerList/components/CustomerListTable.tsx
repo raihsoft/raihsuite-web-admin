@@ -4,10 +4,8 @@ import Tag from '@/components/ui/Tag'
 import Tooltip from '@/components/ui/Tooltip'
 import { TbEye } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
-import cloneDeep from 'lodash/cloneDeep'
 import useCustomerList from '../hooks/useCustomerList'
-import type { ColumnDef, OnSortParam } from '@/components/shared/DataTable'
-import type { TableQueries } from '@/@types/common'
+import type { ColumnDef } from '@/components/shared/DataTable'
 
 type FeePayment = {
     id: string
@@ -28,6 +26,7 @@ const ActionColumn = ({ onView }: { onView: () => void }) => (
 
 const FeePaymentListTable = () => {
     const navigate = useNavigate()
+
     const {
         customerList,
         customerListTotal,
@@ -36,18 +35,10 @@ const FeePaymentListTable = () => {
         setTableData,
     } = useCustomerList()
 
-   
-    const filteredList = useMemo(() => {
-        const query = (tableData.query as string || '').toLowerCase().trim()
-        if (!query) return customerList
-
-        return customerList.filter(
-            (item) =>
-                item.participant_name.toLowerCase().includes(query) ||
-                item.payment_type.toLowerCase().includes(query) ||
-                String(item.fee_amount).includes(query)
-        )
-    }, [customerList, tableData.query])
+    // =========================
+    // IMPORTANT: NO FILTERING
+    // =========================
+    const data = useMemo(() => customerList, [customerList])
 
     const columns: ColumnDef<FeePayment>[] = useMemo(
         () => [
@@ -100,29 +91,34 @@ const FeePaymentListTable = () => {
         [navigate],
     )
 
-    const handleSetTableData = (data: TableQueries) => {
+    // =========================
+    // Pagination handlers
+    // =========================
+    const handleSetTableData = (data: any) => {
         setTableData(data)
     }
 
     const handlePaginationChange = (page: number) => {
-        const newData = cloneDeep(tableData)
-        newData.pageIndex = page
-        handleSetTableData(newData)
+        handleSetTableData({
+            ...tableData,
+            pageIndex: page,
+        })
     }
 
     const handleSelectChange = (value: number) => {
-        const newData = cloneDeep(tableData)
-        newData.pageSize = Number(value)
-        newData.pageIndex = 1
-        handleSetTableData(newData)
+        handleSetTableData({
+            ...tableData,
+            pageSize: Number(value),
+            pageIndex: 1,
+        })
     }
 
     return (
         <DataTable
             columns={columns}
-            data={filteredList}   
+            data={data}
             loading={isLoading}
-            noData={!isLoading && filteredList.length === 0}
+            noData={!isLoading && data.length === 0}
             pagingData={{
                 total: customerListTotal,
                 pageIndex: tableData.pageIndex as number,

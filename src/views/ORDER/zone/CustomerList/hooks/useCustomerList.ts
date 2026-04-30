@@ -49,7 +49,7 @@
 
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
-import { apiGetEmployees, apiGetOrganizations, apiGetZones } from '@/services/CustomersService'
+import { apiGetZones } from '@/services/ZoneService'
 import type { TableQueries } from '@/@types/common'
 import type { GetCustomersListResponse } from '../types'
 
@@ -64,20 +64,31 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
+    // Get current page index and page size with defaults
+    const pageIndex = tableData.pageIndex ?? 1
+    const pageSize = tableData.pageSize ?? 10
+
+    // Convert pageIndex/pageSize to offset/limit for API
+    const apiParams = {
+        offset: (pageIndex - 1) * pageSize,
+        limit: pageSize,
+        ordering: tableData.sort?.key ? `${tableData.sort.order === 'desc' ? '-' : ''}${tableData.sort.key}` : undefined,
+        search: tableData.query || undefined,
+    }
+
     const { data, error, isLoading } = useSWR(
-        ['/api/zones', { ...tableData, ...filterData }] as const,
-        ([, params]) => apiGetZones<GetCustomersListResponse, TableQueries>(params),
+        ['/api/zones', apiParams] as const,
+        ([, params]) => apiGetZones<GetCustomersListResponse>(params),
         { revalidateOnFocus: false }
     )
-// console.log(data,"sssssssssss")
-    // Map API response to table-friendly structure
-const customerList = data?.results?.map((customer: any, index: number) => ({
-    id: customer.id ?? index,
-    zone_name: customer.zone_name,
-    status: 'active',
-    totalSpending: 0,
-})) ?? []
 
+    // Map API response to table-friendly structure
+    const customerList = data?.results?.map((customer: any, index: number) => ({
+        id: customer.id ?? index,
+        zone_name: customer.zone_name,
+        status: 'active',
+        totalSpending: 0,
+    })) ?? []
 
     const customerListTotal = data?.count ?? 0
 

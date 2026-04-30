@@ -1,75 +1,27 @@
-import { useMemo } from 'react'
-import Avatar from '@/components/ui/Avatar'
-import Tag from '@/components/ui/Tag'
+import { useMemo, useCallback } from 'react'
 import Tooltip from '@/components/ui/Tooltip'
-import DataTable from '@/components/shared/DataTable'
+import CommonTable from '@/components/shared/CommonTable'
 import useCustomerList from '../hooks/useCustomerList'
-import { Link, useNavigate } from 'react-router-dom'
-import cloneDeep from 'lodash/cloneDeep'
+import { useNavigate } from 'react-router-dom'
 import { TbPencil, TbEye } from 'react-icons/tb'
-import { HiOutlineUser } from 'react-icons/hi'
-import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
+import type { ColumnDef } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
-import type { TableQueries } from '@/@types/common'
+import { useCustomerListStore } from '../store/customerListStore'
+const ActionColumn = ({ onEdit, onViewDetail }: any) => (
+    <div className="flex items-center gap-3">
+        <Tooltip title="Edit">
+            <div className="text-xl cursor-pointer" onClick={onEdit}>
+                <TbPencil />
+            </div>
+        </Tooltip>
 
-const statusColor: Record<string, string> = {
-    active: 'bg-emerald-200 dark:bg-emerald-200 text-gray-900 dark:text-gray-900',
-    blocked: 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900',
-}
-
-const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string }) => {
-    const highlightMatch = (text: string, query?: string) => {
-        if (!query || query.length === 0) return text
-        
-        const regex = new RegExp(`(${query})`, 'gi')
-        const parts = text.split(regex)
-        
-        return parts.map((part, i) => 
-            regex.test(part) ? (
-                <mark key={i} className="bg-yellow-300 font-bold">{part}</mark>
-            ) : (
-                part
-            )
-        )
-    }
-    
-    return (
-        <span className="font-semibold text-gray-900 dark:text-gray-100">
-            {highlightMatch(row.name, searchQuery)}
-        </span>
-    )
-}
-
-const ActionColumn = ({
-    onEdit,
-    onViewDetail,
-}: {
-    onEdit: () => void
-    onViewDetail: () => void
-}) => {
-    return (
-        <div className="flex items-center gap-3">
-            <Tooltip title="Edit">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onEdit}
-                >
-                    <TbPencil />
-                </div>
-            </Tooltip>
-            <Tooltip title="View">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onViewDetail}
-                >
-                    <TbEye />
-                </div>
-            </Tooltip>
-        </div>
-    )
-}
+        <Tooltip title="View">
+            <div className="text-xl cursor-pointer" onClick={onViewDetail}>
+                <TbEye />
+            </div>
+        </Tooltip>
+    </div>
+)
 
 const CustomerListTable = () => {
     const navigate = useNavigate()
@@ -79,199 +31,82 @@ const CustomerListTable = () => {
         customerListTotal,
         tableData,
         isLoading,
-        setTableData,
-        setSelectAllCustomer,
-        setSelectedCustomer,
         selectedCustomer,
+        setSelectedCustomer,
+        setSelectAllCustomer,
+        setTableData,
     } = useCustomerList()
 
-    // Filter and sort list - show only matches, with exact matches first
-    const filteredAndSortedList = useMemo(() => {
-        const query = (tableData.query as string || '').toLowerCase().trim()
-        
-        if (!query || query.length === 0) return customerList
-        
-        // Filter to only include matching names
-        const filtered = customerList.filter((customer: Customer) =>
-            customer.name.toLowerCase().includes(query)
-        )
-        
-        // Sort to put exact/partial matches first
-        return filtered.sort((a: Customer, b: Customer) => {
-            const aName = a.name.toLowerCase()
-            const bName = b.name.toLowerCase()
-            
-            // Exact match comes first
-            if (aName === query) return -1
-            if (bName === query) return 1
-            
-            // Starts with query comes next
-            if (aName.startsWith(query) && !bName.startsWith(query)) return -1
-            if (!aName.startsWith(query) && bName.startsWith(query)) return 1
-            
-            return 0
-        })
-    }, [customerList, tableData.query])
+    const data = useMemo(() => customerList, [customerList])
 
-    const handleEdit = (customer: Customer) => {
-        navigate(`/employee-edit/${customer.id}`)
-    }
+    // =========================
+    // DEBUG + FIXED CHECKBOX STATE
+    // =========================
+const checkboxChecked = useCallback(
+    (row: Customer) => {
+        return selectedCustomer.some((s) => String(s.id) === String(row.id))
+    },
+    [selectedCustomer]
+)
 
+    // =========================
+    // ROW SELECT
+    // =========================
+const handleSelectItem = useCallback(
+    (items: Customer[]) => {
+        // CommonTable passes full new array — just sync to store
+        useCustomerListStore.setState({ selectedCustomer: items })
+    },
+    []
+)
 
-    const handleViewDetails = (customer: Customer) => {
-        navigate(`/employee-details/${customer.id}`)
-    }
-
+const handleSelectAll = useCallback(
+    (items: Customer[]) => {
+        useCustomerListStore.setState({ selectedCustomer: items })
+    },
+    []
+)
+    // =========================
+    // TABLE COLUMNS
+    // =========================
     const columns: ColumnDef<Customer>[] = useMemo(
         () => [
-            //    {
-            //     // header: 'Photo',
-            //     accessorKey: 'img',
-            //     cell: (props) => (
-            //         <Link to={`/employee-details/${props.row.original.id}`}>
-            //             <Avatar 
-            //                 size={40} 
-            //                 shape="circle" 
-            //                 src={props.row.original.img}
-            //                 icon={!props.row.original.img ? <HiOutlineUser /> : undefined}
-            //                 className={!props.row.original.img ? 'bg-gray-200 dark:bg-gray-700' : ''}
-            //             />
-            //         </Link>
-            //     ),
-
-            // },
+            { header: 'Name', accessorKey: 'name' },
+            { header: 'Email', accessorKey: 'email' },
+            { header: 'Designation', accessorKey: 'designation' },
+            { header: 'Organization', accessorKey: 'organization' },
             {
-                header: 'Name',
-                accessorKey: 'name',
-                cell: (props) => (
-                    <NameColumn
-                        row={props.row.original}
-                        searchQuery={tableData.query as string}
-                    />
-                ),
-            },
-            {
-                header: 'Email',
-                accessorKey: 'email',
-            },
-         
-            {
-                header: 'Designation',
-                accessorKey: 'designation',
-
-            },
-             { 
-                header: 'organization',
-                accessorKey: 'organization',
-
-            },
-              {
-                header: 'Facebook',
-                accessorKey: 'facebook',
-
-            },
-             {
-                header: 'Instagram',
-                accessorKey: 'instagram',
-
-            },
-           
-            {
-                header: 'LinkedIn',
-                accessorKey: 'linkedin',
-
-            },
-            {
-                header: 'Website',
-                accessorKey: 'website',
-
-            },
-            {
-                header: 'action',
+                header: 'Action',
                 id: 'action',
                 cell: (props) => (
                     <ActionColumn
-                        onEdit={() => handleEdit(props.row.original)}
+                        onEdit={() =>
+                            navigate(`/employee-edit/${props.row.original.id}`)
+                        }
                         onViewDetail={() =>
-                            handleViewDetails(props.row.original)
+                            navigate(`/employee-details/${props.row.original.id}`)
                         }
                     />
                 ),
             },
-            
-            
-           
-           
-            
-           
-            
         ],
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [],
+        [navigate]
     )
 
-    const handleSetTableData = (data: TableQueries) => {
-        setTableData(data)
-        if (selectedCustomer.length > 0) {
-            setSelectAllCustomer([])
-        }
-    }
-
-    const handlePaginationChange = (page: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageIndex = page
-        handleSetTableData(newTableData)
-    }
-
-    const handleSelectChange = (value: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageSize = Number(value)
-        newTableData.pageIndex = 1
-        handleSetTableData(newTableData)
-    }
-
-    const handleSort = (sort: OnSortParam) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.sort = sort
-        handleSetTableData(newTableData)
-    }
-
-    const handleRowSelect = (checked: boolean, row: Customer) => {
-        setSelectedCustomer(checked, row)
-    }
-
-    const handleAllRowSelect = (checked: boolean, rows: Row<Customer>[]) => {
-        if (checked) {
-            const originalRows = rows.map((row) => row.original)
-            setSelectAllCustomer(originalRows)
-        } else {
-            setSelectAllCustomer([])
-        }
-    }
-// console.log("customerList", customerList)
     return (
-        <DataTable
-            selectable
-            columns={columns}
-            data={filteredAndSortedList}
-            noData={!isLoading && filteredAndSortedList.length === 0}
-            skeletonAvatarColumns={[2]}
-            skeletonAvatarProps={{ width: 28, height: 28 }}
-            loading={isLoading}
-            pagingData={{
-                total: customerListTotal,
-                pageIndex: tableData.pageIndex as number,
-                pageSize: tableData.pageSize as number,
-            }}
-            checkboxChecked={(row) =>
-                selectedCustomer.some((selected) => selected.id === row.id)
-            }
-            onPaginationChange={handlePaginationChange}
-            onSelectChange={handleSelectChange}
-            onSort={handleSort}
-            onCheckBoxChange={handleRowSelect}
-            onIndeterminateCheckBoxChange={handleAllRowSelect}
-        />
+        <CommonTable
+        data={data}
+        total={customerListTotal}
+        loading={isLoading}
+        tableData={tableData}
+        setTableData={setTableData}
+
+        selectedItems={selectedCustomer}
+        setSelectedItems={handleSelectItem}
+
+        checkboxChecked={checkboxChecked}
+        columns={columns}
+    />
     )
 }
 

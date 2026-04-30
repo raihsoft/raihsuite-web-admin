@@ -15,13 +15,38 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
+    // ✅ FIX: convert pagination properly
+    const pageIndex = tableData.pageIndex ?? 1
+    const pageSize = tableData.pageSize ?? 10
+
+    const offset = (pageIndex - 1) * pageSize
+
+    // ✅ stable SWR key (NO object spreading chaos)
+    const swrKey = [
+        '/api/asset_categories',
+        pageIndex,
+        pageSize,
+        tableData.query || '',
+        JSON.stringify(filterData || {}),
+    ]
+
+    // ✅ proper API params
     const { data, error, isLoading, mutate } = useSWR(
-        ['/api/asset_categories', { ...tableData, ...filterData }] as const,
-        ([, params]) =>
-            apiGetAssetCategories<GetCustomersListResponse, TableQueries>(params),
-        { revalidateOnFocus: false }
+        swrKey,
+        () =>
+            apiGetAssetCategories<GetCustomersListResponse, TableQueries>({
+                limit: pageSize,
+                offset: offset,
+                search: tableData.query || '',
+                ...filterData,
+            }),
+        {
+            revalidateOnFocus: false,
+            keepPreviousData: true, // 🔥 IMPORTANT for pagination UX
+        }
     )
 
+    // ✅ normalize data safely
     const customerList =
         data?.results?.map((customer: any, index: number) => ({
             id: customer.id ?? index,
@@ -47,6 +72,6 @@ export default function useCustomerList() {
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
-        mutate, // <-- expose mutate here
+        mutate,
     }
 }

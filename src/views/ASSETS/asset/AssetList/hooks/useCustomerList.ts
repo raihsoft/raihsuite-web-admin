@@ -16,15 +16,43 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
+    const pageIndex = tableData.pageIndex ?? 1
+    const pageSize = tableData.pageSize ?? 10
+
+    // =========================
+    // FIX 1: STABLE SWR KEY
+    // =========================
+    const swrKey = [
+        '/api/assets',
+        pageIndex,
+        pageSize,
+        tableData.query || '',
+        JSON.stringify(filterData || {}),
+    ]
+
+    // =========================
+    // FETCHER
+    // =========================
+    const fetcher = () =>
+        apiGetAssets<GetCustomersListResponse, TableQueries>(
+            transformPaginationParams({
+                ...tableData,
+                ...filterData,
+            })
+        )
+
     const { data, error, isLoading, mutate } = useSWR(
-        ['/api/assets', { ...tableData, ...filterData }] as const,
-        ([, params]) =>
-            apiGetAssets<GetCustomersListResponse, TableQueries>(
-                transformPaginationParams(params)
-            ),
-        { revalidateOnFocus: false }
+        swrKey,
+        fetcher,
+        {
+            revalidateOnFocus: false,
+            keepPreviousData: true, // 🔥 IMPORTANT FOR PAGINATION
+        }
     )
 
+    // =========================
+    // NORMALIZE DATA
+    // =========================
     const customerList =
         data?.results?.map((customer: any, index: number) => ({
             id: customer.id ?? index,
@@ -36,10 +64,23 @@ export default function useCustomerList() {
             tags: customer.tags,
             description: customer.description,
             status: 'active',
-            totalSpending: 0,
         })) ?? []
 
-    const customerListTotal = data?.count ?? 0
+    // =========================
+    // FIX: SAFE TOTAL
+    // =========================
+    const customerListTotal =
+        data?.count ??
+        data?.total ??
+        (pageIndex - 1) * pageSize + customerList.length
+
+    // =========================
+    // RESET HELPERS
+    // =========================
+    const clearSelection = () => {
+        setSelectedCustomer([])
+        setSelectAllCustomer([])
+    }
 
     return {
         customerList,
@@ -53,6 +94,7 @@ export default function useCustomerList() {
         setSelectedCustomer,
         setSelectAllCustomer,
         setFilterData,
-        mutate, // <-- expose mutate here
+        mutate,
+        clearSelection,
     }
 }

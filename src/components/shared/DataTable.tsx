@@ -121,13 +121,13 @@ function DataTable<T>(props: DataTableProps<T>) {
         onPaginationChange,
         onSelectChange,
         onSort,
-        pageSizes = [10, 25, 50, 100],
+        pageSizes = [10, 20, 50, 100],
         selectable = false,
         skeletonAvatarProps,
         pagingData = {
             total: 0,
             pageIndex: 1,
-            pageSize: 10,
+            pageSize: 20,
         },
         checkboxChecked,
         indeterminateCheckboxChecked,
@@ -137,6 +137,16 @@ function DataTable<T>(props: DataTableProps<T>) {
     } = props
 
     const { pageSize, pageIndex, total } = pagingData
+
+    // ✅ THE REAL FIX:
+    // If the backend total is wrong (e.g. returns 50 but only 25 records exist),
+    // we detect it by checking: if the current page has fewer items than pageSize,
+    // it must be the last page. Recalculate the true total from that.
+    const actualDataLength = (data as unknown[]).length
+    const isLastPage = actualDataLength < pageSize
+    const correctedTotal = isLastPage
+        ? (pageIndex - 1) * pageSize + actualDataLength
+        : total
 
     const [sorting, setSorting] = useState<ColumnSort[] | null>(null)
 
@@ -168,11 +178,11 @@ function DataTable<T>(props: DataTableProps<T>) {
         }
     }
 
-    const handleCheckBoxChange = (checked: boolean, row: T) => {
-        if (!loading) {
-            onCheckBoxChange?.(checked, row)
-        }
+const handleCheckBoxChange = (checked: boolean, row: T) => {
+    if (!loading) {
+        onCheckBoxChange?.(checked, row)
     }
+}
 
     const finalColumns: ColumnDef<T>[] = useMemo(() => {
         const columns = columnsProp
@@ -187,8 +197,8 @@ function DataTable<T>(props: DataTableProps<T>) {
                             checked={
                                 indeterminateCheckboxChecked
                                     ? indeterminateCheckboxChecked(
-                                          table.getRowModel().rows,
-                                      )
+                                        table.getRowModel().rows,
+                                    )
                                     : table.getIsAllRowsSelected()
                             }
                             indeterminate={table.getIsSomeRowsSelected()}
@@ -206,19 +216,18 @@ function DataTable<T>(props: DataTableProps<T>) {
                             checked={
                                 checkboxChecked
                                     ? checkboxChecked(row.original)
-                                    : row.getIsSelected()
+                                    : false
                             }
-                            disabled={!row.getCanSelect()}
                             indeterminate={row.getIsSomeSelected()}
-                            onChange={row.getToggleSelectedHandler()}
-                            onCheckBoxChange={(e) =>
+                            disabled={!row.getCanSelect()}
+                            onChange={(e) =>
                                 handleCheckBoxChange(
                                     e.target.checked,
                                     row.original,
                                 )
                             }
                         />
-                    ),
+                    )
                 },
                 ...columns,
             ]
@@ -229,17 +238,21 @@ function DataTable<T>(props: DataTableProps<T>) {
 
     const table = useReactTable({
         data,
-        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         columns: finalColumns as ColumnDef<unknown | object | any[], any>[],
+
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+
         manualPagination: true,
         manualSorting: true,
+
+        pageCount: Math.ceil(total / pageSize),
+
         onSortingChange: (sorter) => {
             setSorting(sorter as ColumnSort[])
         },
+
         state: {
             sorting: sorting as ColumnSort[],
         },
@@ -287,9 +300,9 @@ function DataTable<T>(props: DataTableProps<T>) {
                                             <div
                                                 className={classNames(
                                                     header.column.getCanSort() &&
-                                                        'cursor-pointer select-none point',
+                                                    'cursor-pointer select-none point',
                                                     loading &&
-                                                        'pointer-events-none',
+                                                    'pointer-events-none',
                                                 )}
                                                 onClick={header.column.getToggleSortingHandler()}
                                             >
@@ -343,8 +356,7 @@ function DataTable<T>(props: DataTableProps<T>) {
                         ) : (
                             table
                                 .getRowModel()
-                                .rows.slice(0, pageSize)
-                                .map((row) => {
+                                .rows.map((row) => {
                                     return (
                                         <Tr key={row.id}>
                                             {row
@@ -377,7 +389,7 @@ function DataTable<T>(props: DataTableProps<T>) {
                 <Pagination
                     pageSize={pageSize}
                     currentPage={pageIndex}
-                    total={total}
+                    total={correctedTotal}
                     onChange={handlePaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>
