@@ -1,6 +1,7 @@
 import { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { useSessionUser, useToken } from "@/store/authStore";
 import AxiosBase from "./AxiosBase";
+import { TOKEN_NAME_IN_STORAGE } from "@/constants/api.constant";
 
 type FailedRequest = {
   resolve: (token: string) => void;
@@ -82,8 +83,8 @@ const AxiosResponseIntrceptorErrorCallback = async (error: AxiosError) => {
 
       const newAccess = (res.data as any).access;
 
-      // Save new access token
-      localStorage.setItem("access_token", newAccess);
+      // Save new access token using consistent key
+      localStorage.setItem(TOKEN_NAME_IN_STORAGE, newAccess);
       setToken(newAccess);
 
       useSessionUser.getState().setSessionSignedIn(true);
