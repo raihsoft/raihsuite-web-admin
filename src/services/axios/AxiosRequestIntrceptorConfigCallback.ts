@@ -13,19 +13,18 @@ const AxiosRequestIntrceptorConfigCallback = (
 
     let accessToken = ''
 
-    // 🔹 Correct token fetch logic
+    // 🔹 Get token from the same storage key used by authStore
     if (storage === 'localStorage') {
-        // accessToken = localStorage.getItem(TOKEN_NAME_IN_STORAGE) || ''
-        accessToken = localStorage.getItem('access_token') || ''
+        accessToken = localStorage.getItem(TOKEN_NAME_IN_STORAGE) || ''
 
     } else if (storage === 'sessionStorage') {
-        accessToken = sessionStorage.getItem(access_token) || ''
+        accessToken = sessionStorage.getItem(TOKEN_NAME_IN_STORAGE) || ''
     }
 
-    // ⭐ MAIN FIX → Add space after Bearer
+    // ⭐ Add Bearer token to request
     if (accessToken) {
         config.headers[REQUEST_HEADER_AUTH_KEY] =
-            `${TOKEN_TYPE} ${accessToken}`  // ✅ Correct -> "Bearer <token>"
+            `${TOKEN_TYPE} ${accessToken}`
     }
 
     return config

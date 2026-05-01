@@ -95,7 +95,7 @@ const CustomerListSelected = () => {
                                         <span className="font-semibold flex items-center gap-1">
                                             <span className="heading-text">
                                                 {selectedCustomer.length}{' '}
-                                                Customers
+                                                Asset type categories
                                             </span>
                                             <span>selected</span>
                                         </span>
