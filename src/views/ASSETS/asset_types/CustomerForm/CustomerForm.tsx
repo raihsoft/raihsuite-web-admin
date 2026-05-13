@@ -12,6 +12,7 @@ import type { CommonProps } from '@/@types/common'
 import type { CustomerFormSchema } from './types'
 import { apiCreateAssets } from '@/services/CustomersService'
 import { apiCreateAssetType } from '@/services/CustomersService'
+import { getTenantId } from '@/utils/tenant'
 
 type CustomerFormProps = {
     defaultValues?: CustomerFormSchema
@@ -62,7 +63,7 @@ const CustomerForm = (props: CustomerFormProps) => {
 
         // Otherwise handle create locally
         try {
-            const tenant = localStorage.getItem('tenant')
+            const tenant = getTenantId()
             if (!tenant) {
                 alert('Tenant not found — Please login again.')
                 return

@@ -11,6 +11,7 @@ import type { CustomerFormSchema } from '../CustomerForm'
 import { apiCreateAssetTypeCategory } from '@/services/CustomersService'
 import { mutate } from 'swr'
 import { useCustomerListStore } from '../AssetTypeCategoriesList/store/customerListStore'
+import { getTenantId } from '@/utils/tenant'
 
 const CustomerEdit = () => {
     const navigate = useNavigate()
@@ -21,8 +22,14 @@ const CustomerEdit = () => {
     const handleFormSubmit = async (values: CustomerFormSchema) => {
         try {
             setIsSubmiting(true)
-            const tenant = localStorage.getItem('tenant')
-            if (!tenant) throw new Error('Tenant missing')
+            const tenant = getTenantId()
+            if (!tenant) {
+                toast.push(
+                    <Notification type="danger">Tenant not found. Please login again.</Notification>,
+                    { placement: 'top-center' },
+                )
+                return
+            }
 
             // ✅ Use JSON payload instead of FormData
             const payload = {

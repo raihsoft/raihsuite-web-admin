@@ -54,6 +54,7 @@ export async function apiSignOut() {
   // 🔹 Clear tokens
   localStorage.removeItem('access_token')
   localStorage.removeItem('refresh_token')
+  localStorage.removeItem('tenant')
   localStorage.removeItem('tenant_id')
   localStorage.removeItem('sessionUser')
 
