@@ -14,6 +14,7 @@ import CustomerForm from '../CustomerForm'
 import NoUserFound from '@/assets/svg/NoUserFound'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
 import { useParams, useNavigate } from 'react-router-dom'
+import { getTenantId } from '@/utils/tenant'
 import useSWR, { mutate } from 'swr'
 import { useCustomerListStore } from '../AssetCategoriesList/store/customerListStore'
 import type { CustomerFormSchema } from '../CustomerForm'
@@ -48,7 +49,7 @@ const CustomerEdit = () => {
 
         try {
             // 1. Get Tenant (Same as your Asset logic)
-            const tenant = localStorage.getItem('tenant')
+            const tenant = getTenantId()
             if (!tenant) {
                 toast.push(
                     <Notification type="danger">Tenant not found. Please login again.</Notification>,

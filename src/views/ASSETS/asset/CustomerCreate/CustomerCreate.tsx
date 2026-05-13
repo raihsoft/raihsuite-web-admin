@@ -10,6 +10,7 @@ import { TbTrash } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 import { mutate } from 'swr'
 import { apiCreateAssets } from '@/services/CustomersService'
+import { getTenantId } from '@/utils/tenant'
 import { useCustomerListStore } from '../AssetList/store/customerListStore'
 import type { CustomerFormSchema } from '../CustomerForm'
 
@@ -24,8 +25,8 @@ const CustomerEdit = () => {
         // console.log('🟢 Submitted values:', values)
         setIsSubmitting(true)
         try {
-            // Get tenant from localStorage
-            const tenant = localStorage.getItem('tenant')
+            // Get tenant from storage helper
+            const tenant = getTenantId()
             if (!tenant) {
                 toast.push(
                     <Notification type="danger">Tenant not found. Please login again.</Notification>,
@@ -97,7 +98,7 @@ const CustomerEdit = () => {
                     file_type: '',
                     asset_type_ref: '',
                     asset_category: '',
-                    tags: '',        
+                    tags: [],        
                     img: '',
                 }}
                 onFormSubmit={handleFormSubmit}

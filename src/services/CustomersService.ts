@@ -231,7 +231,7 @@ export async function apiGetAssets<T, U extends Record<string, unknown>>(
     })
 }
 
-export async function apiCreateAssets<T, U extends Record<string, unknown>>(
+export async function apiCreateAssets<T, U extends Record<string, unknown> | FormData>(
     data: U,
 ) {
     return ApiService.fetchDataWithAxios<T>({
@@ -278,7 +278,7 @@ export async function apiAssetType<T, U extends Record<string, unknown>>(
     })
 }
 
-export async function apiCreateAssetType<T, U extends Record<string, unknown>>(
+export async function apiCreateAssetType<T, U extends Record<string, unknown> | FormData>(
     data: U,
 ) {
     return ApiService.fetchDataWithAxios<T>({
@@ -334,7 +334,7 @@ export async function apiGetAssetCategories<T, U extends Record<string, unknown>
     })
 }
 
-export async function apiCreateAssetCategories<T, U extends Record<string, unknown>>(
+export async function apiCreateAssetCategories<T, U extends Record<string, unknown> | FormData>(
     data: U,
 ) {
     return ApiService.fetchDataWithAxios<T>({
@@ -414,7 +414,7 @@ export async function apiGetTenantMemberships<T, U extends Record<string, unknow
  * Create a new asset type category
  * Backend expects JSON body with { name, description, tenant }
  */
-export async function apiCreateAssetTypeCategory<T, U extends Record<string, unknown>>(data: U) {
+export async function apiCreateAssetTypeCategory<T, U extends Record<string, unknown> | FormData>(data: U) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/asset/asset_type_categories/',
         method: 'post',

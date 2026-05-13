@@ -13,7 +13,7 @@ export type SignInResponse = {
         authority: string[]
         avatar: string
         email: string
-
+        tenant_id?: string
     }
 }
 
@@ -51,6 +51,7 @@ export type User = {
     userName?: string | null
     email?: string | null
     authority?: string[]
+    tenant_id?: string | null
 }
 
 export type Token = {

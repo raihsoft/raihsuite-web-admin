@@ -11,6 +11,7 @@ import type { CustomerFormSchema } from '../CustomerForm'
 import { apiCreateAssetType } from '@/services/CustomersService'
 import { mutate } from 'swr'
 import { useCustomerListStore } from '../AssetTypeList/store/customerListStore'
+import { getTenantId } from '@/utils/tenant'
 
 const CustomerEdit = () => {
     const navigate = useNavigate()
@@ -22,8 +23,14 @@ const CustomerEdit = () => {
     const handleFormSubmit = async (values: CustomerFormSchema) => {
         try {
             setIsSubmiting(true)
-            const tenant = localStorage.getItem('tenant')
-            if (!tenant) throw new Error('Tenant missing')
+            const tenant = getTenantId()
+            if (!tenant) {
+                toast.push(
+                    <Notification type="danger">Tenant not found. Please login again.</Notification>,
+                    { placement: 'top-center' },
+                )
+                return
+            }
 
             const formData = new FormData()
             formData.append('name', values.name)
@@ -81,6 +88,7 @@ const CustomerEdit = () => {
                     file_extension: '',
                     description: '',
                     tags: [],
+                    img: '',
                 }}
                 onFormSubmit={handleFormSubmit}
             >
