@@ -2,7 +2,6 @@ import Container from '@/components/shared/Container'
 import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
 import { TbArrowNarrowLeft } from 'react-icons/tb'
-import { FaEnvelope, FaPhone } from 'react-icons/fa'
 import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
 import { apiGetEnquiryById } from '@/services/CustomersService'
@@ -23,6 +22,7 @@ const CustomerDetails = () => {
     return (
         <Loading loading={isLoading}>
             <Container>
+
                 {/* Header */}
                 <div className="flex items-center px-6 md:px-10 py-6">
                     <button
@@ -35,90 +35,140 @@ const CustomerDetails = () => {
                     </button>
                 </div>
 
-                <div className="px-6 md:px-10 pb-10 max-w-4xl mx-auto">
-                
-
+                {/* Wider Layout */}
+                <div className="px-6 md:px-10 pb-10 max-w-6xl mx-auto">
                     {data && !isEmpty(data) ? (
                         <Card className="rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
-                            <div className="p-8 space-y-8">
 
-                                {/* Top Profile Section */}
-                                <div className="flex flex-col md:flex-row md:items-center gap-6">
+                            {/* Bigger spacing */}
+                            <div className="p-10 space-y-8">
 
+                                {/* Basic Info */}
+                                <div className="space-y-5">
 
-                                    {/* Name + Contact */}
-                                    <div className="flex-1">
-                                        <h4 className="text-xl font-semibold mb-2">
-                                            {data.name}
-                                        </h4>
+                                    <div className="flex flex-col sm:flex-row sm:justify-between">
+                                        <span className="text-gray-500 text-sm">Name</span>
+                                        <span className="font-medium text-lg">
+                                            {data.name || '—'}
+                                        </span>
+                                    </div>
 
-                                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
-                                            {data.email && (
-                                                <a
-                                                    href={`mailto:${data.email}`}
-                                                    className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 px-3 py-2 rounded-lg hover:shadow-sm transition"
-                                                >
-                                                    <FaEnvelope />
-                                                    <span className="break-all">
-                                                        {data.email}
-                                                    </span>
-                                                </a>
-                                            )}
+                                    <div className="flex flex-col sm:flex-row sm:justify-between">
+                                        <span className="text-gray-500 text-sm">Email</span>
+                                        {data.email ? (
+                                            <a
+                                                href={`mailto:${data.email}`}
+                                                className="font-medium text-lg hover:underline"
+                                            >
+                                                {data.email}
+                                            </a>
+                                        ) : (
+                                            <span>—</span>
+                                        )}
+                                    </div>
 
-                                            {data.phone && (
-                                                <a
-                                                    href={`tel:${data.phone}`}
-                                                    className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 px-3 py-2 rounded-lg hover:shadow-sm transition"
-                                                >
-                                                    <FaPhone />
-                                                    {data.phone}
-                                                </a>
-                                            )}
+                                    {/* Mobile */}
+                                    {data.mobile && (
+                                        <div className="flex flex-col sm:flex-row sm:justify-between">
+                                            <span className="text-gray-500 text-sm">Mobile</span>
+                                            <a
+                                                href={`tel:${data.mobile}`}
+                                                className="font-medium text-lg hover:underline"
+                                            >
+                                                {data.mobile}
+                                            </a>
                                         </div>
-                                    </div>
-                                </div>
+                                    )}
 
-                                {/* Divider */}
-                                <div className="border-t border-gray-100 dark:border-gray-800" />
+                                    {/* Phone */}
+                                    {data.phone && (
+                                        <div className="flex flex-col sm:flex-row sm:justify-between">
+                                            <span className="text-gray-500 text-sm">Phone</span>
+                                            <a
+                                                href={`tel:${data.phone}`}
+                                                className="font-medium text-lg hover:underline"
+                                            >
+                                                {data.phone}
+                                            </a>
+                                        </div>
+                                    )}
 
-                                {/* Message Section */}
-                                <div>
-                                    <h4 className="text-lg font-semibold mb-3">
-                                        Message
-                                    </h4>
-
-                                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-5 leading-relaxed text-gray-700 dark:text-gray-200 whitespace-pre-wrap">
-                                        {data.message || '—'}
-                                    </div>
-                                </div>
-
-                                {/* Divider */}
-                                <div className="border-t border-gray-100 dark:border-gray-800" />
-
-                                {/* Extra Info */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     {data.subject && (
-                                        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-5">
-                                            <h5 className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-                                                Subject
-                                            </h5>
-                                            <p className="text-base font-medium">
+                                        <div className="flex flex-col sm:flex-row sm:justify-between">
+                                            <span className="text-gray-500 text-sm">Subject</span>
+                                            <span className="font-medium text-lg">
                                                 {data.subject}
-                                            </p>
+                                            </span>
                                         </div>
                                     )}
 
                                     {data.created_at && (
-                                        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-5">
-                                            <h5 className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-                                                Submitted
-                                            </h5>
-                                            <p className="text-base font-medium">
+                                        <div className="flex flex-col sm:flex-row sm:justify-between">
+                                            <span className="text-gray-500 text-sm">Submitted</span>
+                                            <span className="font-medium text-lg">
                                                 {new Date(data.created_at).toLocaleString()}
-                                            </p>
+                                            </span>
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Divider */}
+                                <div className="border-t border-gray-200 dark:border-gray-800" />
+
+                                {/* Custom Data */}
+                                {data.custom_data && (
+                                    <div className="space-y-5">
+                                        <h4 className="text-base text-gray-500">Additional Details</h4>
+
+                                        {data.custom_data.parent_name && (
+                                            <div className="flex flex-col sm:flex-row sm:justify-between">
+                                                <span className="text-gray-500 text-sm">Parent Name</span>
+                                                <span className="font-medium text-lg">
+                                                    {data.custom_data.parent_name}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {data.custom_data.full_address && (
+                                            <div className="flex flex-col sm:flex-row sm:justify-between">
+                                                <span className="text-gray-500 text-sm">Address</span>
+                                                <span className="font-medium text-lg">
+                                                    {data.custom_data.full_address}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {data.custom_data.current_institution && (
+                                            <div className="flex flex-col sm:flex-row sm:justify-between">
+                                                <span className="text-gray-500 text-sm">Current Institution</span>
+                                                <span className="font-medium text-lg">
+                                                    {data.custom_data.current_institution}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {data.custom_data.desired_course && (
+                                            <div className="flex flex-col sm:flex-row sm:justify-between">
+                                                <span className="text-gray-500 text-sm">Desired Course</span>
+                                                <span className="font-medium text-lg">
+                                                    {data.custom_data.desired_course}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Message */}
+                                <div>
+                                    <h4 className="text-base text-gray-500 mb-3">
+                                        Message
+                                    </h4>
+                                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 text-gray-700 dark:text-gray-200 whitespace-pre-wrap text-base leading-relaxed">
+                                        {data.message || '—'}
+                                    </div>
+                                </div>
+
+
                             </div>
                         </Card>
                     ) : (

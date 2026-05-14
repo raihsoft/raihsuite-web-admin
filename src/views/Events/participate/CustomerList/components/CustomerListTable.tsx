@@ -1,50 +1,11 @@
 import { useMemo } from 'react'
-import Avatar from '@/components/ui/Avatar'
-import Tag from '@/components/ui/Tag'
 import Tooltip from '@/components/ui/Tooltip'
-import DataTable from '@/components/shared/DataTable'
+import CommonTable from '@/components/shared/CommonTable'
 import useCustomerList from '../hooks/useCustomerList'
-import { Link, useNavigate } from 'react-router-dom'
-import cloneDeep from 'lodash/cloneDeep'
+import { useNavigate } from 'react-router-dom'
 import { TbPencil, TbEye } from 'react-icons/tb'
-import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
+import type { ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
-import type { TableQueries } from '@/@types/common'
-
-const statusColor: Record<string, string> = {
-    active: 'bg-emerald-200 dark:bg-emerald-200 text-gray-900 dark:text-gray-900',
-    blocked: 'bg-red-200 dark:bg-red-200 text-gray-900 dark:text-gray-900',
-}
-
-const NameColumn = ({ row, searchQuery }: { row: Customer; searchQuery?: string }) => {
-    const highlightMatch = (text: string, query?: string) => {
-        if (!query || query.length === 0) return text
-        
-        const regex = new RegExp(`(${query})`, 'gi')
-        const parts = text.split(regex)
-        
-        return parts.map((part, i) => 
-            regex.test(part) ? (
-                <mark key={i} className="bg-yellow-300 font-bold">{part}</mark>
-            ) : (
-                part
-            )
-        )
-    }
-    
-    const displayName = row.name || `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim()
-
-    return (
-        <div className="flex items-center">
-            <Link
-                className={`hover:text-primary ml-2 rtl:mr-2 font-semibold text-gray-900 dark:text-gray-100`}
-                to={`/participants/${row.id}`}
-            >
-                {highlightMatch(displayName, searchQuery)}
-            </Link>
-        </div>
-    )
-}
 
 const ActionColumn = ({
     onEdit,
@@ -52,32 +13,23 @@ const ActionColumn = ({
 }: {
     onEdit: () => void
     onViewDetail: () => void
-}) => {
-    return (
-        <div className="flex items-center gap-3">
-            <Tooltip title="Edit">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onEdit}
-                >
-                    <TbPencil />
-                </div>
-            </Tooltip>
-            <Tooltip title="View">
-                <div
-                    className={`text-xl cursor-pointer select-none font-semibold`}
-                    role="button"
-                    onClick={onViewDetail}
-                >
-                    <TbEye />
-                </div>
-            </Tooltip>
-        </div>
-    )
-}
+}) => (
+    <div className="flex items-center gap-3">
+        <Tooltip title="Edit">
+            <div className="text-xl cursor-pointer" onClick={onEdit}>
+                <TbPencil />
+            </div>
+        </Tooltip>
 
-const CustomerListTable = () => {
+        <Tooltip title="View">
+            <div className="text-xl cursor-pointer" onClick={onViewDetail}>
+                <TbEye />
+            </div>
+        </Tooltip>
+    </div>
+)
+
+const ParticipantsTable = () => {
     const navigate = useNavigate()
 
     const {
@@ -85,200 +37,124 @@ const CustomerListTable = () => {
         customerListTotal,
         tableData,
         isLoading,
-        setTableData,
-        setSelectAllCustomer,
         setSelectedCustomer,
+        setSelectAllCustomer,
         selectedCustomer,
+        setTableData,
     } = useCustomerList()
 
-    const handleEdit = (customer: Customer) => {
-        navigate(`/participants/edit/${customer.id}`)
+    // =========================
+    // SAFE DATA (server only)
+    // =========================
+    const data = useMemo(() => customerList, [customerList])
+
+    // =========================
+    // Edit / View
+    // =========================
+    const handleEdit = (row: Customer) => {
+        navigate(`/participants/edit/${row.id}`)
     }
 
-    const handleViewDetails = (customer: Customer) => {
-        navigate(`/participants/${customer.id}`)
+    const handleView = (row: Customer) => {
+        navigate(`/participants/${row.id}`)
     }
 
-    // Filter and sort list - show only matches, with exact matches first
-    const filteredAndSortedList = useMemo(() => {
-        const query = (tableData.query as string || '').toLowerCase().trim()
-        
-        if (!query || query.length === 0) return customerList
-        
-        // Filter to include matching names, email, or event title
-        const filtered = customerList.filter(customer =>
-            (customer.name || '').toLowerCase().includes(query) ||
-            (customer.email || '').toLowerCase().includes(query) ||
-            (customer.event_title || '').toLowerCase().includes(query)
-        )
-        
-        // Sort to put exact/partial matches first (by name)
-        return filtered.sort((a, b) => {
-            const aName = (a.name || '').toLowerCase()
-            const bName = (b.name || '').toLowerCase()
-            
-            // Exact match comes first
-            if (aName === query) return -1
-            if (bName === query) return 1
-            
-            // Starts with query comes next
-            if (aName.startsWith(query) && !bName.startsWith(query)) return -1
-            if (!aName.startsWith(query) && bName.startsWith(query)) return 1
-            
-            return 0
-        })
-    }, [customerList, tableData.query])
-
-    const columns: ColumnDef<Customer>[] = useMemo(
-    () => [
-        {
-            header: 'First Name',
-            accessorKey: 'firstName',
-        },
-        {
-            header: 'Last Name',
-            accessorKey: 'lastName',
-        },
-        {
-            header: 'Email',
-            accessorKey: 'email',
-        },
-        {
-            header: 'Phone',
-            accessorKey: 'phone',
-        },
-        {
-            header: 'Place',
-            accessorKey: 'place',
-        },
-        {
-            header: 'Event',
-            accessorKey: 'event_title',
-            cell: (props) => (
-                <span
-                    className="text-gray font-semibold cursor-pointer"
-                    onClick={() =>
-                        navigate(`/events/${props.row.original.code}`)
-                    }
-                >
-                    {props.row.original.event_title}
-                </span>
-            ),
-        },
-        {
-            header: 'Fee Amount',
-            accessorKey: 'fee_amount',
-            cell: (props) =>
-                props.row.original.fee_amount !== undefined
-                    ? Number(props.row.original.fee_amount).toFixed(2)
-                    : '-',
-        },
-        {
-            header: 'Amount Paid',
-            accessorKey: 'amount_paid',
-            cell: (props) =>
-                props.row.original.amount_paid !== undefined
-                    ? Number(props.row.original.amount_paid).toFixed(2)
-                    : '-',
-        },
-        {
-            header: 'Balance Due',
-            accessorKey: 'balance_due',
-            cell: (props) =>
-                props.row.original.balance_due !== undefined
-                    ? Number(props.row.original.balance_due).toFixed(2)
-                    : '-',
-        },
-        {
-            header: 'Referred By Employee',
-            accessorKey: 'referencedBy',
-            cell: (props) => (
-                <span className="font-medium">
-                    {props.row.original.referencedBy || '-'}
-                </span>
-            ),
-        },
-        {
-            header: 'Action',
-            id: 'action',
-            cell: (props) => (
-                <ActionColumn
-                    onEdit={() => handleEdit(props.row.original)}
-                    onViewDetail={() =>
-                        handleViewDetails(props.row.original)
-                    }
-                />
-            ),
-        },
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-)
-
-
-    const handleSetTableData = (data: TableQueries) => {
-        setTableData(data)
-        if (selectedCustomer.length > 0) {
-            setSelectAllCustomer([])
-        }
-    }
-
-    const handlePaginationChange = (page: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageIndex = page
-        handleSetTableData(newTableData)
-    }
-
-    const handleSelectChange = (value: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageSize = Number(value)
-        newTableData.pageIndex = 1
-        handleSetTableData(newTableData)
-    }
-
-    const handleSort = (sort: OnSortParam) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.sort = sort
-        handleSetTableData(newTableData)
-    }
-
-    const handleRowSelect = (checked: boolean, row: Customer) => {
-        setSelectedCustomer(checked, row)
-    }
-
+    // =========================
+    // SELECT ALL (SAFE)
+    // =========================
     const handleAllRowSelect = (checked: boolean, rows: Row<Customer>[]) => {
+        if (!Array.isArray(rows)) return
+
         if (checked) {
-            const originalRows = rows.map((row) => row.original)
-            setSelectAllCustomer(originalRows)
+            const safeRows = rows
+                .map(r => r?.original)
+                .filter(Boolean)
+                .filter(r => r.id)
+
+            setSelectAllCustomer(safeRows as any)
         } else {
             setSelectAllCustomer([])
         }
     }
 
+    // =========================
+    // Columns
+    // =========================
+    const columns: ColumnDef<Customer>[] = useMemo(
+        () => [
+            { header: 'First Name', accessorKey: 'firstName' },
+            { header: 'Last Name', accessorKey: 'lastName' },
+            { header: 'Email', accessorKey: 'email' },
+            { header: 'Phone', accessorKey: 'phone' },
+            { header: 'Place', accessorKey: 'place' },
+
+            {
+                header: 'Event',
+                accessorKey: 'event_title',
+                cell: (props) => (
+                    <span
+                        className="cursor-pointer font-semibold"
+                        onClick={() =>
+                            navigate(`/events/${props.row.original.code}`)
+                        }
+                    >
+                        {props.row.original.event_title}
+                    </span>
+                ),
+            },
+
+            {
+                header: 'Fee',
+                accessorKey: 'fee_amount',
+                cell: (props) =>
+                    Number(props.row.original.fee_amount || 0).toFixed(2),
+            },
+
+            {
+                header: 'Paid',
+                accessorKey: 'amount_paid',
+                cell: (props) =>
+                    Number(props.row.original.amount_paid || 0).toFixed(2),
+            },
+
+            {
+                header: 'Balance',
+                accessorKey: 'balance_due',
+                cell: (props) =>
+                    Number(props.row.original.balance_due || 0).toFixed(2),
+            },
+
+            {
+                header: 'Action',
+                id: 'action',
+                cell: (props) => (
+                    <ActionColumn
+                        onEdit={() => handleEdit(props.row.original)}
+                        onViewDetail={() => handleView(props.row.original)}
+                    />
+                ),
+            },
+        ],
+        [navigate]
+    )
+
     return (
-        <DataTable
-            selectable
-            columns={columns}
-            data={filteredAndSortedList}
-            noData={!isLoading && filteredAndSortedList.length === 0}
-            skeletonAvatarColumns={[0]}
-            skeletonAvatarProps={{ width: 28, height: 28 }}
+        <CommonTable
+            data={data}
+            total={customerListTotal}
             loading={isLoading}
-            pagingData={{
-                total: customerListTotal,
-                pageIndex: tableData.pageIndex as number,
-                pageSize: tableData.pageSize as number,
-            }}
+            tableData={tableData}
+            setTableData={setTableData}   // ✅ FIXED (IMPORTANT)
+            selectedItems={selectedCustomer}
+            setSelectedItems={setSelectedCustomer}
+            columns={columns}
+            selectable={true}
             checkboxChecked={(row) =>
-                selectedCustomer.some((selected) => selected.id === row.id)
+                selectedCustomer.some((s) => s.id === row.id)
             }
-            onPaginationChange={handlePaginationChange}
-            onSelectChange={handleSelectChange}
-            onSort={handleSort}
-            onCheckBoxChange={handleRowSelect}
-            onIndeterminateCheckBoxChange={handleAllRowSelect}
+            pageSizes={[10, 20, 50, 100]}
         />
     )
 }
 
-export default CustomerListTable
+export default ParticipantsTable

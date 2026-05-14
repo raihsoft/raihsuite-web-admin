@@ -2,7 +2,6 @@ import { apiGetTicketList } from '@/services/CustomersService'
 import useSWR from 'swr'
 import { useTicketListStore } from '../store/ticketListStore'
 import type { GetTicketsListResponse, Ticket } from '../types'
-import type { TableQueries } from '@/@types/common'
 
 export default function useTicketList() {
     const {
@@ -15,21 +14,53 @@ export default function useTicketList() {
         setFilterData,
     } = useTicketListStore((state) => state)
 
+    // =========================
+    // Pagination FIX
+    // =========================
+    const pageIndex = tableData.pageIndex ?? 1
+    const pageSize = tableData.pageSize ?? 10
+    const offset = (pageIndex - 1) * pageSize
+
+    // =========================
+    // Stable SWR key
+    // =========================
+    const swrKey = [
+        '/api/events/tickets',
+        pageIndex,
+        pageSize,
+        tableData.query || '',
+        JSON.stringify(filterData || {}),
+    ]
+
+    // =========================
+    // Fetcher
+    // =========================
+    const fetcher = () =>
+        apiGetTicketList<GetTicketsListResponse, any>({
+            limit: pageSize,
+            offset,
+            search: tableData.query || '',
+            ...filterData,
+        })
+
     const { data, error, isLoading, mutate } = useSWR(
-        ['/api/events/tickets', { ...tableData, ...filterData }],
-        ([_, params]) =>
-            apiGetTicketList<GetTicketsListResponse, TableQueries>(params),
+        swrKey,
+        fetcher,
         {
             revalidateOnFocus: false,
-        },
+            keepPreviousData: true,
+        }
     )
 
-    // Normalize API response shape
+    // =========================
+    // Normalize data
+    // =========================
     const rawList: Ticket[] = (data?.list ?? data?.results ?? []) as Ticket[]
 
     const ticketList = (Array.isArray(rawList) ? rawList : []).map(
         (item, index) => ({
             id: item.id ?? `tmp-${index}`,
+
             participant_name: item.participant_name ?? '',
             token: item.token ?? '',
             status: item.status ?? '',
@@ -37,12 +68,21 @@ export default function useTicketList() {
             event_title: item.event_title ?? '',
             created_at: item.created_at ?? '',
             updated_at: item.updated_at ?? '',
-        }),
+        })
     )
 
     const ticketListTotal =
+        data?.count ??
         data?.total ??
-        (Array.isArray(rawList) ? rawList.length : 0)
+        0
+
+    // =========================
+    // SAFE selection reset
+    // =========================
+    const clearSelection = () => {
+        setSelectedTicket([])
+        setSelectAllTicket([])
+    }
 
     return {
         ticketList,
@@ -57,5 +97,6 @@ export default function useTicketList() {
         setSelectedTicket,
         setSelectAllTicket,
         setFilterData,
+        clearSelection,
     }
 }

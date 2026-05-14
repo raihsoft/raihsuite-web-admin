@@ -1,15 +1,12 @@
 import { useMemo, useState } from 'react'
-import Avatar from '@/components/ui/Avatar'
 import Tag from '@/components/ui/Tag'
 import Tooltip from '@/components/ui/Tooltip'
-import DataTable from '@/components/shared/DataTable'
+import CommonTable from '@/components/shared/CommonTable'
 import useCustomerList from '../hooks/useCustomerList'
-import { Link, useNavigate } from 'react-router-dom'
-import cloneDeep from 'lodash/cloneDeep'
+import { useNavigate } from 'react-router-dom'
 import { TbPencil, TbEye } from 'react-icons/tb'
-import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
+import type { ColumnDef } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
-import type { TableQueries } from '@/@types/common'
 
 const NameColumn = ({ row, searchQuery }: { row: any; searchQuery?: string }) => {
     const highlightMatch = (text: string, query?: string) => {
@@ -69,8 +66,6 @@ const CustomerListTable = () => {
     const navigate = useNavigate()
     const [selectOrder, setSelectOrder] = useState<string>('');
     const [selectedOrganization, setSelectedOrganization] = useState<string>('');
-    const [filterData, setFilterData] = useState<TableQueries>({});
-
 
     const {
         customerList,
@@ -158,15 +153,14 @@ const CustomerListTable = () => {
                 header: 'Status',
                 accessorKey: 'status',
             },
-             {
+            {
                 header: 'Payment Status',
                 accessorKey: 'is_paid',
             },
-             {
+            {
                 header: 'Payment Note',
                 accessorKey: 'payment_note',
             },
-
             {
                 header: 'Action',
                 id: 'action',
@@ -184,69 +178,10 @@ const CustomerListTable = () => {
         [],
     )
 
-    const handleSetTableData = (data: TableQueries) => {
-        setTableData(data)
-        if (selectedCustomer.length > 0) {
-            setSelectAllCustomer([])
-        }
-    }
-
-    const handlePaginationChange = (page: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageIndex = page
-        handleSetTableData(newTableData)
-    }
-
-    const handleSelectChange = (value: number) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.pageSize = Number(value)
-        newTableData.pageIndex = 1
-        handleSetTableData(newTableData)
-    }
-
-    const handleSort = (sort: OnSortParam) => {
-        const newTableData = cloneDeep(tableData)
-        newTableData.sort = sort
-        handleSetTableData(newTableData)
-    }
-
-    const handleRowSelect = (checked: boolean, row: Customer) => {
-        setSelectedCustomer(checked, row)
-    }
-
-    const handleAllRowSelect = (checked: boolean, rows: Row<Customer>[]) => {
-        if (checked) {
-            const originalRows = rows.map((row) => row.original)
-            setSelectAllCustomer(originalRows)
-        } else {
-            setSelectAllCustomer([])
-        }
-    }
-
-    // console.log('customerList', customerList)
-
     return (
-
         <div>
-
-
             <div className="flex gap-4 mb-4">
-
-                {/* <select
-                    value={selectOrder}
-                    onChange={(e) => setSelectOrder(e.target.value)}
-                    className="p-2 border rounded"
-                >
-                    <option value="">Select zone</option>
-                    {Array.from(new Set(customerList.map((customer:any) => customer.zone_name))).map(
-                        (zone_name) => (
-                        <option key={zone_name} value={zone_name}>
-                            {zone_name}
-                        </option>
-                    ))}
-                </select> */}
-
-                 <select
+                <select
                     value={selectedOrganization}
                     onChange={(e) => setSelectedOrganization(e.target.value)}
                     className="p-2 border rounded"
@@ -263,7 +198,6 @@ const CustomerListTable = () => {
                 {/* Reset Filters Button */}
                 <button
                     onClick={() => {
-
                         setSelectOrder('')
                         setSelectedOrganization('')
                     }}
@@ -273,28 +207,15 @@ const CustomerListTable = () => {
                 </button>
             </div>
 
-        <DataTable
-            selectable
-            columns={columns}
-            data={filteredAndSortedList}
-            noData={!isLoading && filteredAndSortedList.length === 0}
-            skeletonAvatarColumns={[0]}
-            skeletonAvatarProps={{ width: 28, height: 28 }}
-            loading={isLoading}
-            pagingData={{
-                total: customerListTotal,
-                pageIndex: tableData.pageIndex as number,
-                pageSize: tableData.pageSize as number,
-            }}
-            checkboxChecked={(row) =>
-                selectedCustomer.some((selected) => selected.id === row.id)
-            }
-            onPaginationChange={handlePaginationChange}
-            onSelectChange={handleSelectChange}
-            onSort={handleSort}
-            onCheckBoxChange={handleRowSelect}
-            onIndeterminateCheckBoxChange={handleAllRowSelect}
-        />
+            <CommonTable
+                data={filteredAndSortedList as any}
+                total={customerListTotal}
+                loading={isLoading}
+                tableData={tableData}
+                selectedItems={selectedCustomer as any}
+                setSelectedItems={setSelectedCustomer as any}
+                columns={columns}
+            />
         </div>
     )
 }

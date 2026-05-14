@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, forwardRef, useImperativeHandle } from 'react'
 import { Form } from '@/components/ui/Form'
 import Container from '@/components/shared/Container'
 import BottomStickyBar from '@/components/template/BottomStickyBar'
@@ -12,6 +12,7 @@ import type { CommonProps } from '@/@types/common'
 import type { CustomerFormSchema } from './types'
 import { apiCreateAssets } from '@/services/CustomersService'
 import { apiCreateAssetType } from '@/services/CustomersService'
+import { getTenantId } from '@/utils/tenant'
 
 type CustomerFormProps = {
     defaultValues?: CustomerFormSchema
@@ -28,7 +29,7 @@ const validationSchema: ZodType<CustomerFormSchema> = z.object({
 
 })
 
-const CustomerForm = (props: CustomerFormProps) => {
+const CustomerForm = forwardRef((props: CustomerFormProps, ref) => {
     const { defaultValues = {}, newCustomer = false, children } = props
 
     const {
@@ -36,6 +37,7 @@ const CustomerForm = (props: CustomerFormProps) => {
         reset,
         formState: { errors },
         control,
+        setError,
     } = useForm<CustomerFormSchema>({
         defaultValues: {
             banAccount: false,
@@ -44,6 +46,10 @@ const CustomerForm = (props: CustomerFormProps) => {
         },
         resolver: zodResolver(validationSchema),
     })
+
+    useImperativeHandle(ref, () => ({
+        setError,
+    }))
 
     // RESET WHEN EDITING
     useEffect(() => {
@@ -62,7 +68,7 @@ const CustomerForm = (props: CustomerFormProps) => {
 
         // Otherwise handle create locally
         try {
-            const tenant = localStorage.getItem('tenant')
+            const tenant = getTenantId()
             if (!tenant) {
                 alert('Tenant not found — Please login again.')
                 return
@@ -100,5 +106,7 @@ const CustomerForm = (props: CustomerFormProps) => {
         </Form>
     )
 }
+)
 
 export default CustomerForm
+

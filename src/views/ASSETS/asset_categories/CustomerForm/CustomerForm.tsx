@@ -11,6 +11,7 @@ import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import type { CustomerFormSchema } from './types'
 import { apiCreateAssetCategories, apiCreateAssets } from '@/services/CustomersService'   // 🔹 Change API if needed
+import { getTenantId } from '@/utils/tenant'
 
 // 🔹 Props
 type CustomerFormProps = {
@@ -65,9 +66,10 @@ const CustomerForm = (props: CustomerFormPropsWithSubmit) => {
 
         try {
             // 🧩 Get tenant
-            const tenant = localStorage.getItem('tenant')
+            const tenant = getTenantId()
 
             if (!tenant) {
+                alert('Tenant not found — Please login again.')
                 return
             }
 

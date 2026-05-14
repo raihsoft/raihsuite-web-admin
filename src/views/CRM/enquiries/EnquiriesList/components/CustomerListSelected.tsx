@@ -104,7 +104,7 @@ const CustomerListSelected = () => {
                                     </span>
                                     <span className="font-semibold flex items-center gap-1">
                                         <span className="heading-text">
-                                            {selectedCustomer.length} Customers
+                                            {selectedCustomer.length} Enquiries
                                         </span>
                                         <span>selected</span>
                                     </span>

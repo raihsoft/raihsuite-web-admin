@@ -19,35 +19,38 @@ const CustomerEdit = () => {
     const [isSubmiting, setIsSubmiting] = useState(false)
 
     const handleFormSubmit = async (values: CustomerFormSchema) => {
-        try {
-            setIsSubmiting(true)
-            const tenant = localStorage.getItem('tenant')
-            if (!tenant) throw new Error('Tenant missing')
+        setIsSubmiting(true)
 
-            // ✅ Use JSON payload instead of FormData
+        try {
+            // ✅ CLEAN PAYLOAD (NO TENANT)
             const payload = {
                 name: values.name,
                 description: values.description || '',
-                tenant,
             }
-
-            // console.log('Submitting payload:', payload)
 
             await apiCreateAssetTypeCategory(payload)
 
-            // ✅ Revalidate SWR cache
-            const { tableData, filterData } = useCustomerListStore.getState()
-            await mutate(['/api/asset_type_categories', { ...tableData, ...filterData }])
+            const { tableData, filterData } =
+                useCustomerListStore.getState()
+
+            await mutate([
+                '/api/asset_type_categories',
+                { ...tableData, ...filterData },
+            ])
 
             toast.push(
-                <Notification type="success">Category created!</Notification>,
+                <Notification type="success">
+                    Category created!
+                </Notification>,
                 { placement: 'top-center' },
             )
+
             navigate('/asset_type_categories')
-        } catch (err: any) {
-            console.error('Create failed:', err.response?.data || err.message)
+        } catch (err) {
             toast.push(
-                <Notification type="danger">Create failed!</Notification>,
+                <Notification type="danger">
+                    Create failed!
+                </Notification>,
                 { placement: 'top-center' },
             )
         } finally {
@@ -56,20 +59,16 @@ const CustomerEdit = () => {
     }
 
     const handleConfirmDiscard = () => {
-        setDiscardConfirmationOpen(true)
+        setDiscardConfirmationOpen(false)
+
         toast.push(
-            <Notification type="success">Customer discarded!</Notification>,
+            <Notification type="warning">
+                Changes discarded!
+            </Notification>,
             { placement: 'top-center' },
         )
-        navigate('/asset-type-categories')
-    }
 
-    const handleDiscard = () => {
-        setDiscardConfirmationOpen(true)
-    }
-
-    const handleCancel = () => {
-        setDiscardConfirmationOpen(false)
+        navigate('/asset_type_categories')
     }
 
     return (
@@ -84,19 +83,20 @@ const CustomerEdit = () => {
             >
                 <Container>
                     <div className="flex items-center justify-between px-8">
-                        <span></span>
+                        <span />
                         <div className="flex items-center">
                             <Button
                                 className="ltr:mr-3 rtl:ml-3"
                                 type="button"
                                 customColorClass={() =>
-                                    'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error bg-transparent'
+                                    'border-error ring-1 ring-error text-error bg-transparent'
                                 }
                                 icon={<TbTrash />}
-                                onClick={handleDiscard}
+                                onClick={() => setDiscardConfirmationOpen(true)}
                             >
                                 Discard
                             </Button>
+
                             <Button
                                 variant="solid"
                                 type="submit"
@@ -108,18 +108,17 @@ const CustomerEdit = () => {
                     </div>
                 </Container>
             </CustomerForm>
+
             <ConfirmDialog
                 isOpen={discardConfirmationOpen}
                 type="danger"
                 title="Discard changes"
-                onClose={handleCancel}
-                onRequestClose={handleCancel}
-                onCancel={handleCancel}
+                onClose={() => setDiscardConfirmationOpen(false)}
+                onCancel={() => setDiscardConfirmationOpen(false)}
                 onConfirm={handleConfirmDiscard}
             >
                 <p>
-                    Are you sure you want to discard this? This action can&apos;t
-                    be undone.
+                    Are you sure you want to discard this? This action can’t be undone.
                 </p>
             </ConfirmDialog>
         </>
