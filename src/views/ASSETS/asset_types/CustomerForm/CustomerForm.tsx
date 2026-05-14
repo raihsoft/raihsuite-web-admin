@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, forwardRef, useImperativeHandle } from 'react'
 import { Form } from '@/components/ui/Form'
 import Container from '@/components/shared/Container'
 import BottomStickyBar from '@/components/template/BottomStickyBar'
@@ -29,7 +29,7 @@ const validationSchema: ZodType<CustomerFormSchema> = z.object({
 
 })
 
-const CustomerForm = (props: CustomerFormProps) => {
+const CustomerForm = forwardRef((props: CustomerFormProps, ref) => {
     const { defaultValues = {}, newCustomer = false, children } = props
 
     const {
@@ -37,6 +37,7 @@ const CustomerForm = (props: CustomerFormProps) => {
         reset,
         formState: { errors },
         control,
+        setError,
     } = useForm<CustomerFormSchema>({
         defaultValues: {
             banAccount: false,
@@ -45,6 +46,10 @@ const CustomerForm = (props: CustomerFormProps) => {
         },
         resolver: zodResolver(validationSchema),
     })
+
+    useImperativeHandle(ref, () => ({
+        setError,
+    }))
 
     // RESET WHEN EDITING
     useEffect(() => {
@@ -101,5 +106,7 @@ const CustomerForm = (props: CustomerFormProps) => {
         </Form>
     )
 }
+)
 
 export default CustomerForm
+

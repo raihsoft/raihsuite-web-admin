@@ -10,7 +10,6 @@ import { TbTrash } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 import { mutate } from 'swr'
 import { apiCreateAssets } from '@/services/CustomersService'
-import { getTenantId } from '@/utils/tenant'
 import { useCustomerListStore } from '../AssetList/store/customerListStore'
 import type { CustomerFormSchema } from '../CustomerForm'
 
@@ -21,58 +20,58 @@ const CustomerEdit = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     // ✅ Form Submit
-    const handleFormSubmit = async (values: CustomerFormSchema) => {
-        // console.log('🟢 Submitted values:', values)
-        setIsSubmitting(true)
-        try {
-            // Get tenant from storage helper
-            const tenant = getTenantId()
-            if (!tenant) {
-                toast.push(
-                    <Notification type="danger">Tenant not found. Please login again.</Notification>,
-                    { placement: 'top-center' }
-                )
-                return
-            }
+const handleFormSubmit = async (values: CustomerFormSchema) => {
+    setIsSubmitting(true)
 
-            // Prepare FormData
-            const formData = new FormData()
-            formData.append('title', values.title)
-            formData.append('description', values.description)
-            formData.append('file_type', values.file_type)
-            formData.append('asset_type_ref', values.asset_type_ref)
-            formData.append('asset_category', values.asset_category)
-            formData.append('tags', values.tags || '')
-            if (values.file) {
-                formData.append('file', values.file)
-            }
-            formData.append('tenant', tenant)
+    try {
+        const formData = new FormData()
 
-            // API CALL to create asset
-            await apiCreateAssets(formData)
-            // console.log('✅ Asset Created Successfully')
+        formData.append('title', values.title)
+        formData.append('description', values.description)
+        formData.append('file_type', values.file_type)
+        formData.append('asset_type_ref', values.asset_type_ref)
+        formData.append('asset_category', values.asset_category)
 
-            // Show success toast
-            toast.push(
-                <Notification type="success">Asset Created Successfully!</Notification>,
-                { placement: 'top-center' }
-            )
+        // tags
+        formData.append(
+            'tags',
+            JSON.stringify(values.tags || [])
+        )
 
-            // Refetch the assets list with current pagination/filter state
-            const { tableData, filterData } = useCustomerListStore.getState()
-            await mutate(['/api/assets', { ...tableData, ...filterData }])
-
-            navigate('/assets')
-        } catch (error) {
-            // console.error('❌ Error creating asset:', error)
-            toast.push(
-                <Notification type="danger">Failed to create asset</Notification>,
-                { placement: 'top-center' }
-            )
-        } finally {
-            setIsSubmitting(false)
+        // file
+        if (values.file) {
+            formData.append('file', values.file)
         }
+
+        await apiCreateAssets(formData)
+
+        toast.push(
+            <Notification type="success">
+                Asset Created Successfully!
+            </Notification>,
+            { placement: 'top-center' }
+        )
+
+        const { tableData, filterData } =
+            useCustomerListStore.getState()
+
+        await mutate([
+            '/api/assets',
+            { ...tableData, ...filterData },
+        ])
+
+        navigate('/assets')
+    } catch (error) {
+        toast.push(
+            <Notification type="danger">
+                Failed to create asset
+            </Notification>,
+            { placement: 'top-center' }
+        )
+    } finally {
+        setIsSubmitting(false)
     }
+}
 
     // ✅ Confirm discard
     const handleConfirmDiscard = () => {
