@@ -9,12 +9,26 @@ const CustomerListActionTools = () => {
 
     const { customerList } = useCustomerList()
 
+    const csvHeaders = [
+        { label: 'First Name', key: 'firstName' },
+        { label: 'Last Name', key: 'lastName' },
+        { label: 'Email', key: 'email' },
+        { label: 'Phone', key: 'phone' },
+        { label: 'Place', key: 'place' },
+        { label: 'Event', key: 'event_title' },
+    ]
+
+    const downloadData = customerList.map(
+        ({ fee_amount, amount_paid, balance_due, ...rest }) => rest,
+    )
+
     return (
         <div className="flex flex-col md:flex-row gap-3">
             <CSVLink
                 className="w-full"
-                filename="customerList.csv"
-                data={customerList}
+                filename="participant.csv"
+                headers={csvHeaders}
+                data={downloadData}
             >
                 <Button
                     icon={<TbCloudDownload className="text-xl" />}
