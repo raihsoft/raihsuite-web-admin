@@ -103,26 +103,26 @@ const ParticipantsTable = () => {
                 ),
             },
 
-            {
-                header: 'Fee',
-                accessorKey: 'fee_amount',
-                cell: (props) =>
-                    Number(props.row.original.fee_amount || 0).toFixed(2),
-            },
+            // {
+            //     header: 'Fee',
+            //     accessorKey: 'fee_amount',
+            //     cell: (props) =>
+            //         Number(props.row.original.fee_amount || 0).toFixed(2),
+            // },
 
-            {
-                header: 'Paid',
-                accessorKey: 'amount_paid',
-                cell: (props) =>
-                    Number(props.row.original.amount_paid || 0).toFixed(2),
-            },
+            // {
+            //     header: 'Paid',
+            //     accessorKey: 'amount_paid',
+            //     cell: (props) =>
+            //         Number(props.row.original.amount_paid || 0).toFixed(2),
+            // },
 
-            {
-                header: 'Balance',
-                accessorKey: 'balance_due',
-                cell: (props) =>
-                    Number(props.row.original.balance_due || 0).toFixed(2),
-            },
+            // {
+            //     header: 'Balance',
+            //     accessorKey: 'balance_due',
+            //     cell: (props) =>
+            //         Number(props.row.original.balance_due || 0).toFixed(2),
+            // },
 
             {
                 header: 'Action',
