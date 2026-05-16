@@ -18,6 +18,8 @@ const ProfileImage = ({ control }: ProfileImageSectionProps) => {
             for (const file of files) {
                 if (!allowedFileType.includes(file.type)) {
                     valid = 'Please upload a .jpeg or .png file!'
+                }
+            }
         }
 
         return valid
