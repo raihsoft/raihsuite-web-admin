@@ -824,3 +824,92 @@ export async function apiScanTicket<T>(data: {
         data,
     })
 }
+
+
+// program api calls
+
+export async function apiGetProgramList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/programs/programs/',
+        method: 'get',
+        params,
+    })
+}
+
+export async function apiCreateProgram<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/programs/programs/',
+        method: 'post',
+        data,
+    })
+}
+
+export async function apiUpdateProgram<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/programs/programs/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+export async function apiDeleteProgram(id: string) {
+  return ApiService.fetchDataWithAxios({
+    url: `/programs/programs/${id}/`,
+    method: 'delete',
+  })
+}
+
+
+
+export async function apiGetProgramparticipantList<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/programs/participants/',
+        method: 'get',
+        params,
+    })
+}
+export async function apigetProgramparticipantbyid<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/programs/participants/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+export async function apiCreateProgramparticipant<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/programs/participants/',
+        method: 'post',
+        data,
+    })
+}
+
+export async function apiUpdateProgramparticipant<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/programs/participants/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+export async function apiDeleteProgramparticipant(id: string) {
+  return ApiService.fetchDataWithAxios({
+    url: `/programs/participants/${id}/`,
+    method: 'delete',
+  })
+}

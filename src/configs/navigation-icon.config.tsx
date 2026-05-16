@@ -12,7 +12,7 @@ import { LiaBandcamp } from "react-icons/lia";
 import { CgBrowse } from "react-icons/cg";
 import { BiPackage } from "react-icons/bi";
 import { MdEvent } from "react-icons/md";
-
+import { RiSlideshowLine } from "react-icons/ri";
 
 import type { JSX } from 'react'
 import { BsPersonCheck } from 'react-icons/bs';
@@ -33,6 +33,7 @@ const navigationIcon: NavigationIcons = {
     boxIcon:  <span><LiaAddressBook /></span>,
     orderIcon: <span><BiPackage /></span>,
     eventsIcon: <span><MdEvent /></span>,
+    programsIcon: <span><RiSlideshowLine /></span>,
     employeesEdit: <span><CgBrowse /></span>,
 }
 
