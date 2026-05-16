@@ -12,7 +12,7 @@ import {
 } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
 import { mutate } from 'swr'
-import { useCustomerListStore } from '../participantList/store/customerListStore'
+import { useCustomerListStore } from '../ParticipantList/store/customerListStore'
 import NoUserFound from '@/assets/svg/NoUserFound'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
 import { useParams, useNavigate } from 'react-router-dom'
