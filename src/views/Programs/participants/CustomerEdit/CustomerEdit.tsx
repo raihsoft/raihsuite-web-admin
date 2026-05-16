@@ -18,7 +18,7 @@ import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
 import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
 import type { CustomerFormSchema } from '../CustomerForm'
-import type { Customer } from '../participantList/types'
+import type { Customer } from '../ParticipantList/types'
 
 const CustomerEdit = () => {
     const { id } = useParams()
