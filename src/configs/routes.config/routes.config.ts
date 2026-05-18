@@ -11,6 +11,8 @@ import assetsCategoryRoute from './AssetCategoryRoute'
 import assettypes from './AssetTypeRoute'
 import assetTypeCategories from './AssetTypeCategoriesRoute'
 import participantsRoute from './ParticipantsRoute'
+import ProgramsparticipantRoute from './programparticipantRouts'
+import programsRoute from './ProgramsRoute'
 import eventsRoute from './EventsRoute'
 import EventsRoute from './EventsRoute'
 import { s } from '@fullcalendar/core/internal-common'
@@ -153,6 +155,34 @@ export const protectedRoutes: Routes = [
             footer: false,
         },
     },
+    {
+        key: 'Programs.CustomerDetails',
+        path: '/programs/:id',
+        component: lazy(() => import('@/views/Programs/programs/CustomerDetails')),
+        authority: [],
+        meta: {
+            header: {
+                title: 'Program Details',
+                description: 'View program details.',
+                contained: true,
+            },
+            footer: false,
+        },
+    },
+    {
+        key: 'Programs.prograparticipantDetails',
+        path: '/program-participants/:id',
+        component: lazy(() => import('@/views/Programs/participants/CustomerDetails')),
+        authority: [],
+        meta: {
+            header: {
+                title: 'Participant Details',
+                description: 'View participant details.',
+                contained: true,
+            },
+            footer: false,
+        },
+    },
 
     {
         key: 'changePassword',
@@ -169,7 +199,23 @@ export const protectedRoutes: Routes = [
         },
     },
 
-    ...othersRoute,...employeeRoute,...orderRoute,...organizationRoute,...zoneRoute,...assetsRoute,...assetsCategoryRoute,...assettypes,...assetTypeCategories,...participantsRoute,...EventsRoute,...SessionRoute,...SessionAttendanceRoute,...TicketsRoute,...FeepaymentListRoute 
+    ...programsRoute,
+    ...ProgramsparticipantRoute,
+    ...othersRoute,
+    ...employeeRoute,
+    ...orderRoute,
+    ...organizationRoute,
+    ...zoneRoute,
+    ...assetsRoute,
+    ...assetsCategoryRoute,
+    ...assettypes,
+    ...assetTypeCategories,
+    ...participantsRoute,
+    ...EventsRoute,
+    ...SessionRoute,
+    ...SessionAttendanceRoute,
+    ...TicketsRoute,
+    ...FeepaymentListRoute 
 
 ]
 
