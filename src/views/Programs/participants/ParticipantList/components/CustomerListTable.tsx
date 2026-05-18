@@ -147,6 +147,32 @@ const CustomerListTable = () => {
                 ),
             },
             {
+                header: 'Additional Details',
+                accessorKey: 'custom_data',
+                cell: (props) => {
+                    const customData = props.row.original.custom_data
+
+                    if (!customData) {
+                        return <span>-</span>
+                    }
+
+                    return (
+                        <Tooltip
+                            title={JSON.stringify(customData, null, 2)}
+                        >
+                            <div className="max-w-[250px] truncate">
+                                {Object.entries(customData)
+                                    .map(
+                                        ([key, value]) =>
+                                            `${key}: ${value}`,
+                                    )
+                                    .join(', ')}
+                            </div>
+                        </Tooltip>
+                    )
+                },
+            },
+            {
                 header: 'Action',
                 id: 'action',
                 cell: (props) => (
