@@ -4,11 +4,11 @@ import Loading from '@/components/shared/Loading'
 import ProfileSection from './ProfileSection'
 import BillingSection from './BillingSection'
 import ActivitySection from './ActivitySection'
-import { apiGetCustomer } from '@/services/CustomersService'
+import { apiGetProgramList } from '@/services/CustomersService'
 import useSWR from 'swr'
 import { useParams } from 'react-router-dom'
 import isEmpty from 'lodash/isEmpty'
-import type { Customer } from '../ContactList/types'
+import type { Customer } from '../ProgramsList/types'
 
 const { TabNav, TabList, TabContent } = Tabs
 
@@ -16,9 +16,9 @@ const CustomerDetails = () => {
     const { id } = useParams()
 
     const { data, isLoading } = useSWR(
-        ['/api/customers', { id: id as string }],
+        ['programs/programs/', { id: id as string }],
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([_, params]) => apiGetCustomer<Customer, { id: string }>(params),
+        ([_, params]) => apiGetProgramList<Customer, { id: string }>(params),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,

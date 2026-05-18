@@ -104,7 +104,7 @@ const CustomerDetails = () => {
                                         </div>
                                     )}
 
-                                    
+
 
                                     {data.created_at && (
                                         <div className="flex flex-col sm:flex-row sm:justify-between">
@@ -120,57 +120,41 @@ const CustomerDetails = () => {
                                 <div className="border-t border-gray-200 dark:border-gray-800" />
 
                                 {/* Custom Data */}
-                                {data.custom_data && (
-                                    <div className="space-y-5">
-                                        <h4 className="text-base text-gray-500">Additional Details</h4>
+                                {data.custom_data &&
+                                    Object.keys(data.custom_data).length > 0 && (
+                                        <div className="space-y-5">
+                                            <h4 className="text-base text-gray-500">
+                                                Additional Details
+                                            </h4>
 
-                                        {data.custom_data.parent_name && (
-                                            <div className="flex flex-col sm:flex-row sm:justify-between">
-                                                <span className="text-gray-500 text-sm">Parent Name</span>
-                                                <span className="font-medium text-lg">
-                                                    {data.custom_data.name}
-                                                </span>
-                                            </div>
-                                        )}
+                                            {Object.entries(data.custom_data).map(
+                                                ([key, value]) => (
+                                                    <div
+                                                        key={key}
+                                                        className="flex flex-col sm:flex-row sm:justify-between gap-1"
+                                                    >
+                                                        <span className="text-gray-500 text-sm capitalize">
+                                                            {key.replace(/_/g, ' ')}
+                                                        </span>
 
-                                        {data.custom_data.full_address && (
-                                            <div className="flex flex-col sm:flex-row sm:justify-between">
-                                                <span className="text-gray-500 text-sm">Address</span>
-                                                <span className="font-medium text-lg">
-                                                    {data.custom_data.location_name}
-                                                </span>
-                                            </div>
-                                        )}
-
-                                        {data.custom_data.current_institution && (
-                                            <div className="flex flex-col sm:flex-row sm:justify-between">
-                                                <span className="text-gray-500 text-sm">Current Institution</span>
-                                                <span className="font-medium text-lg">
-                                                    {data.custom_data.organization}
-                                                </span>
-                                            </div>
-                                        )}
-
-                                        {data.custom_data.desired_course && (
-                                            <div className="flex flex-col sm:flex-row sm:justify-between">
-                                                <span className="text-gray-500 text-sm">Desired Course</span>
-                                                <span className="font-medium text-lg">
-                                                    {data.custom_data.designation}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
+                                                        <span className="font-medium text-lg break-words text-right">
+                                                            {String(value || '—')}
+                                                        </span>
+                                                    </div>
+                                                ),
+                                            )}
+                                        </div>
+                                    )}
 
                                 {/* Message */}
-                                <div>
+                                {/* <div>
                                     <h4 className="text-base text-gray-500 mb-3">
                                         Message
                                     </h4>
                                     <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 text-gray-700 dark:text-gray-200 whitespace-pre-wrap text-base leading-relaxed">
                                         {data.message || '—'}
                                     </div>
-                                </div>
+                                </div> */}
 
 
                             </div>
