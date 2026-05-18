@@ -1,112 +1,112 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Container from '@/components/shared/Container'
 import Button from '@/components/ui/Button'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import CustomerForm from '../CustomerForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import sleep from '@/utils/sleep'
+import {apiCreateProgram } from '@/services/CustomersService'
 import { TbTrash } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
-import type { CustomerFormSchema } from '../CustomerForm'
 
-const CustomerEdit = () => {
+type ProgramOption = {
+    label: string
+    value: string
+}
+
+const CustomerCreate = () => {
     const navigate = useNavigate()
 
-    const [discardConfirmationOpen, setDiscardConfirmationOpen] =
-        useState(false)
-    const [isSubmiting, setIsSubmiting] = useState(false)
+    const [discardConfirmationOpen, setDiscardConfirmationOpen] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const handleFormSubmit = async (values: CustomerFormSchema) => {
-        // console.log('Submitted values', values)
-        setIsSubmiting(true)
-        await sleep(800)
-        setIsSubmiting(false)
-        toast.push(
-            <Notification type="success">Customer created!</Notification>,
-            { placement: 'top-center' },
-        )
-        navigate('/concepts/customers/customer-list')
-    }
 
-    const handleConfirmDiscard = () => {
-        setDiscardConfirmationOpen(true)
-        toast.push(
-            <Notification type="success">Customer discardd!</Notification>,
-            { placement: 'top-center' },
-        )
-        navigate('/concepts/customers/customer-list')
-    }
+    // 
 
-    const handleDiscard = () => {
-        setDiscardConfirmationOpen(true)
-    }
+    // =========================
+    // SUBMIT
+    // =========================
+    const handleFormSubmit = async (values: any) => {
+        setIsSubmitting(true)
 
-    const handleCancel = () => {
-        setDiscardConfirmationOpen(false)
+        try {
+            const payload = {
+                name: values.name,
+                code: values.code,
+                description: values.description,
+                start_date: values.start_date,
+                end_date: values.end_date,
+            }
+
+            // console.log('🚀 FINAL PAYLOAD:', payload)
+
+            await apiCreateProgram(payload)
+
+            toast.push(
+                <Notification type="success">
+                    Program created successfully
+                </Notification>,
+                { placement: 'top-center' }
+            )
+
+            navigate('/programs')
+        } catch (error) {
+            // console.log('❌ CREATE ERROR:', error)
+
+            toast.push(
+                <Notification type="danger">
+                    Failed to create program    
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (
         <>
             <CustomerForm
                 newCustomer
+                // ✅ IMPORTANT FIX
                 defaultValues={{
-                    firstName: '',
-                    lastName: '',
+                    name: '',
+                    code: '',
+                    description: '',
+                    start_date: '',
+                    end_date: '',
                     email: '',
-                    img: '',
-                    phoneNumber: '',
-                    dialCode: '',
-                    country: '',
-                    address: '',
-                    city: '',
-                    postcode: '',
-                    tags: [],
+                    phone: '',
+                    place: '',
                 }}
                 onFormSubmit={handleFormSubmit}
             >
                 <Container>
-                    <div className="flex items-center justify-between px-8">
-                        <span></span>
-                        <div className="flex items-center">
-                            <Button
-                                className="ltr:mr-3 rtl:ml-3"
-                                type="button"
-                                customColorClass={() =>
-                                    'border-error ring-1 ring-error text-error hover:border-error hover:ring-error hover:text-error bg-transparent'
-                                }
-                                icon={<TbTrash />}
-                                onClick={handleDiscard}
-                            >
-                                Discard
-                            </Button>
-                            <Button
-                                variant="solid"
-                                type="submit"
-                                loading={isSubmiting}
-                            >
-                                Create
-                            </Button>
-                        </div>
+                    <div className="flex justify-end gap-3 px-8">
+                        <Button
+                            type="button"
+                            onClick={() => setDiscardConfirmationOpen(true)}
+                        >
+                            Discard
+                        </Button>
+
+                        <Button type="submit" variant="solid" loading={isSubmitting}>
+                            Create
+                        </Button>
                     </div>
                 </Container>
             </CustomerForm>
+
             <ConfirmDialog
                 isOpen={discardConfirmationOpen}
-                type="danger"
-                title="Discard changes"
-                onClose={handleCancel}
-                onRequestClose={handleCancel}
-                onCancel={handleCancel}
-                onConfirm={handleConfirmDiscard}
+                onClose={() => setDiscardConfirmationOpen(false)}
+                onCancel={() => setDiscardConfirmationOpen(false)}
+                onConfirm={() => navigate('/programs')}
             >
-                <p>
-                    Are you sure you want discard this? This action can&apos;t
-                    be undo.{' '}
-                </p>
+                Are you sure you want to discard?
             </ConfirmDialog>
         </>
     )
 }
 
-export default CustomerEdit
+export default CustomerCreate
