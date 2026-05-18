@@ -18,63 +18,107 @@ const CustomerListSelected = () => {
         customerList,
         mutate,
         customerListTotal,
+        tableData,
         setSelectAllCustomer,
     } = useCustomerList()
 
-    const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
-    const [sendMessageDialogOpen, setSendMessageDialogOpen] = useState(false)
-    const [sendMessageLoading, setSendMessageLoading] = useState(false)
+    const [deleteConfirmationOpen, setDeleteConfirmationOpen] =
+        useState(false)
 
+    const [sendMessageDialogOpen, setSendMessageDialogOpen] =
+        useState(false)
+
+    const [sendMessageLoading, setSendMessageLoading] =
+        useState(false)
+
+    // =========================
+    // DELETE OPEN
+    // =========================
     const handleDelete = () => {
         setDeleteConfirmationOpen(true)
     }
 
+    // =========================
+    // DELETE CANCEL
+    // =========================
     const handleCancel = () => {
         setDeleteConfirmationOpen(false)
     }
 
     // =========================
-    // DELETE (SAFE VERSION)
+    // BULK DELETE
     // =========================
     const handleConfirmDelete = async () => {
         try {
             if (!selectedCustomer.length) return
 
-            await Promise.allSettled(
-                selectedCustomer.map((c) =>
-                    apiDeleteProgram(c.id)
+            // DELETE API CALLS
+            await Promise.all(
+                selectedCustomer.map((item) =>
+                    apiDeleteProgram(item.id)
                 )
             )
 
-            const newCustomerList = customerList.filter(
+            // REMOVE FROM CURRENT PAGE
+            const updatedList = customerList.filter(
                 (customer) =>
                     !selectedCustomer.some(
-                        (selected) => selected.id === customer.id
+                        (selected) =>
+                            selected.id === customer.id
                     )
             )
 
+            // NEW TOTAL
+            const updatedTotal =
+                customerListTotal -
+                selectedCustomer.length
+
+            // CLEAR SELECTION
             setSelectAllCustomer([])
 
+            // UPDATE SWR CACHE
             mutate(
                 {
-                    results: newCustomerList,
-                    count: customerListTotal - selectedCustomer.length,
+                    results: updatedList,
+                    count: updatedTotal,
                 },
                 false
             )
 
+            // =========================
+            // FIX EMPTY PAGE ISSUE
+            // =========================
+            const totalPages = Math.ceil(
+                updatedTotal / tableData.pageSize
+            )
+
+            // if current page becomes empty
+            if (
+                updatedList.length === 0 &&
+                tableData.pageIndex > 1
+            ) {
+                tableData.pageIndex =
+                    totalPages || 1
+            }
+
             toast.push(
                 <Notification type="success">
-                    Participants deleted!
+                    Programs deleted successfully!
                 </Notification>,
-                { placement: 'top-center' }
+                {
+                    placement: 'top-center',
+                }
             )
-        } catch (err) {
+        } catch (error) {
+            console.error(error)
+
             toast.push(
                 <Notification type="danger">
-                    Failed to delete participants
+                    Failed to delete programs
                 </Notification>,
-                { placement: 'top-center' }
+                {
+                    placement: 'top-center',
+                }
             )
         } finally {
             setDeleteConfirmationOpen(false)
@@ -82,16 +126,21 @@ const CustomerListSelected = () => {
     }
 
     // =========================
-    // SEND MESSAGE (unchanged)
+    // SEND MESSAGE
     // =========================
     const handleSend = () => {
         setSendMessageLoading(true)
 
         setTimeout(() => {
             toast.push(
-                <Notification type="success">Message sent!</Notification>,
-                { placement: 'top-center' }
+                <Notification type="success">
+                    Message sent!
+                </Notification>,
+                {
+                    placement: 'top-center',
+                }
             )
+
             setSendMessageLoading(false)
             setSendMessageDialogOpen(false)
             setSelectAllCustomer([])
@@ -108,16 +157,24 @@ const CustomerListSelected = () => {
                 >
                     <div className="container mx-auto">
                         <div className="flex items-center justify-between">
-                            <span className="flex items-center gap-2">
-                                <span className="text-lg text-primary">
-                                    <TbChecks />
-                                </span>
-
-                                <span className="font-semibold flex items-center gap-1">
-                                    <span className="heading-text">
-                                        {selectedCustomer.length} program
+                            <span>
+                                <span className="flex items-center gap-2">
+                                    <span className="text-lg text-primary">
+                                        <TbChecks />
                                     </span>
-                                    <span>selected</span>
+
+                                    <span className="font-semibold flex items-center gap-1">
+                                        <span className="heading-text">
+                                            {
+                                                selectedCustomer.length
+                                            }{' '}
+                                            programs
+                                        </span>
+
+                                        <span>
+                                            selected
+                                        </span>
+                                    </span>
                                 </span>
                             </span>
 
@@ -133,59 +190,106 @@ const CustomerListSelected = () => {
                                 >
                                     Delete
                                 </Button>
+
+                                {/* MESSAGE BUTTON */}
+                                {/* 
+                                <Button
+                                    size="sm"
+                                    variant="solid"
+                                    onClick={() =>
+                                        setSendMessageDialogOpen(
+                                            true
+                                        )
+                                    }
+                                >
+                                    Message
+                                </Button>
+                                */}
                             </div>
                         </div>
                     </div>
                 </StickyFooter>
             )}
 
-            {/* DELETE CONFIRM */}
+            {/* DELETE DIALOG */}
             <ConfirmDialog
                 isOpen={deleteConfirmationOpen}
                 type="danger"
-                title="Remove participants"
+                title="Delete Programs"
                 onClose={handleCancel}
                 onRequestClose={handleCancel}
                 onCancel={handleCancel}
                 onConfirm={handleConfirmDelete}
             >
                 <p>
-                    Are you sure you want to remove these participants? This
-                    action can&apos;t be undone.
+                    Are you sure you want to delete
+                    selected programs? This action
+                    can&apos;t be undone.
                 </p>
             </ConfirmDialog>
 
             {/* MESSAGE DIALOG */}
             <Dialog
                 isOpen={sendMessageDialogOpen}
-                onRequestClose={() => setSendMessageDialogOpen(false)}
-                onClose={() => setSendMessageDialogOpen(false)}
+                onRequestClose={() =>
+                    setSendMessageDialogOpen(false)
+                }
+                onClose={() =>
+                    setSendMessageDialogOpen(false)
+                }
             >
-                <h5 className="mb-2">Send Message</h5>
-                <p>Send message to selected participants</p>
+                <h5 className="mb-2">
+                    Send Message
+                </h5>
+
+                <p>
+                    Send message to selected
+                    programs
+                </p>
 
                 <Avatar.Group
                     chained
                     omittedAvatarTooltip
                     className="mt-4"
                     maxCount={4}
-                    omittedAvatarProps={{ size: 30 }}
+                    omittedAvatarProps={{
+                        size: 30,
+                    }}
                 >
-                    {selectedCustomer.map((customer) => (
-                        <Tooltip key={customer.id} title={customer.name}>
-                            <Avatar size={30} src={customer.img} alt="" />
-                        </Tooltip>
-                    ))}
+                    {selectedCustomer.map(
+                        (customer) => (
+                            <Tooltip
+                                key={customer.id}
+                                title={
+                                    customer.name
+                                }
+                            >
+                                <Avatar
+                                    size={30}
+                                    src={
+                                        customer.img
+                                    }
+                                    alt=""
+                                />
+                            </Tooltip>
+                        )
+                    )}
                 </Avatar.Group>
 
                 <div className="my-4">
-                    <RichTextEditor content={''} />
+                    <RichTextEditor
+                        content={''}
+                    />
                 </div>
 
-                <div className="flex items-center gap-2 justify-end">
+                <div className="flex items-center justify-end gap-2">
                     <Button
                         size="sm"
-                        onClick={() => setSendMessageDialogOpen(false)}
+                        onClick={() =>
+                            setSendMessageDialogOpen(
+                                false
+                            )
+                        }
                     >
                         Cancel
                     </Button>
@@ -193,7 +297,9 @@ const CustomerListSelected = () => {
                     <Button
                         size="sm"
                         variant="solid"
-                        loading={sendMessageLoading}
+                        loading={
+                            sendMessageLoading
+                        }
                         onClick={handleSend}
                     >
                         Send
