@@ -838,6 +838,17 @@ export async function apiGetProgramList<T, U extends Record<string, unknown>>(
     })
 }
 
+export async function apiGetProgramById<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/programs/programs/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
 export async function apiCreateProgram<T, U extends Record<string, unknown>>(
     data: U,
 ) {

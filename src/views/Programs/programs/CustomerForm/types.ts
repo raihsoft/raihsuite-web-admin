@@ -7,6 +7,12 @@ export type OverviewFields = {
     dialCode: string
     phoneNumber: string
     img: string
+    title: string
+    code: string
+    description: string
+    start_date: string
+    end_date: string
+
 }
 
 export type AddressFields = {

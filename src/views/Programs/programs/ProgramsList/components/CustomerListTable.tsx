@@ -65,13 +65,13 @@ const CustomerListTable = () => {
         if (!query) return list
 
         return list.filter((customer: any) =>
-            customer.participant_name
+            customer.name
                 ?.toLowerCase()
                 .includes(query) ||
-            customer.email
+            customer.code
                 ?.toLowerCase()
                 .includes(query) ||
-            customer.phone
+            customer.description
                 ?.toLowerCase()
                 .includes(query) ||
             customer.place
@@ -87,11 +87,11 @@ const CustomerListTable = () => {
     // ACTIONS
     // =========================
     const handleViewDetails = (customer: Customer) => {
-        navigate(`Programs/programs/CustomerDetails${customer.id}`)
+        navigate(`/programs/${customer.id}`)
     }
 
     const handleEdit = (customer: Customer) => {
-        navigate(`Programs/programs/CustomerEdit${customer.id}`)
+        navigate(`/programs/edit/${customer.id}`)
     }
 
     // =========================
