@@ -65,6 +65,11 @@ export type Customer = {
     paymentMethod: PaymentMethod[]
     subscription: Subscription[]
     totalSpending: number
+    code: string
+    description: string
+     tenant: number
+    start_date: string
+    end_date: string
 }
 export type Customer = {
     id: number
@@ -75,4 +80,5 @@ export type Customer = {
     start_date: string
     end_date: string
         status: string
+    
 }
