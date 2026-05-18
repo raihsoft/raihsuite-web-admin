@@ -10,6 +10,7 @@ import RichTextEditor from '@/components/shared/RichTextEditor'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
 import { TbChecks } from 'react-icons/tb'
+import { apiDeleteProgram } from '@/services/CustomersService'
 
 const CustomerListSelected = () => {
     const {
@@ -32,29 +33,64 @@ const CustomerListSelected = () => {
         setDeleteConfirmationOpen(false)
     }
 
-    const handleConfirmDelete = () => {
-        const newCustomerList = customerList.filter((customer) => {
-            return !selectedCustomer.some(
-                (selected) => selected.id === customer.id,
+    // =========================
+    // DELETE (SAFE VERSION)
+    // =========================
+    const handleConfirmDelete = async () => {
+        try {
+            if (!selectedCustomer.length) return
+
+            await Promise.allSettled(
+                selectedCustomer.map((c) =>
+                    apiDeleteProgram(c.id)
+                )
             )
-        })
-        setSelectAllCustomer([])
-        mutate(
-            {
-                list: newCustomerList,
-                total: customerListTotal - selectedCustomer.length,
-            },
-            false,
-        )
-        setDeleteConfirmationOpen(false)
+
+            const newCustomerList = customerList.filter(
+                (customer) =>
+                    !selectedCustomer.some(
+                        (selected) => selected.id === customer.id
+                    )
+            )
+
+            setSelectAllCustomer([])
+
+            mutate(
+                {
+                    results: newCustomerList,
+                    count: customerListTotal - selectedCustomer.length,
+                },
+                false
+            )
+
+            toast.push(
+                <Notification type="success">
+                    Participants deleted!
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } catch (err) {
+            toast.push(
+                <Notification type="danger">
+                    Failed to delete participants
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setDeleteConfirmationOpen(false)
+        }
     }
 
+    // =========================
+    // SEND MESSAGE (unchanged)
+    // =========================
     const handleSend = () => {
         setSendMessageLoading(true)
+
         setTimeout(() => {
             toast.push(
                 <Notification type="success">Message sent!</Notification>,
-                { placement: 'top-center' },
+                { placement: 'top-center' }
             )
             setSendMessageLoading(false)
             setSendMessageDialogOpen(false)
@@ -66,27 +102,23 @@ const CustomerListSelected = () => {
         <>
             {selectedCustomer.length > 0 && (
                 <StickyFooter
-                    className=" flex items-center justify-between py-4 bg-white dark:bg-gray-800"
+                    className="flex items-center justify-between py-4 bg-white dark:bg-gray-800"
                     stickyClass="-mx-4 sm:-mx-8 border-t border-gray-200 dark:border-gray-700 px-8"
                     defaultClass="container mx-auto px-8 rounded-xl border border-gray-200 dark:border-gray-600 mt-4"
                 >
                     <div className="container mx-auto">
                         <div className="flex items-center justify-between">
-                            <span>
-                                {selectedCustomer.length > 0 && (
-                                    <span className="flex items-center gap-2">
-                                        <span className="text-lg text-primary">
-                                            <TbChecks />
-                                        </span>
-                                        <span className="font-semibold flex items-center gap-1">
-                                            <span className="heading-text">
-                                                {selectedCustomer.length}{' '}
-                                                programs
-                                            </span>
-                                            <span>selected</span>
-                                        </span>
+                            <span className="flex items-center gap-2">
+                                <span className="text-lg text-primary">
+                                    <TbChecks />
+                                </span>
+
+                                <span className="font-semibold flex items-center gap-1">
+                                    <span className="heading-text">
+                                        {selectedCustomer.length} program
                                     </span>
-                                )}
+                                    <span>selected</span>
+                                </span>
                             </span>
 
                             <div className="flex items-center">
@@ -101,42 +133,37 @@ const CustomerListSelected = () => {
                                 >
                                     Delete
                                 </Button>
-                                {/* <Button
-                                    size="sm"
-                                    variant="solid"
-                                    onClick={() =>
-                                        setSendMessageDialogOpen(true)
-                                    }
-                                >
-                                    Message
-                                </Button> */}
                             </div>
                         </div>
                     </div>
                 </StickyFooter>
             )}
+
+            {/* DELETE CONFIRM */}
             <ConfirmDialog
                 isOpen={deleteConfirmationOpen}
                 type="danger"
-                title="Remove customers"
+                title="Remove participants"
                 onClose={handleCancel}
                 onRequestClose={handleCancel}
                 onCancel={handleCancel}
                 onConfirm={handleConfirmDelete}
             >
                 <p>
-                    {' '}
-                    Are you sure you want to remove these customers? This action
-                    can&apos;t be undo.{' '}
+                    Are you sure you want to remove these participants? This
+                    action can&apos;t be undone.
                 </p>
             </ConfirmDialog>
+
+            {/* MESSAGE DIALOG */}
             <Dialog
                 isOpen={sendMessageDialogOpen}
                 onRequestClose={() => setSendMessageDialogOpen(false)}
                 onClose={() => setSendMessageDialogOpen(false)}
             >
                 <h5 className="mb-2">Send Message</h5>
-                <p>Send message to the following customers</p>
+                <p>Send message to selected participants</p>
+
                 <Avatar.Group
                     chained
                     omittedAvatarTooltip
@@ -150,16 +177,19 @@ const CustomerListSelected = () => {
                         </Tooltip>
                     ))}
                 </Avatar.Group>
+
                 <div className="my-4">
                     <RichTextEditor content={''} />
                 </div>
-                <div className="ltr:justify-end flex items-center gap-2">
+
+                <div className="flex items-center gap-2 justify-end">
                     <Button
                         size="sm"
                         onClick={() => setSendMessageDialogOpen(false)}
                     >
                         Cancel
                     </Button>
+
                     <Button
                         size="sm"
                         variant="solid"
