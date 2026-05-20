@@ -95,7 +95,24 @@ const TicketListTable = () => {
         return selectedTicket.some((t) => t?.id === row.id)
     }
 
-    return (
+return (
+    <>
+        <div className="mb-4 text-sm text-gray-500">
+            Showing{' '}
+            {ticketListTotal === 0
+                ? 0
+                : ((tableData.pageIndex as number) - 1) *
+                      (tableData.pageSize as number) +
+                  1}{' '}
+            to{' '}
+            {Math.min(
+                (tableData.pageIndex as number) *
+                    (tableData.pageSize as number),
+                ticketListTotal
+            )}{' '}
+            of {ticketListTotal} entries
+        </div>
+
         <CommonTable
             data={data}
             total={ticketListTotal}
@@ -106,10 +123,15 @@ const TicketListTable = () => {
             setSelectedItems={setSelectedTicket}
             columns={columns}
             selectable={true}
-            checkboxChecked={checkboxChecked}
+            checkboxChecked={(row) =>
+                selectedTicket.some(
+                    (s) => s.id === row.id
+                )
+            }
             pageSizes={[10, 20, 50, 100]}
         />
-    )
+    </>
+)
 }
 
 export default TicketListTable

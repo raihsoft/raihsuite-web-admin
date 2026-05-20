@@ -77,6 +77,19 @@ const CustomerDetails = () => {
                                             <span>—</span>
                                         )}
                                     </div>
+                                    <div className="flex flex-col sm:flex-row sm:justify-between">
+                                        <span className="text-gray-500 text-sm">Place</span>
+                                        {data.place ? (
+                                            <a
+                                                href={`mailto:${data.place}`}
+                                                className="font-medium text-lg hover:underline"
+                                            >
+                                                {data.place}
+                                            </a>
+                                        ) : (
+                                            <span>—</span>
+                                        )}
+                                    </div>
 
                                     {/* Mobile */}
                                     {data.mobile && (

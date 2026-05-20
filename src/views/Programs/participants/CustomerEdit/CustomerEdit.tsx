@@ -115,7 +115,7 @@ const CustomerEdit = () => {
                 { ...tableData, ...filterData },
             ])
 
-            navigate('/participants-programs')
+            navigate('/programs-participants')
         } catch (error: any) {
             // console.log('❌ UPDATE ERROR:', error)
 
@@ -202,7 +202,7 @@ const CustomerEdit = () => {
                 { ...tableData, ...filterData },
             ])
 
-            navigate('/participants-programs')
+            navigate('/programs-participants')
         } catch (error) {
             toast.push(
                 <Notification type="danger">
@@ -226,7 +226,7 @@ const CustomerEdit = () => {
     }
 
     const handleBack = () => {
-        navigate('/participants-programs')
+        navigate('/programs-participants')
     }
 
     return (

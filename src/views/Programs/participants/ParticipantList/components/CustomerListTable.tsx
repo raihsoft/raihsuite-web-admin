@@ -87,7 +87,7 @@ const CustomerListTable = () => {
     // ACTIONS
     // =========================
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/program-participants/${customer.id}`)
+        navigate(`/program-participants/details/${customer.id}`)
     }
 
     const handleEdit = (customer: Customer) => {
@@ -261,50 +261,75 @@ const CustomerListTable = () => {
         }
     }
 
-    return (
-        <>
-            {/* HEADER */}
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">
-                    Total Participants: {customerListTotal}
-                </h3>
-
-                <CustomerListActionTools />
+return (
+    <>
+        {/* =========================
+            HEADER
+        ========================= */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            
+            {/* SHOWING ENTRIES */}
+            <div className="text-sm text-gray-500">
+                Showing{' '}
+                {customerListTotal === 0
+                    ? 0
+                    : ((tableData.pageIndex as number) - 1) *
+                          (tableData.pageSize as number) +
+                      1}{' '}
+                to{' '}
+                {Math.min(
+                    (tableData.pageIndex as number) *
+                        (tableData.pageSize as number),
+                    customerListTotal
+                )}{' '}
+                of {customerListTotal} entries
             </div>
 
-            {/* TABLE */}
-            <DataTable
-                selectable
-                columns={columns}
-                data={filteredAndSortedList}
-                noData={
-                    !isLoading &&
-                    filteredAndSortedList.length === 0
-                }
-                loading={isLoading}
-                pagingData={{
-                    total: customerListTotal,
-                    pageIndex: tableData.pageIndex as number,
-                    pageSize: tableData.pageSize as number,
-                }}
-                checkboxChecked={(row) =>
-                    selectedCustomer.some(
-                        (selected) =>
-                            selected.id === row.id
-                    )
-                }
-                onPaginationChange={
-                    handlePaginationChange
-                }
-                onSelectChange={handleSelectChange}
-                onSort={handleSort}
-                onCheckBoxChange={handleRowSelect}
-                onIndeterminateCheckBoxChange={
-                    handleAllRowSelect
-                }
-            />
-        </>
-    )
+            {/* ACTION TOOLS */}
+            <CustomerListActionTools />
+        </div>
+
+        {/* =========================
+            TABLE
+        ========================= */}
+        <DataTable
+            selectable
+            columns={columns}
+            data={filteredAndSortedList}
+            noData={
+                !isLoading &&
+                filteredAndSortedList.length === 0
+            }
+            loading={isLoading}
+            pagingData={{
+                total: customerListTotal,
+                pageIndex:
+                    tableData.pageIndex as number,
+                pageSize:
+                    tableData.pageSize as number,
+            }}
+            checkboxChecked={(row) =>
+                selectedCustomer.some(
+                    (selected) =>
+                        selected.id === row.id
+                )
+            }
+            onPaginationChange={
+                handlePaginationChange
+            }
+            onSelectChange={
+                handleSelectChange
+            }
+            onSort={handleSort}
+            onCheckBoxChange={
+                handleRowSelect
+            }
+            onIndeterminateCheckBoxChange={
+                handleAllRowSelect
+            }
+        />
+    </>
+)
 }
 
 export default CustomerListTable

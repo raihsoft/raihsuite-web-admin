@@ -155,28 +155,41 @@ const CustomerListTable = () => {
         }
     }
 
-    return (
+           const start =
+    customerListTotal === 0
+        ? 0
+        : (tableData.pageIndex - 1) * tableData.pageSize + 1
+
+const end = Math.min(
+    tableData.pageIndex * tableData.pageSize,
+    customerListTotal
+)
+        
+
+return (
+    <>
+        <div className="mb-4 text-sm text-gray-500">
+            Showing {start} to {end} of {customerListTotal} entries
+        </div>
+
         <DataTable
             selectable
             columns={columns}
-            data={filteredList}
-            noData={!isLoading && filteredList.length === 0}
+            data={customerList}
+            noData={!isLoading && customerList.length === 0}
             loading={isLoading}
             pagingData={{
                 total: customerListTotal,
-                pageIndex: tableData.pageIndex,
-                pageSize: tableData.pageSize,
+                pageIndex: tableData.pageIndex as number,
+                pageSize: tableData.pageSize as number,
             }}
-            checkboxChecked={(row) =>
-                selectedCustomer.some((s) => s.id === row.id)
-            }
+
             onPaginationChange={handlePaginationChange}
             onSelectChange={handleSelectChange}
-            onSort={handleSort}
-            onCheckBoxChange={handleRowSelect}
-            onIndeterminateCheckBoxChange={handleAllRowSelect}
+
         />
-    )
+    </>
+)
 }
 
 export default CustomerListTable

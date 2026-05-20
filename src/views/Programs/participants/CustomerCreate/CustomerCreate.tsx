@@ -79,7 +79,7 @@ const CustomerCreate = () => {
                 { placement: 'top-center' }
             )
 
-            navigate('/participants-programs')
+            navigate('/programs-participants')
         } catch (error) {
             // console.log('❌ CREATE ERROR:', error)
 
@@ -129,7 +129,7 @@ const CustomerCreate = () => {
                 isOpen={discardConfirmationOpen}
                 onClose={() => setDiscardConfirmationOpen(false)}
                 onCancel={() => setDiscardConfirmationOpen(false)}
-                onConfirm={() => navigate('/participants-programs')}
+                onConfirm={() => navigate('/programs-participants')}
             >
                 Are you sure you want to discard?
             </ConfirmDialog>
