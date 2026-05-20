@@ -150,12 +150,29 @@ const EventsTable = () => {
         }
     }
 
-    return (
+
+const start =
+    eventsTotal === 0
+        ? 0
+        : (tableData.pageIndex - 1) * tableData.pageSize + 1
+
+const end = Math.min(
+    tableData.pageIndex * tableData.pageSize,
+    eventsTotal
+)
+        
+
+return (
+    <>
+        <div className="mb-4 text-sm text-gray-500">
+            Showing {start} to {end} of {eventsTotal} entries
+        </div>
+
         <DataTable
             selectable
             columns={columns}
-            data={filteredAndSortedList}
-            noData={!isLoading && filteredAndSortedList.length === 0}
+            data={eventsList}
+            noData={!isLoading && eventsList.length === 0}
             loading={isLoading}
             pagingData={{
                 total: eventsTotal,
@@ -163,14 +180,15 @@ const EventsTable = () => {
                 pageSize: tableData.pageSize as number,
             }}
             checkboxChecked={(row) =>
-                selectedCustomer.some((selected) => selected.code === row.code)
+                selectedCustomer.some((s) => s.id === row.id)
             }
             onPaginationChange={handlePaginationChange}
             onSelectChange={handleSelectChange}
             onCheckBoxChange={handleRowSelect}
             onIndeterminateCheckBoxChange={handleAllRowSelect}
         />
-    )
+    </>
+)
 }
 
 export default EventsTable

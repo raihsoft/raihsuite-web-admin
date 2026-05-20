@@ -8,6 +8,7 @@
     import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
     import type { Customer } from '../types'
     import type { TableQueries } from '@/@types/common'
+import CustomerListActionTools from './CustomerListActionTools'
 
     const EllipsisCell = ({ value, maxWidth = '200px' }: any) => {
         if (!value) return '-'
@@ -169,28 +170,47 @@
             }
         }
 
-        return (
-            <DataTable
-                selectable
-                columns={columns}
-                data={customerList}   // ✅ IMPORTANT FIX
-                noData={!isLoading && customerList.length === 0}
-                loading={isLoading}
-                pagingData={{
-                    total: customerListTotal,
-                    pageIndex: tableData.pageIndex as number,
-                    pageSize: tableData.pageSize as number,
-                }}
-                checkboxChecked={(row) =>
-                    selectedCustomer.some((s) => s.id === row.id)
-                }
-                onPaginationChange={handlePaginationChange}
-                onSelectChange={handleSelectChange}
-                onSort={handleSort}
-                onCheckBoxChange={handleRowSelect}
-                onIndeterminateCheckBoxChange={handleAllRowSelect}
-            />
-        )
+           const start =
+    customerListTotal === 0
+        ? 0
+        : (tableData.pageIndex - 1) * tableData.pageSize + 1
+
+const end = Math.min(
+    tableData.pageIndex * tableData.pageSize,
+    customerListTotal
+)
+        
+
+return (
+    <>
+        <div className="mb-4 text-sm text-gray-500">
+            Showing {start} to {end} of {customerListTotal} entries
+        </div>
+
+        <DataTable
+            selectable
+            columns={columns}
+            data={customerList}
+            noData={!isLoading && customerList.length === 0}
+            loading={isLoading}
+            pagingData={{
+                total: customerListTotal,
+                pageIndex: tableData.pageIndex as number,
+                pageSize: tableData.pageSize as number,
+            }}
+            checkboxChecked={(row) =>
+                selectedCustomer.some((s) => s.id === row.id)
+            }
+            onPaginationChange={handlePaginationChange}
+            onSelectChange={handleSelectChange}
+            onSort={handleSort}
+            onCheckBoxChange={handleRowSelect}
+            onIndeterminateCheckBoxChange={handleAllRowSelect}
+        />
+    </>
+)
+
+
     }
 
     export default CustomerListTable

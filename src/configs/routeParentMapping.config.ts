@@ -68,14 +68,16 @@ export const routeParentMapping: Record<string, string> = {
     'ticketEdit': 'events.ticket',
 
     // Programs
-    'Programs.details': 'programs.list',
-    'Programs.create': 'programs.list',
-    'Programs.edit': 'programs.list',
+    'programs.list': 'programs.list',
+    'programs.list.create': 'programs.list',
+    'programs.list.edit': 'programs.list',
+    'programs.list.details': 'programs.list',
 
-
-    'Programs.participantsDetails': 'programs.participants',
-    'Programs.participantsCreate': 'programs.participants',
-    'Programs.participantsEdit': 'programs.participants',
+    // Participants
+    'programs.participants': 'programs.participants',
+    'programs.participants.create': 'programs.participants',
+    'programs.participants.details': 'programs.participants',
+    'programs.participants.edit': 'programs.participants',
 }
 
 /**

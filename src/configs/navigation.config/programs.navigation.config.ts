@@ -27,7 +27,7 @@ const programsNavigationConfig: NavigationTree[] = [
         
             {
                 key: 'programs.participants',
-                path: '/participants-programs',
+                path: '/programs-participants',
                 title: 'Participants',
                 translateKey: 'nav.programs.participants',
                 icon: 'MdEvent',
