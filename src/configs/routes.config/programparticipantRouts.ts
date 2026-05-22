@@ -3,13 +3,13 @@ import type { Routes } from '@/@types/routes'
 
 const ProgramsparticipantRoute: Routes = [
     {
-        key: 'programs.participantList',
-        path: '/participants-programs',
+        key: 'programs.participants',
+        path: '/programs-participants',
         component: lazy(() => import('@/views/Programs/participants/ParticipantList')),
         authority: [],
     },
     {
-        key: 'programs.participantCreate',
+        key: 'programs.participants.create',
         path: '/program-participants/create',
         component: lazy(() => import('@/views/Programs/participants/CustomerCreate')),
         authority: [],
@@ -23,8 +23,8 @@ const ProgramsparticipantRoute: Routes = [
         },
     },
     {
-        key: 'programs.participantDetails',
-        path: '/program-participants/:id',
+        key: 'programs.participants.details',
+        path: '/program-participants/details/:id',
         component: lazy(() => import('@/views/Programs/participants/CustomerDetails')),
         authority: [],
         meta: {
@@ -37,7 +37,7 @@ const ProgramsparticipantRoute: Routes = [
         },
     },
     {
-        key: 'programs.participantEdit',
+        key: 'programs.participants.edit',
         path: '/program-participants/edit/:id',
         component: lazy(() => import('@/views/Programs/participants/CustomerEdit')),
         authority: [],
@@ -53,6 +53,3 @@ const ProgramsparticipantRoute: Routes = [
 ]
 
 export default ProgramsparticipantRoute
-
-
-

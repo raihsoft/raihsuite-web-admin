@@ -175,43 +175,45 @@ const filteredAndSortedList = useMemo(() => {
         }
     }
 
-    return (
-        <>
-            {/* ✅ Total + Showing Count */}
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">
-                    Total Enquiries: {customerListTotal}
-                </h3>
+           const start =
+    customerListTotal === 0
+        ? 0
+        : (tableData.pageIndex - 1) * tableData.pageSize + 1
 
-                {/* <span className="text-sm text-gray-500">
-                    Showing: {filteredAndSortedList.length}
-                </span> */}
-            </div>
+const end = Math.min(
+    tableData.pageIndex * tableData.pageSize,
+    customerListTotal
+)
+        
 
-            <DataTable
-                selectable
-                columns={columns}
-                data={filteredAndSortedList}
-                noData={!isLoading && filteredAndSortedList.length === 0}
-                skeletonAvatarColumns={[0]}
-                skeletonAvatarProps={{ width: 28, height: 28 }}
-                loading={isLoading}
-                pagingData={{
-                    total: customerListTotal,
-                    pageIndex: tableData.pageIndex as number,
-                    pageSize: tableData.pageSize as number,
-                }}
-                checkboxChecked={(row) =>
-                    selectedCustomer.some((selected) => selected.id === row.id)
-                }
-                onPaginationChange={handlePaginationChange}
-                onSelectChange={handleSelectChange}
-                onSort={handleSort}
-                onCheckBoxChange={handleRowSelect}
-                onIndeterminateCheckBoxChange={handleAllRowSelect}
-            />
-        </>
-    )
+return (
+    <>
+        <div className="mb-4 text-sm text-gray-500">
+            Showing {start} to {end} of {customerListTotal} entries
+        </div>
+
+        <DataTable
+            selectable
+            columns={columns}
+            data={customerList}
+            noData={!isLoading && customerList.length === 0}
+            loading={isLoading}
+            pagingData={{
+                total: customerListTotal,
+                pageIndex: tableData.pageIndex as number,
+                pageSize: tableData.pageSize as number,
+            }}
+            checkboxChecked={(row) =>
+                selectedCustomer.some((s) => s.id === row.id)
+            }
+            onPaginationChange={handlePaginationChange}
+            onSelectChange={handleSelectChange}
+            onSort={handleSort}
+            onCheckBoxChange={handleRowSelect}
+            onIndeterminateCheckBoxChange={handleAllRowSelect}
+        />
+    </>
+)
 }
 
 export default CustomerListTable

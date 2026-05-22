@@ -53,9 +53,9 @@ const CustomerDetails = () => {
                                         </span>
                                     </div>
 
-                                    {data.participant_name && (
+                                    {data.code && (
                                         <div className="flex flex-col sm:flex-row sm:justify-between">
-                                            <span className="text-gray-500 text-sm">Participant Name</span>
+                                            <span className="text-gray-500 text-sm"> Code</span>
                                             <span className="font-medium text-lg">
                                                 {data.code || '—'}
                                             </span>

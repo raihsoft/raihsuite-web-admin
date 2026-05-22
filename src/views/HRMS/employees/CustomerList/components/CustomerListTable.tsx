@@ -93,21 +93,43 @@ const handleSelectAll = useCallback(
         [navigate]
     )
 
-    return (
+return (
+    <>
+        <div className="mb-4 text-sm text-gray-500">
+            Showing{' '}
+            {customerListTotal === 0
+                ? 0
+                : ((tableData.pageIndex as number) - 1) *
+                      (tableData.pageSize as number) +
+                  1}{' '}
+            to{' '}
+            {Math.min(
+                (tableData.pageIndex as number) *
+                    (tableData.pageSize as number),
+                customerListTotal
+            )}{' '}
+            of {customerListTotal} entries
+        </div>
+
         <CommonTable
-        data={data}
-        total={customerListTotal}
-        loading={isLoading}
-        tableData={tableData}
-        setTableData={setTableData}
-
-        selectedItems={selectedCustomer}
-        setSelectedItems={handleSelectItem}
-
-        checkboxChecked={checkboxChecked}
-        columns={columns}
-    />
-    )
+            data={data}
+            total={customerListTotal}
+            loading={isLoading}
+            tableData={tableData}
+            setTableData={setTableData}
+            selectedItems={selectedCustomer}
+            setSelectedItems={setSelectedCustomer}
+            columns={columns}
+            selectable={true}
+            checkboxChecked={(row) =>
+                selectedCustomer.some(
+                    (s) => s.id === row.id
+                )
+            }
+            pageSizes={[10, 20, 50, 100]}
+        />
+    </>
+)
 }
 
 export default CustomerListTable
