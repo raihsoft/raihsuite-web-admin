@@ -150,9 +150,21 @@ const CustomerListTable = () => {
                 header: 'Additional Details',
                 accessorKey: 'custom_data',
                 cell: (props) => {
-                    const customData = props.row.original.custom_data
+                    let customData =
+                        props.row.original.custom_data
 
-                    if (!customData) {
+                    if (typeof customData === 'string') {
+                        try {
+                            customData = JSON.parse(customData)
+                        } catch {
+                            customData = {}
+                        }
+                    }
+
+                    if (
+                        !customData ||
+                        Object.keys(customData).length === 0
+                    ) {
                         return <span>-</span>
                     }
 

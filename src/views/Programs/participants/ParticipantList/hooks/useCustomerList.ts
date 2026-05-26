@@ -87,6 +87,37 @@ export default function useCustomerList() {
         apiResponse?.total_count ??
         0
 
+    const parseCustomData = (
+        customData: unknown
+    ): Record<string, unknown> => {
+        if (customData === null || customData === undefined) {
+            return {}
+        }
+
+        if (typeof customData === 'string') {
+            try {
+                return JSON.parse(customData) as Record<
+                    string,
+                    unknown
+                >
+            } catch {
+                return {}
+            }
+        }
+
+        if (
+            typeof customData === 'object' &&
+            !Array.isArray(customData)
+        ) {
+            return customData as Record<
+                string,
+                unknown
+            >
+        }
+
+        return {}
+    }
+
     // =========================
     // SAVE ORIGINAL TOTAL
     // =========================
@@ -143,9 +174,9 @@ export default function useCustomerList() {
                 place:
                     customer.place ?? '',
 
-                custom_data:
-                    customer.custom_data ??
-                    {},
+                custom_data: parseCustomData(
+                    customer.custom_data,
+                ),
 
                 created_at:
                     customer.created_at ??
