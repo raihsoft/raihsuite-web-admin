@@ -4,6 +4,37 @@ import { useNavigate } from 'react-router-dom'
 import useCustomerList from '../hooks/useCustomerList'
 import { CSVLink } from 'react-csv'
 
+const parseCustomData = (
+    customData: unknown
+): Record<string, unknown> => {
+    if (customData === null || customData === undefined) {
+        return {}
+    }
+
+    if (typeof customData === 'string') {
+        try {
+            return JSON.parse(customData) as Record<
+                string,
+                unknown
+            >
+        } catch {
+            return {}
+        }
+    }
+
+    if (
+        typeof customData === 'object' &&
+        !Array.isArray(customData)
+    ) {
+        return customData as Record<
+            string,
+            unknown
+        >
+    }
+
+    return {}
+}
+
 const formatCustomData = (customData: unknown): string => {
     if (customData === null || customData === undefined) {
         return ''
@@ -11,15 +42,12 @@ const formatCustomData = (customData: unknown): string => {
 
     if (typeof customData === 'string') {
         try {
-            const parsed = JSON.parse(customData)
-            return formatCustomData(parsed)
+            return formatCustomData(
+                JSON.parse(customData)
+            )
         } catch {
             return customData
         }
-    }
-
-    if (typeof customData !== 'object') {
-        return String(customData)
     }
 
     if (Array.isArray(customData)) {
@@ -29,15 +57,36 @@ const formatCustomData = (customData: unknown): string => {
             .join(', ')
     }
 
-    const entries = Object.entries(customData as Record<string, unknown>)
+    if (typeof customData === 'object') {
+        return Object.entries(
+            customData as Record<string, unknown>
+        )
+            .map(
+                ([key, value]) =>
+                    `${key}: ${formatCustomData(value)}`,
+            )
+            .join(', ')
+    }
 
-    if (entries.length === 0) {
+    return String(customData)
+}
+
+const getCustomField = (
+    customData: unknown,
+    field: string
+): string => {
+    const parsed = parseCustomData(customData)
+    const value = parsed[field]
+
+    if (value === null || value === undefined) {
         return ''
     }
 
-    return entries
-        .map(([key, value]) => `${key}: ${formatCustomData(value)}`)
-        .join(', ')
+    if (typeof value === 'object') {
+        return formatCustomData(value)
+    }
+
+    return String(value)
 }
 
 const CustomerListActionTools = () => {
@@ -45,10 +94,19 @@ const CustomerListActionTools = () => {
 
     const { customerList } = useCustomerList()
 
-    const downloadData = customerList.map((item) => ({
-        ...item,
-        custom_data: formatCustomData(item.custom_data),
-    }))
+    const downloadData = customerList.map((item) => {
+        const { custom_data, ...rest } = item
+
+        return {
+            ...rest,
+            scheme: getCustomField(custom_data, 'scheme'),
+            ration_card_category: getCustomField(
+                custom_data,
+                'ration_card_category',
+            ),
+            course: getCustomField(custom_data, 'course'),
+        }
+    })
 
     return (
         <div className="flex flex-col md:flex-row gap-3">
