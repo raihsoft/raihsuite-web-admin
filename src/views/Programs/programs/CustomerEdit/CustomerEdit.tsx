@@ -9,6 +9,10 @@ import {
     apiUpdateProgram,
     apiDeleteProgram,
     apiGetProgramById,
+    apiGetParticipantCustomFields,
+    apiCreateParticipantCustomField,
+    apiUpdateParticipantCustomField,
+    apiDeleteParticipantCustomField,
 } from '@/services/CustomersService'
 
 import CustomerForm from '../CustomerForm'
@@ -43,16 +47,25 @@ const CustomerEdit = () => {
     // GET PROGRAM
     // =========================
     const { data, isLoading } = useSWR(
-        ['/api/programs', id as string],
-        ([_, idParam]) =>
-            apiGetProgramById<Customer>(
-                idParam as string,
-            ),
+        id ? ['/programs/programs', id] : null,
+        () => apiGetProgramById<Customer>(id!),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
         },
     )
+
+    const { data: customFieldsResponse, isLoading: customFieldsLoading, mutate: mutateCustomFields } = useSWR(
+        id ? ['/programs/participant-custom-fields', { program: id }] : null,
+        () => apiGetParticipantCustomFields<any, any>({ program: id! }),
+        {
+            revalidateOnFocus: false,
+            revalidateIfStale: false,
+        },
+    )
+
+    const initialCustomFields = customFieldsResponse?.results ?? customFieldsResponse ?? []
+    const isDataLoading = isLoading || customFieldsLoading
 
     // =========================
     // STATE
@@ -75,7 +88,7 @@ const CustomerEdit = () => {
     // UPDATE PROGRAM
     // =========================
     const handleFormSubmit = async (
-        values: CustomerFormSchema,
+        values: any,
     ) => {
         if (!id) return
 
@@ -92,6 +105,49 @@ const CustomerEdit = () => {
 
             await apiUpdateProgram(id, payload)
 
+            // Sync Custom Fields
+            const fieldsToDelete = initialCustomFields.filter(
+                (oldField: any) => !values.customFields.some((newField: any) => newField.id === oldField.id)
+            )
+            const fieldsToCreate = values.customFields.filter(
+                (newField: any) => !newField.id
+            )
+            const fieldsToUpdate = values.customFields.filter(
+                (newField: any) => newField.id
+            )
+
+            for (const field of fieldsToDelete) {
+                if (field.id) {
+                    await apiDeleteParticipantCustomField(field.id)
+                }
+            }
+
+            for (const field of fieldsToCreate) {
+                await apiCreateParticipantCustomField({
+                    program: id,
+                    label: field.label,
+                    field_key: field.field_key,
+                    field_type: field.field_type,
+                    is_required: field.is_required,
+                    placeholder: field.placeholder || '',
+                    order: field.order,
+                    is_active: field.is_active ?? true,
+                    options: field.options || [],
+                })
+            }
+
+            for (const field of fieldsToUpdate) {
+                await apiUpdateParticipantCustomField(field.id, {
+                    label: field.label,
+                    field_type: field.field_type,
+                    is_required: field.is_required,
+                    placeholder: field.placeholder || '',
+                    order: field.order,
+                    is_active: field.is_active ?? true,
+                    options: field.options || [],
+                })
+            }
+
             toast.push(
                 <Notification type="success">
                     Program updated successfully!
@@ -105,6 +161,7 @@ const CustomerEdit = () => {
                 '/api/programs',
                 { ...tableData, ...filterData },
             ])
+            await mutateCustomFields()
 
             navigate('/programs')
         } catch (error) {
@@ -207,7 +264,20 @@ const CustomerEdit = () => {
     // =========================
     return (
         <>
-            {!isLoading && !data && (
+            {isDataLoading && (
+                <div className="h-full flex flex-col items-center justify-center">
+                    <NoUserFound
+                        height={280}
+                        width={280}
+                    />
+
+                    <h3 className="mt-8">
+                        Loading...
+                    </h3>
+                </div>
+            )}
+
+            {!isDataLoading && !data && (
                 <div className="h-full flex flex-col items-center justify-center">
                     <NoUserFound
                         height={280}
@@ -220,12 +290,13 @@ const CustomerEdit = () => {
                 </div>
             )}
 
-            {!isLoading && data && (
+            {!isDataLoading && data && (
                 <>
                     <CustomerForm
                         defaultValues={
                             getDefaultValues()
                         }
+                        defaultCustomFields={initialCustomFields}
                         newCustomer={false}
                         onFormSubmit={
                             handleFormSubmit

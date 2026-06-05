@@ -38,15 +38,10 @@ const ProgramsRoute: Routes = [
     },
     {
         key: 'programs.list.details',
-        path: '/programs/details/:id',
+        path: '/programs/:id',
         component: lazy(() => import('@/views/Programs/programs/CustomerDetails')),
         authority: [],
         meta: {
-            header: {
-                title: 'Program Details',
-                description: 'View program details and activity.',
-                contained: true,
-            },
             footer: false,
         },
     },

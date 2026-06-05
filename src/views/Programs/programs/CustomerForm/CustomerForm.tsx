@@ -1,7 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Container from '@/components/shared/Container'
 import BottomStickyBar from '@/components/template/BottomStickyBar'
 import OverviewSection from './OverviewSection'
+import { CustomFieldsSection } from './CustomFieldsSection'
+import type { ParticipantCustomField } from './types'
 import isEmpty from 'lodash/isEmpty'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -17,6 +19,7 @@ const schema = z.object({
 
 const CustomerForm = ({
     defaultValues = {},
+    defaultCustomFields = [],
     children,
     onFormSubmit,
 }: any) => {
@@ -27,33 +30,51 @@ const CustomerForm = ({
         formState: { errors },
     } = useForm({
         defaultValues,
-
         resolver: zodResolver(schema),
     })
 
+    const [customFields, setCustomFields] = useState<ParticipantCustomField[]>([])
+
+    const defaultValuesStr = JSON.stringify(defaultValues)
     useEffect(() => {
         if (!isEmpty(defaultValues)) {
             reset(defaultValues)
         }
-    }, [defaultValues, reset])
+    }, [defaultValuesStr, reset])
+
+    const defaultCustomFieldsStr = JSON.stringify(defaultCustomFields)
+    useEffect(() => {
+        if (defaultCustomFields) {
+            setCustomFields(defaultCustomFields)
+        }
+    }, [defaultCustomFieldsStr])
 
     const onSubmit = (values: any) => {
         console.log(
             '🔥 FORM SUBMIT:',
             values,
+            'CUSTOM FIELDS:',
+            customFields
         )
 
-        onFormSubmit?.(values)
+        onFormSubmit?.({
+            ...values,
+            customFields,
+        })
     }
 
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
         >
-            <Container>
+            <Container className="space-y-6 pb-24">
                 <OverviewSection
                     control={control}
                     errors={errors}
+                />
+                <CustomFieldsSection
+                    fields={customFields}
+                    onChange={setCustomFields}
                 />
             </Container>
 

@@ -30,10 +30,10 @@ export default function useCustomerList() {
     // BACKEND PAGINATION
     // =========================
     const offset =
-        (tableData.pageIndex - 1) *
-        tableData.pageSize
+        ((tableData.pageIndex ?? 1) - 1) *
+        (tableData.pageSize ?? 10)
 
-    const limit = tableData.pageSize
+    const limit = tableData.pageSize ?? 10
 
     // =========================
     // SWR KEY
@@ -92,7 +92,7 @@ export default function useCustomerList() {
     // SAFE RESPONSE
     // =========================
     const apiResponse =
-        data?.data ?? data
+        (data as any)?.data ?? data
 
     const results =
         apiResponse?.results ?? []
@@ -173,13 +173,15 @@ export default function useCustomerList() {
     // AUTO FIX EMPTY PAGE
     // =========================
     useEffect(() => {
+        const pageSize = tableData.pageSize ?? 10
+        const pageIndex = tableData.pageIndex ?? 1
         const maxPage = Math.ceil(
             customerListTotal /
-                tableData.pageSize,
+                pageSize,
         )
 
         if (
-            tableData.pageIndex >
+            pageIndex >
                 maxPage &&
             maxPage > 0
         ) {
