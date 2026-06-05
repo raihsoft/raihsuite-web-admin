@@ -24,18 +24,6 @@ const programsNavigationConfig: NavigationTree[] = [
                 authority: [],
                 subMenu: [],
             },
-        
-            {
-                key: 'programs.participants',
-                path: '/programs-participants',
-                title: 'Participants',
-                translateKey: 'nav.programs.participants',
-                icon: 'MdEvent',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-            
         ],
     },
 ]

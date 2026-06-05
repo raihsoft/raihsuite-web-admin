@@ -155,20 +155,7 @@ export const protectedRoutes: Routes = [
             footer: false,
         },
     },
-    {
-        key: 'Programs.CustomerDetails',
-        path: '/programs/:id',
-        component: lazy(() => import('@/views/Programs/programs/CustomerDetails')),
-        authority: [],
-        meta: {
-            header: {
-                title: 'Program Details',
-                description: 'View program details.',
-                contained: true,
-            },
-            footer: false,
-        },
-    },
+
     {
         key: 'Programs.prograparticipantDetails',
         path: '/program-participants/:id',

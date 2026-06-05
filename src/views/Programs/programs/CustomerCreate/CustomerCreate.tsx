@@ -5,7 +5,7 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import CustomerForm from '../CustomerForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import {apiCreateProgram } from '@/services/CustomersService'
+import { apiCreateProgram, apiCreateParticipantCustomField } from '@/services/CustomersService'
 import { TbTrash } from 'react-icons/tb'
 import { useNavigate } from 'react-router-dom'
 
@@ -40,7 +40,24 @@ const CustomerCreate = () => {
 
             // console.log('🚀 FINAL PAYLOAD:', payload)
 
-            await apiCreateProgram(payload)
+            const res: any = await apiCreateProgram(payload)
+            const programId = res?.id
+
+            if (programId && values.customFields && values.customFields.length > 0) {
+                for (const field of values.customFields) {
+                    await apiCreateParticipantCustomField({
+                        program: programId,
+                        label: field.label,
+                        field_key: field.field_key,
+                        field_type: field.field_type,
+                        is_required: field.is_required,
+                        placeholder: field.placeholder || '',
+                        order: field.order,
+                        is_active: field.is_active ?? true,
+                        options: field.options || [],
+                    })
+                }
+            }
 
             toast.push(
                 <Notification type="success">

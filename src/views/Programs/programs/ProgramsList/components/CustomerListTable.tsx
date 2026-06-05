@@ -87,7 +87,7 @@ const CustomerListTable = () => {
     // ACTIONS
     // =========================
     const handleViewDetails = (customer: Customer) => {
-        navigate(`/programs/details/${customer.id}`)
+        navigate(`/programs/${customer.id}`)
     }
 
     const handleEdit = (customer: Customer) => {

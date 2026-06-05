@@ -1,47 +1,35 @@
 import type { Control, FieldErrors } from 'react-hook-form'
 
-export type OverviewFields = {
-    firstName: string
-    lastName: string
-    email: string
-    dialCode: string
-    phoneNumber: string
-    img: string
-    title: string
+export type CustomerFormSchema = {
+    name: string
     code: string
     description: string
     start_date: string
     end_date: string
-
 }
-
-export type AddressFields = {
-    country: string
-    address: string
-    postcode: string
-    city: string
-}
-
-export type ProfileImageFields = {
-    img: string
-}
-
-export type TagsFields = {
-    tags: Array<{ value: string; label: string }>
-}
-
-export type AccountField = {
-    banAccount?: boolean
-    accountVerified?: boolean
-}
-
-export type CustomerFormSchema = OverviewFields &
-    AddressFields &
-    ProfileImageFields &
-    TagsFields &
-    AccountField
 
 export type FormSectionBaseProps = {
     control: Control<CustomerFormSchema>
     errors: FieldErrors<CustomerFormSchema>
+}
+
+export type ParticipantCustomFieldOption = {
+    id?: string
+    label: string
+    value: string
+    order: number
+    is_active?: boolean
+}
+
+export type ParticipantCustomField = {
+    id?: string
+    program?: string
+    field_key: string
+    label: string
+    field_type: 'text' | 'select'
+    is_required: boolean
+    placeholder?: string
+    order: number
+    is_active?: boolean
+    options?: ParticipantCustomFieldOption[]
 }
