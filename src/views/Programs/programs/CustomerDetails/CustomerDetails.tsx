@@ -416,6 +416,7 @@ const CustomerDetails = () => {
                         <div className="space-y-1">
                             <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">First Name</label>
                             <Input
+                                placeholder="Enter first name"
                                 value={participantForm.first_name}
                                 onChange={(e) => setParticipantForm({ ...participantForm, first_name: e.target.value })}
                             />
@@ -423,6 +424,7 @@ const CustomerDetails = () => {
                         <div className="space-y-1">
                             <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Last Name</label>
                             <Input
+                                placeholder="Enter last name"
                                 value={participantForm.last_name}
                                 onChange={(e) => setParticipantForm({ ...participantForm, last_name: e.target.value })}
                             />
@@ -433,6 +435,7 @@ const CustomerDetails = () => {
                         <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Email Address</label>
                         <Input
                             type="email"
+                            placeholder="Enter email address"
                             value={participantForm.email}
                             onChange={(e) => setParticipantForm({ ...participantForm, email: e.target.value })}
                         />
@@ -441,6 +444,7 @@ const CustomerDetails = () => {
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Phone Number</label>
                         <Input
+                            placeholder="Enter phone number"
                             value={participantForm.phone}
                             onChange={(e) => setParticipantForm({ ...participantForm, phone: e.target.value })}
                         />
@@ -449,6 +453,7 @@ const CustomerDetails = () => {
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Place / City</label>
                         <Input
+                            placeholder="Enter place / city"
                             value={participantForm.place}
                             onChange={(e) => setParticipantForm({ ...participantForm, place: e.target.value })}
                         />

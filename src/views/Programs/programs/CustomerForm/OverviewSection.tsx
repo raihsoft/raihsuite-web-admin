@@ -88,6 +88,7 @@ const OverviewSection = ({
                     control={control}
                     render={({ field }) => (
                         <DatePicker
+                            placeholder="Select start date"
                             value={
                                 field.value
                                     ? new Date(
@@ -124,6 +125,7 @@ const OverviewSection = ({
                     control={control}
                     render={({ field }) => (
                         <DatePicker
+                            placeholder="Select end date"
                             value={
                                 field.value
                                     ? new Date(

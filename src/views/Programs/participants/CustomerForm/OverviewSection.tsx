@@ -17,6 +17,7 @@ const OverviewSection = ({ control, errors, programOptions }: any) => {
                     render={({ field }) => (
                         <ReactSelect
                             options={programOptions || []}
+                            placeholder="Select Program"
                             value={
                                 programOptions?.find(
                                     (o: any) => o.value === field.value
@@ -30,31 +31,31 @@ const OverviewSection = ({ control, errors, programOptions }: any) => {
 
             <FormItem label="First Name" errorMessage={errors.first_name?.message}>
                 <Controller name="first_name" control={control}
-                    render={({ field }) => <Input {...field} />}
+                    render={({ field }) => <Input {...field} placeholder="Enter first name" />}
                 />
             </FormItem>
 
             <FormItem label="Last Name" errorMessage={errors.last_name?.message}>
                 <Controller name="last_name" control={control}
-                    render={({ field }) => <Input {...field} />}
+                    render={({ field }) => <Input {...field} placeholder="Enter last name" />}
                 />
             </FormItem>
 
             <FormItem label="Email" errorMessage={errors.email?.message}>
                 <Controller name="email" control={control}
-                    render={({ field }) => <Input {...field} />}
+                    render={({ field }) => <Input {...field} placeholder="Enter email" />}
                 />
             </FormItem>
 
             <FormItem label="Phone" errorMessage={errors.phone?.message}>
                 <Controller name="phone" control={control}
-                    render={({ field }) => <Input {...field} />}
+                    render={({ field }) => <Input {...field} placeholder="Enter phone number" />}
                 />
             </FormItem>
 
             <FormItem label="Place" errorMessage={errors.place?.message}>
                 <Controller name="place" control={control}
-                    render={({ field }) => <Input {...field} />}
+                    render={({ field }) => <Input {...field} placeholder="Enter place" />}
                 />
             </FormItem>
         </Card>
