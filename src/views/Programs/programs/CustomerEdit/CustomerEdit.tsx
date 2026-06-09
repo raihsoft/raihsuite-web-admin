@@ -64,7 +64,11 @@ const CustomerEdit = () => {
         },
     )
 
-    const initialCustomFields = customFieldsResponse?.results ?? customFieldsResponse ?? []
+    const initialCustomFields = (customFieldsResponse?.results ?? customFieldsResponse ?? [])
+        .filter((field: any) => {
+            const fieldProgId = field.program && typeof field.program === 'object' ? field.program.id : (field.program || field.program_id)
+            return String(fieldProgId) === String(id)
+        })
     const isDataLoading = isLoading || customFieldsLoading
 
     // =========================

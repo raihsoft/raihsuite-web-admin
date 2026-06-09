@@ -8,7 +8,8 @@ import Dialog from '@/components/ui/Dialog'
 import Input from '@/components/ui/Input'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
-import { TbArrowNarrowLeft } from 'react-icons/tb'
+import { TbArrowNarrowLeft, TbEye } from 'react-icons/tb'
+import Tooltip from '@/components/ui/Tooltip'
 import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
 import {
@@ -45,7 +46,11 @@ const CustomerDetails = () => {
         { revalidateOnFocus: false, revalidateIfStale: false },
     )
 
-    const customFields = customFieldsResponse?.results ?? customFieldsResponse ?? []
+    const customFields = (customFieldsResponse?.results ?? customFieldsResponse ?? [])
+        .filter((field: any) => {
+            const fieldProgId = field.program && typeof field.program === 'object' ? field.program.id : (field.program || field.program_id)
+            return String(fieldProgId) === String(id)
+        })
 
     const [addDialogOpen, setAddDialogOpen] = useState(false)
     const [isSubmittingParticipant, setIsSubmittingParticipant] = useState(false)
@@ -318,6 +323,9 @@ const CustomerDetails = () => {
                                                             <th className="pb-3 text-right">
                                                                 Registered Date
                                                             </th>
+                                                            <th className="pb-3 text-right">
+                                                                Action
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
@@ -358,6 +366,19 @@ const CustomerDetails = () => {
                                                                             ? new Date(participant.created_at).toLocaleDateString()
                                                                             : '—'}
                                                                     </td>
+                                                                    <td className="py-4 text-right">
+                                                                        <div className="flex justify-end gap-3">
+                                                                            <Tooltip title="View">
+                                                                                <div
+                                                                                    className="text-xl cursor-pointer font-semibold"
+                                                                                    role="button"
+                                                                                    onClick={() => navigate(`/program-participants/details/${participant.id}`)}
+                                                                                >
+                                                                                    <TbEye />
+                                                                                </div>
+                                                                            </Tooltip>
+                                                                        </div>
+                                                                    </td>
                                                                 </tr>
                                                             );
                                                         })}
@@ -366,7 +387,6 @@ const CustomerDetails = () => {
                                             </div>
                                         ) : (
                                             <div className="text-center py-12 space-y-3">
-                                                <div className="text-gray-300 dark:text-gray-700 text-5xl">👥</div>
                                                 <h4 className="text-lg font-medium text-gray-500 dark:text-gray-400">
                                                     No participants registered
                                                 </h4>
