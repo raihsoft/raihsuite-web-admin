@@ -13,7 +13,7 @@ const CustomerDetails = () => {
 
     const { data, isLoading } = useSWR(
         ['/api/programs/participants', id as string],
-        ([_, idParam]) => apigetProgramparticipantbyid<any>(idParam as string, {}),
+        ([_, idParam]) => apigetProgramparticipantbyid<any, any>(idParam as string, {}),
         { revalidateOnFocus: false, revalidateIfStale: false },
     )
 
