@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import type { TableQueries } from '@/@types/common'
 
-export default function useCustomerList() {
+export default function useCustomerList(eventId?: string) {
     const {
         tableData,
         filterData,
@@ -19,14 +19,18 @@ export default function useCustomerList() {
     const limit = tableData.pageSize
     const offset = (tableData.pageIndex - 1) * tableData.pageSize
 
+    const params = {
+        limit,
+        offset,
+        ordering: '-created_at', // optional but recommended
+        ...filterData,
+        ...(eventId ? { event_id: eventId } : {}),
+    }
+
     const swrKey = [
         '/api/events/session-attendance',
-        {
-            limit,
-            offset,
-            ordering: '-created_at', // optional but recommended
-            ...filterData,
-        },
+        params,
+        eventId ?? null,
     ] as const
 
     const { data, error, isLoading, mutate } = useSWR(

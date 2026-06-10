@@ -7,14 +7,20 @@ import CustomerForm from '../CustomerForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { apiCreateParticipant } from '@/services/CustomersService'
 import { TbTrash } from 'react-icons/tb'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import type { CustomerFormSchema } from '../CustomerForm'
 import type { UseFormSetError } from 'react-hook-form'
 
 const CustomerCreate = () => {
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
     const [discardConfirmationOpen, setDiscardConfirmationOpen] = useState(false)
     const [isSubmiting, setIsSubmiting] = useState(false)
+
+    const eventId = searchParams.get('eventId') ?? ''
+    const returnTo =
+        searchParams.get('returnTo') ??
+        (eventId ? `/events/${eventId}` : '/participants')
 
     const handleFormSubmit = async (
         values: CustomerFormSchema,
@@ -46,7 +52,7 @@ const CustomerCreate = () => {
                 { placement: 'top-center' }
             )
 
-            navigate('/participants')
+            navigate(returnTo)
         } catch (err: any) {
             if (!err.response) {
                 toast.push(
@@ -103,7 +109,7 @@ const CustomerCreate = () => {
                     lastName: '',
                     email: '',
                     phone: '',
-                    event: '',
+                    event: eventId,
                     place: '',
                     referred_by: '',
                     fee_amount: '', // ✅ DEFAULT VALUE ADDED
@@ -146,7 +152,7 @@ const CustomerCreate = () => {
                 title="Discard changes"
                 onClose={() => setDiscardConfirmationOpen(false)}
                 onCancel={() => setDiscardConfirmationOpen(false)}
-                onConfirm={() => navigate('/participants')}
+                onConfirm={() => navigate(returnTo)}
             >
                 <p>
                     Are you sure you want to discard this? This action can&apos;t

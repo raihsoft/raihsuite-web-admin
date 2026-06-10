@@ -3,7 +3,7 @@ import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import type { GetCustomersListResponse } from '../types'
 
-export default function useCustomerList() {
+export default function useCustomerList(eventId?: string) {
     const {
         tableData,
         filterData,
@@ -14,17 +14,10 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
-    // =========================
-    // Pagination
-    // =========================
     const pageIndex = tableData.pageIndex ?? 1
     const pageSize = tableData.pageSize ?? 10
-
     const offset = (pageIndex - 1) * pageSize
 
-    // =========================
-    // FIX: stable SWR key (NO OFFSET HERE)
-    // =========================
     const swrKey = [
         'participants',
         pageIndex,
@@ -33,40 +26,35 @@ export default function useCustomerList() {
         JSON.stringify(filterData || {}),
     ]
 
-    // =========================
-    // FIX: fetcher uses latest params
-    // =========================
     const fetcher = () =>
         apiGetEventsList<GetCustomersListResponse, any>({
-            limit: pageSize,
-            offset,
+            limit: 1000, // 👈 IMPORTANT: load all once (or large number)
+            offset: 0,
             search: tableData.query || '',
             ...filterData,
         })
 
-    const { data, error, isLoading, mutate } = useSWR(
-        swrKey,
-        fetcher,
-        {
-            revalidateOnFocus: false,
-            keepPreviousData: true,
-        }
-    )
+    const { data, error, isLoading, mutate } = useSWR(swrKey, fetcher, {
+        revalidateOnFocus: false,
+        keepPreviousData: true,
+    })
 
-    // =========================
-    // Normalize response
-    // =========================
     const rawList: any[] = data?.results ?? data?.list ?? []
 
+    // =========================
+    // MAP DATA
+    // =========================
     const customerList = (Array.isArray(rawList) ? rawList : []).map(
         (item, index) => ({
             id: item.id ?? item.pk ?? `tmp-${index}`,
+
+            event: item.event ?? '',
 
             firstName: item.first_name ?? '',
             lastName: item.last_name ?? '',
 
             name:
-                item.name ||
+                item.participant_name ||
                 `${item.first_name ?? ''} ${item.last_name ?? ''}`.trim(),
 
             email: item.email ?? '',
@@ -81,22 +69,22 @@ export default function useCustomerList() {
         })
     )
 
-    const customerListTotal =
-        data?.count ??
-        data?.total ??
-        0
+    // =========================
+    // 🔥 FRONTEND FILTER (MAIN FIX)
+    // =========================
+    const filteredList = eventId
+        ? customerList.filter((p) => p.event === eventId)
+        : customerList
 
-    // =========================
-    // FIX: selection reset helper
-    // =========================
+    const customerListTotal = filteredList.length
+
+    const paginatedList = filteredList.slice(offset, offset + pageSize)
+
     const clearSelection = () => {
         setSelectedCustomer([])
         setSelectAllCustomer([])
     }
 
-    // =========================
-    // FIX: page size change resets page
-    // =========================
     const updatePageSize = (size: number) => {
         setTableData({
             ...tableData,
@@ -105,9 +93,6 @@ export default function useCustomerList() {
         })
     }
 
-    // =========================
-    // FIX: page change
-    // =========================
     const updatePageIndex = (page: number) => {
         setTableData({
             ...tableData,
@@ -116,7 +101,7 @@ export default function useCustomerList() {
     }
 
     return {
-        customerList,
+        customerList: paginatedList,
         customerListTotal,
         error,
         isLoading,
