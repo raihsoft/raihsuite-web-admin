@@ -3,7 +3,7 @@ import useSWR from 'swr'
 import { useTicketListStore } from '../store/ticketListStore'
 import type { GetTicketsListResponse, Ticket } from '../types'
 
-export default function useTicketList() {
+export default function useTicketList(eventId?: string) {
     const {
         tableData,
         filterData,
@@ -30,6 +30,7 @@ export default function useTicketList() {
         pageSize,
         tableData.query || '',
         JSON.stringify(filterData || {}),
+        eventId ?? '',
     ]
 
     // =========================
@@ -40,6 +41,7 @@ export default function useTicketList() {
             limit: pageSize,
             offset,
             search: tableData.query || '',
+            ...(eventId ? { event_id: eventId } : {}),
             ...filterData,
         })
 

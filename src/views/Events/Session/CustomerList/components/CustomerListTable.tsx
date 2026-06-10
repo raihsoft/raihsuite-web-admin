@@ -40,7 +40,7 @@ const ActionColumn = ({
     </div>
 )
 
-const CustomerListTable = () => {
+const CustomerListTable = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
 
     const {
@@ -52,7 +52,7 @@ const CustomerListTable = () => {
         selectedCustomer,
         setSelectedCustomer,
         setSelectAllCustomer,
-    } = useCustomerList()
+    } = useCustomerList(eventId)
 
     // ✅ Correct filtering (fixed fields)
     const filteredList = useMemo(() => {

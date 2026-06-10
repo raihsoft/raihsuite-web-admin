@@ -4,7 +4,7 @@ import { useCustomerListStore } from '../store/customerListStore'
 import type { GetCustomersListResponse } from '../types'
 import type { TableQueries } from '@/@types/common'
 
-export default function useCustomerList() {
+export default function useCustomerList(eventId?: string) {
     const {
         tableData,
         filterData,
@@ -19,15 +19,19 @@ export default function useCustomerList() {
     const limit = tableData.pageSize
     const offset = (tableData.pageIndex - 1) * tableData.pageSize
 
+    const params = {
+        limit,
+        offset,
+        ordering: '-created_at',
+        ...filterData,
+        ...(eventId ? { event_id: eventId } : {}),
+    }
+
     const { data, error, isLoading, mutate } = useSWR(
         [
             '/api/events/sessions',
-            {
-                limit,
-                offset,
-                ordering: '-created_at',
-                ...filterData,
-            },
+            params,
+            eventId ?? null,
         ],
         ([_, params]) =>
             apiGetSessionList<GetCustomersListResponse, TableQueries>(params),

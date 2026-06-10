@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import useCustomerList from '../hooks/useCustomerList'
 import { CSVLink } from 'react-csv'
 
-const CustomerListActionTools = () => {
+const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
 
-    const { customerList } = useCustomerList()
+    const { customerList } = useCustomerList(eventId)
 
     const csvHeaders = [
         { label: 'First Name', key: 'firstName' },
@@ -40,7 +40,15 @@ const CustomerListActionTools = () => {
             <Button
                 variant="solid"
                 icon={<TbUserPlus className="text-xl" />}
-                onClick={() => navigate('/participants/create')}
+                onClick={() =>
+                    navigate(
+                        eventId
+                            ? `/participants/create?eventId=${eventId}&returnTo=${encodeURIComponent(
+                                  `/events/${eventId}`
+                              )}`
+                            : '/participants/create'
+                    )
+                }
             >
                 Add new
             </Button>

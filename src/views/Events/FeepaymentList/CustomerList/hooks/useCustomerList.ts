@@ -3,7 +3,7 @@ import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import type { GetCustomersListResponse } from '../types'
 
-export default function useCustomerList() {
+export default function useCustomerList(eventId?: string) {
     const {
         tableData,
         filterData,
@@ -30,6 +30,7 @@ export default function useCustomerList() {
         pageSize,
         tableData.query || '',
         JSON.stringify(filterData || {}),
+        eventId ?? '',
     ]
 
     // =========================
@@ -40,6 +41,7 @@ export default function useCustomerList() {
             limit: pageSize,
             offset,
             search: tableData.query || '',
+            ...(eventId ? { event_id: eventId } : {}),
             ...filterData,
         })
 

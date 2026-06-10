@@ -5,7 +5,7 @@ import CustomerListActionTools from './components/CustomerListActionTools'
 import CustomersListTableTools from './components/CustomersListTableTools'
 import CustomerListSelected from './components/CustomerListSelected'
 
-const CustomerList = () => {
+const CustomerList = ({ eventId }: { eventId?: string }) => {
     return (
         <>
             <Container>
@@ -13,14 +13,14 @@ const CustomerList = () => {
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                             <h3>Tickets</h3>
-                            <CustomerListActionTools />
+                            <CustomerListActionTools eventId={eventId} />
                         </div>
-                        <CustomersListTableTools />
-                        <CustomerListTable />
+                        <CustomersListTableTools eventId={eventId} />
+                        <CustomerListTable eventId={eventId} />
                     </div>
                 </AdaptiveCard>
             </Container>
-            <CustomerListSelected />
+            <CustomerListSelected eventId={eventId} />
         </>
     )
 }
