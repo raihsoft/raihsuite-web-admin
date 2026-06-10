@@ -14,6 +14,7 @@ type EventRow = {
     start_date?: string
     end_date?: string
     fee_amount?: string | number // string from backend
+    id: string // assuming each event has a unique ID
 }
 
 const ActionColumn = ({
@@ -70,11 +71,11 @@ const EventsTable = () => {
     }, [eventsList, tableData.query])
 
     const handleEdit = (event: EventRow) => {
-        navigate(`/events/edit/${event.code}`)
+        navigate(`/events/edit/${event.id}`)
     }
 
     const handleViewDetails = (event: EventRow) => {
-        navigate(`/events/${event.code}`)
+        navigate(`/events/${event.id}`)
     }
 
     const columns: ColumnDef<EventRow>[] = useMemo(

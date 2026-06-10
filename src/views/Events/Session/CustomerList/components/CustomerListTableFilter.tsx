@@ -29,10 +29,10 @@ const validationSchema: ZodType<FormSchema> = z.object({
     purchaseChannel: z.array(z.string()),
 })
 
-const CustomerListTableFilter = () => {
+const CustomerListTableFilter = ({ eventId }: { eventId?: string }) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
 
-    const { filterData, setFilterData } = useCustomerList()
+    const { filterData, setFilterData } = useCustomerList(eventId)
 
     const openDialog = () => {
         setIsOpen(true)
