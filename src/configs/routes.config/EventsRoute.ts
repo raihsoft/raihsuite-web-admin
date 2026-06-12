@@ -91,7 +91,7 @@ const EventsRoute: Routes = [
 {
     key: 'eventTickets',
     path: '/events/:id/tickets',
-    component: lazy(() => import('@/views/Events/ticket/CustomerList')),
+    component: lazy(() => import('@/views/Events/Ticket/CustomerList')),
     authority: [],
 },
 ]
