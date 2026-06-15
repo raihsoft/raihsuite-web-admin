@@ -15,9 +15,9 @@ export const routeParentMapping: Record<string, string> = {
     'enquiriesDetails': 'enquiries',
 
     // ASSETS - Asset
-    'assetDetails': 'assets',
-    'assetCreate': 'assets',
-    'assetEdit': 'assets',
+    'assetDetails': 'asset',
+    'assetCreate': 'asset',
+    'assetEdit': 'asset',
 
     // ASSETS - Asset Categories
     'assetCategoryDetails': 'assetcategories',
