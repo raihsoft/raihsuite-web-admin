@@ -26,7 +26,7 @@ export type ParticipantCustomField = {
     program?: string
     field_key: string
     label: string
-    field_type: 'text' | 'select'
+    field_type: 'text' | 'number' | 'email' | 'phone' | 'date' | 'select' | 'checkbox' | 'textarea'
     is_required: boolean
     placeholder?: string
     order: number

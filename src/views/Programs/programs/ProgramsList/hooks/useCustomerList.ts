@@ -150,6 +150,15 @@ export default function useCustomerList() {
 
                 is_active:
                     customer.is_active,
+
+                participant_count:
+                    customer.participant_count,
+
+                participants_count:
+                    customer.participants_count,
+
+                participants:
+                    customer.participants,
             }),
         )
     }, [results, error])
@@ -177,12 +186,12 @@ export default function useCustomerList() {
         const pageIndex = tableData.pageIndex ?? 1
         const maxPage = Math.ceil(
             customerListTotal /
-                pageSize,
+            pageSize,
         )
 
         if (
             pageIndex >
-                maxPage &&
+            maxPage &&
             maxPage > 0
         ) {
             setTableData({

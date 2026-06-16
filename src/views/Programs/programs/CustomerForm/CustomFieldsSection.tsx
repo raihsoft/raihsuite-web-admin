@@ -10,16 +10,24 @@ import { TbPlus, TbTrash } from 'react-icons/tb'
 type CustomFieldsSectionProps = {
     fields: ParticipantCustomField[]
     onChange: (fields: ParticipantCustomField[]) => void
+    className?: string
 }
 
 const FIELD_TYPE_OPTIONS = [
     { label: 'Text Input', value: 'text' },
+    { label: 'Number Input', value: 'number' },
+    { label: 'Email Input', value: 'email' },
+    { label: 'Phone Input', value: 'phone' },
+    { label: 'Date Input', value: 'date' },
     { label: 'Dropdown Select', value: 'select' },
+    { label: 'Checkbox', value: 'checkbox' },
+    { label: 'Textarea', value: 'textarea' },
 ]
 
 export const CustomFieldsSection = ({
     fields,
     onChange,
+    className,
 }: CustomFieldsSectionProps) => {
 
     const handleAddField = () => {
@@ -46,7 +54,11 @@ export const CustomFieldsSection = ({
         onChange(reordered)
     }
 
-    const handleFieldChange = (index: number, key: keyof ParticipantCustomField, value: any) => {
+    const handleFieldChange = <K extends keyof ParticipantCustomField>(
+        index: number,
+        key: K,
+        value: ParticipantCustomField[K]
+    ) => {
         const updated = [...fields]
         updated[index] = {
             ...updated[index],
@@ -90,11 +102,11 @@ export const CustomFieldsSection = ({
         onChange(updated)
     }
 
-    const handleOptionChange = (
+    const handleOptionChange = <K extends keyof ParticipantCustomFieldOption>(
         fieldIndex: number,
         optionIndex: number,
-        key: keyof ParticipantCustomFieldOption,
-        value: any
+        key: K,
+        value: ParticipantCustomFieldOption[K]
     ) => {
         const updated = [...fields]
         const currentOptions = updated[fieldIndex].options ? [...(updated[fieldIndex].options as ParticipantCustomFieldOption[])] : []
@@ -117,20 +129,17 @@ export const CustomFieldsSection = ({
     }
 
     return (
-        <Card className="border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <Card className={className}>
+            <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                        Participant Custom Fields
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Configure additional fields to collect from participants when registering under this program.
+                    <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                        Participant Registration Fields
+                    </h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Configure the dynamic custom fields that participants must fill out during registration.
                     </p>
                 </div>
                 <Button
-                    type="button"
-                    size="sm"
-                    variant="solid"
                     icon={<TbPlus />}
                     onClick={handleAddField}
                 >
@@ -154,10 +163,10 @@ export const CustomFieldsSection = ({
                         >
                             {/* Delete Button */}
                             <button
-                                type="button"
                                 className="absolute top-4 right-4 p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                onClick={() => handleRemoveField(fieldIdx)}
                                 title="Remove Field"
+                                type="button"
+                                onClick={() => handleRemoveField(fieldIdx)}
                             >
                                 <TbTrash className="text-lg" />
                             </button>
@@ -177,24 +186,28 @@ export const CustomFieldsSection = ({
                                 {/* Key */}
                                 <FormItem label="Field Key (Internal)">
                                     <Input
+                                        disabled={!!field.id} // Keys are frozen once created
                                         placeholder="e.g. course"
                                         value={field.field_key}
                                         onChange={(e) =>
                                             handleFieldChange(fieldIdx, 'field_key', e.target.value)
                                         }
-                                        disabled={!!field.id} // Keys are frozen once created
                                     />
                                 </FormItem>
 
                                 {/* Field Type */}
                                 <FormItem label="Field Type">
                                     <Select
+                                        isClearable={false}
                                         options={FIELD_TYPE_OPTIONS}
                                         value={FIELD_TYPE_OPTIONS.find(opt => opt.value === field.field_type)}
                                         onChange={(opt) =>
-                                            handleFieldChange(fieldIdx, 'field_type', opt?.value || 'text')
+                                            handleFieldChange(
+                                                fieldIdx,
+                                                'field_type',
+                                                (opt?.value || 'text') as ParticipantCustomField['field_type']
+                                            )
                                         }
-                                        isClearable={false}
                                     />
                                 </FormItem>
 
@@ -224,18 +237,18 @@ export const CustomFieldsSection = ({
                                 </FormItem>
                             </div>
 
-                            {/* Dropdown Options section if field type is select */}
-                            {field.field_type === 'select' && (
+                            {/* Options section for select and checkbox */}
+                            {['select', 'checkbox'].includes(field.field_type) && (
                                 <div className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-4">
                                     <div className="flex items-center justify-between mb-3">
                                         <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                            Dropdown Options
+                                            {field.field_type === 'select' ? 'Dropdown' : 'Checkbox'} Options
                                         </h5>
                                         <Button
-                                            type="button"
-                                            size="xs"
-                                            variant="plain"
                                             icon={<TbPlus />}
+                                            size="xs"
+                                            type="button"
+                                            variant="plain"
                                             onClick={() => handleAddOption(fieldIdx)}
                                         >
                                             Add Option
@@ -254,8 +267,8 @@ export const CustomFieldsSection = ({
                                                 <div key={optIdx} className="flex gap-4 items-center max-w-2xl">
                                                     <div className="flex-1">
                                                         <Input
+                                                            placeholder="Option Display Label (e.g. Option A)"
                                                             size="sm"
-                                                            placeholder="Option Display Label (e.g. BA English)"
                                                             value={opt.label}
                                                             onChange={(e) =>
                                                                 handleOptionChange(fieldIdx, optIdx, 'label', e.target.value)
@@ -264,13 +277,13 @@ export const CustomFieldsSection = ({
                                                     </div>
                                                     <div className="flex-1">
                                                         <Input
+                                                            disabled={!!opt.id}
+                                                            placeholder="Option Value (e.g. option_a)"
                                                             size="sm"
-                                                            placeholder="Option Value (e.g. ba_english)"
                                                             value={opt.value}
                                                             onChange={(e) =>
                                                                 handleOptionChange(fieldIdx, optIdx, 'value', e.target.value)
                                                             }
-                                                            disabled={!!opt.id}
                                                         />
                                                     </div>
                                                     <button

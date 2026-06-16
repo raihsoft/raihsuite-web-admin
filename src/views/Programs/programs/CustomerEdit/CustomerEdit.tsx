@@ -17,7 +17,7 @@ import {
 
 import CustomerForm from '../CustomerForm'
 
-import { mutate } from 'swr'
+import useSWR, { mutate } from 'swr'
 
 import { useCustomerListStore } from '../ProgramsList/store/customerListStore'
 
@@ -33,10 +33,22 @@ import {
     useNavigate,
 } from 'react-router-dom'
 
-import useSWR from 'swr'
-
 import type { CustomerFormSchema } from '../CustomerForm'
 import type { Customer } from '../ProgramsList/types'
+import type { ParticipantCustomField } from '../CustomerForm/types'
+
+type EditCustomField = Omit<ParticipantCustomField, 'program'> & {
+    program?: string | { id: string | number }
+    program_id?: string | number
+}
+
+type CustomFieldsResponse = {
+    results: EditCustomField[]
+}
+
+type FormValues = CustomerFormSchema & {
+    customFields: ParticipantCustomField[]
+}
 
 const CustomerEdit = () => {
     const { id } = useParams()
@@ -57,15 +69,15 @@ const CustomerEdit = () => {
 
     const { data: customFieldsResponse, isLoading: customFieldsLoading, mutate: mutateCustomFields } = useSWR(
         id ? ['/programs/participant-custom-fields', { program: id }] : null,
-        () => apiGetParticipantCustomFields<any, any>({ program: id! }),
+        () => apiGetParticipantCustomFields<CustomFieldsResponse, { program: string }>({ program: id! }),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
         },
     )
 
-    const initialCustomFields = (customFieldsResponse?.results ?? customFieldsResponse ?? [])
-        .filter((field: any) => {
+    const initialCustomFields = (customFieldsResponse?.results ?? [])
+        .filter((field: EditCustomField) => {
             const fieldProgId = field.program && typeof field.program === 'object' ? field.program.id : (field.program || field.program_id)
             return String(fieldProgId) === String(id)
         })
@@ -92,7 +104,7 @@ const CustomerEdit = () => {
     // UPDATE PROGRAM
     // =========================
     const handleFormSubmit = async (
-        values: any,
+        values: FormValues,
     ) => {
         if (!id) return
 
@@ -111,13 +123,13 @@ const CustomerEdit = () => {
 
             // Sync Custom Fields
             const fieldsToDelete = initialCustomFields.filter(
-                (oldField: any) => !values.customFields.some((newField: any) => newField.id === oldField.id)
+                (oldField: EditCustomField) => !values.customFields.some((newField: ParticipantCustomField) => newField.id === oldField.id)
             )
             const fieldsToCreate = values.customFields.filter(
-                (newField: any) => !newField.id
+                (newField: ParticipantCustomField) => !newField.id
             )
             const fieldsToUpdate = values.customFields.filter(
-                (newField: any) => newField.id
+                (newField: ParticipantCustomField) => newField.id
             )
 
             for (const field of fieldsToDelete) {
@@ -136,19 +148,19 @@ const CustomerEdit = () => {
                     placeholder: field.placeholder || '',
                     order: field.order,
                     is_active: field.is_active ?? true,
-                    options: field.options || [],
+                    options: ['select', 'checkbox'].includes(field.field_type) ? (field.options || []) : [],
                 })
             }
 
             for (const field of fieldsToUpdate) {
-                await apiUpdateParticipantCustomField(field.id, {
+                await apiUpdateParticipantCustomField(field.id!, {
                     label: field.label,
                     field_type: field.field_type,
                     is_required: field.is_required,
                     placeholder: field.placeholder || '',
                     order: field.order,
                     is_active: field.is_active ?? true,
-                    options: field.options || [],
+                    options: ['select', 'checkbox'].includes(field.field_type) ? (field.options || []) : [],
                 })
             }
 
@@ -168,7 +180,7 @@ const CustomerEdit = () => {
             await mutateCustomFields()
 
             navigate('/programs')
-        } catch (error) {
+        } catch {
             toast.push(
                 <Notification type="danger">
                     Update failed!
@@ -188,16 +200,14 @@ const CustomerEdit = () => {
     const getDefaultValues =
         (): CustomerFormSchema => {
             if (data) {
-                const item: any = data
-
                 return {
-                    name: item.name || '',
-                    code: item.code || '',
+                    name: data.name || '',
+                    code: data.code || '',
                     description:
-                        item.description || '',
+                        data.description || '',
                     start_date:
-                        item.start_date || '',
-                    end_date: item.end_date || '',
+                        data.start_date || '',
+                    end_date: data.end_date || '',
                 }
             }
 
@@ -234,7 +244,7 @@ const CustomerEdit = () => {
             ])
 
             navigate('/programs')
-        } catch (error) {
+        } catch {
             toast.push(
                 <Notification type="danger">
                     Delete failed!
@@ -357,7 +367,7 @@ const CustomerEdit = () => {
                             deleteConfirmationOpen
                         }
                         type="danger"
-                        title="Delete Program"
+                        title={data ? `Delete "${data.name}"` : 'Delete Program'}
                         onClose={handleCancel}
                         onRequestClose={
                             handleCancel
@@ -368,10 +378,8 @@ const CustomerEdit = () => {
                         }
                     >
                         <p>
-                            Are you sure you want
-                            to delete this
-                            program? This action
-                            can&apos;t be undone.
+                            Are you sure you want to delete "{data?.name}"?
+                            This action can&apos;t be undone.
                         </p>
                     </ConfirmDialog>
                 </>

@@ -61,4 +61,7 @@ export type Customer = {
     status: string
     custom_data?: Record<string, any>
     img?: string
+    participant_count?: number
+    participants_count?: number
+    participants?: any[]
 }

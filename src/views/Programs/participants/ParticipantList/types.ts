@@ -40,9 +40,11 @@ type Subscription = {
 }
 
 export type GetCustomersListResponse = {
-    list: Customer[]
+    list?: Customer[]
     count: number
     results: any[]
+    total?: number
+    total_count?: number
 }
 
 export type Filter = {
@@ -51,19 +53,17 @@ export type Filter = {
 }
 
 export type Customer = {
-    id: string
-    name: string
-    firstName: string
-    lastName: string
+    id: string | number
+    program_name: string
+    first_name: string
+    last_name: string
+    participant_name: string
     email: string
-    img: string
-    role: string
-    lastOnline: number
+    phone: string
+    place: string
+    custom_data: Record<string, unknown>
+    created_at: string
     status: string
-    message: string
-    personalInfo: PersonalInfo
-    orderHistory: OrderHistory[]
-    paymentMethod: PaymentMethod[]
-    subscription: Subscription[]
-    totalSpending: number
+    img?: string
+    name?: string
 }
