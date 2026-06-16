@@ -24,21 +24,25 @@ const CustomerCreate = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [programOptions, setProgramOptions] = useState<ProgramOption[]>([])
 
+    type ProgramResponse = {
+        results: { id: string | number; name: string }[]
+    }
+
     // =========================
     // FETCH PROGRAMS
     // =========================
     useEffect(() => {
         const fetchPrograms = async () => {
             try {
-                const res = await apiGetProgramList()
+                const res = await apiGetProgramList<ProgramResponse, Record<string, unknown>>({})
 
                 console.log('📥 PROGRAM API:', res)
 
-                const list = res?.results || res?.data || []
+                const list = res?.results || []
 
-                const options = list.map((item: any) => ({
+                const options = list.map((item: { name: string; id: string | number }) => ({
                     label: item.name,
-                    value: item.id,
+                    value: String(item.id),
                 }))
 
                 setProgramOptions(options)
@@ -62,10 +66,11 @@ const CustomerCreate = () => {
             const payload = {
                 program: values.program,
                 first_name: values.first_name,
-                last_name: values.last_name,
+                last_name: values.last_name || '',
                 email: values.email,
                 phone: values.phone,
                 place: values.place,
+                custom_data: values.custom_data || {},
             }
 
             // console.log('🚀 FINAL PAYLOAD:', payload)
@@ -106,6 +111,7 @@ const CustomerCreate = () => {
                     email: '',
                     phone: '',
                     place: '',
+                    custom_data: {},
                 }}
                 onFormSubmit={handleFormSubmit}
             >

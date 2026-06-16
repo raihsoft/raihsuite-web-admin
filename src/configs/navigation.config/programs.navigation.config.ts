@@ -6,25 +6,14 @@ import type { NavigationTree } from '@/@types/navigation'
 
 const programsNavigationConfig: NavigationTree[] = [
     {
-        key: 'programs',
+        key: 'programs.list',
         path: '/programs',
         title: 'Programs',
         translateKey: 'nav.programs.title',
         icon: 'programsIcon',
-        type: NAV_ITEM_TYPE_COLLAPSE,
+        type: NAV_ITEM_TYPE_ITEM,
         authority: [],
-        subMenu: [
-            {
-                key: 'programs.list',
-                path: '/programs',
-                title: 'Programs',
-                translateKey: 'nav.programs.item1',
-                icon: 'MdProgram',
-                type: NAV_ITEM_TYPE_ITEM,
-                authority: [],
-                subMenu: [],
-            },
-        ],
+        subMenu: [],
     },
 ]
 

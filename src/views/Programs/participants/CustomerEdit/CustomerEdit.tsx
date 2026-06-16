@@ -15,15 +15,34 @@ import { mutate } from 'swr'
 import { useCustomerListStore } from '../ParticipantList/store/customerListStore'
 import NoUserFound from '@/assets/svg/NoUserFound'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import useSWR from 'swr'
 import type { CustomerFormSchema } from '../CustomerForm'
-import type { Customer } from '../ParticipantList/types'
+
+type Participant = {
+    id: string | number
+    program: string | number
+    program_id?: string | number
+    program_name?: string
+    first_name: string
+    last_name: string
+    participant_name?: string
+    email: string
+    phone: string
+    place: string
+    custom_data?: Record<string, any>
+}
+
+type ProgramResponse = {
+    results: { id: string | number; name: string }[]
+}
 
 const CustomerEdit = () => {
     const { id } = useParams()
 
     const navigate = useNavigate()
+    const location = useLocation()
+    const from = (location.state as any)?.from || '/programs-participants'
 
     // =========================
     // GET PARTICIPANT
@@ -31,7 +50,7 @@ const CustomerEdit = () => {
     const { data, isLoading } = useSWR(
         ['/api/programparticipants', id as string],
         ([_, idParam]) =>
-            apigetProgramparticipantbyid<Customer>(idParam as string),
+            apigetProgramparticipantbyid<Participant, Record<string, unknown>>(idParam as string, {}),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
@@ -41,20 +60,20 @@ const CustomerEdit = () => {
     // =========================
     // PROGRAM DROPDOWN
     // =========================
-    const [programOptions, setProgramOptions] = useState<any[]>([])
+    const [programOptions, setProgramOptions] = useState<{ label: string; value: string }[]>([])
 
     useEffect(() => {
         const fetchPrograms = async () => {
             try {
-                const res: any = await apiGetProgramList()
+                const res = await apiGetProgramList<ProgramResponse, Record<string, unknown>>({})
 
                 // console.log('📥 PROGRAM API:', res)
 
-                const results = res?.results || res?.data?.results || []
+                const results = res?.results || []
 
-                const formatted = results.map((item: any) => ({
-                    label: item.title || item.name,
-                    value: item.id,
+                const formatted = results.map((item: { name: string; id: string | number }) => ({
+                    label: item.name,
+                    value: String(item.id),
                 }))
 
                 // console.log('🟢 PROGRAM OPTIONS:', formatted)
@@ -91,10 +110,11 @@ const CustomerEdit = () => {
             const payload = {
                 program: values.program,
                 first_name: values.first_name,
-                last_name: values.last_name,
+                last_name: values.last_name || '',
                 email: values.email,
                 phone: values.phone,
                 place: values.place,
+                custom_data: values.custom_data || {},
             }
 
             // console.log('🚀 UPDATE PAYLOAD:', payload)
@@ -115,7 +135,7 @@ const CustomerEdit = () => {
                 { ...tableData, ...filterData },
             ])
 
-            navigate('/programs-participants')
+            navigate(from)
         } catch (error: any) {
             // console.log('❌ UPDATE ERROR:', error)
 
@@ -138,34 +158,23 @@ const CustomerEdit = () => {
     const getDefaultValues = (): CustomerFormSchema => {
         if (data) {
             // console.log('📦 EDIT DATA:', data)
-
-            const item: any = data
+            let parsedCustomData = data.custom_data || {}
+            if (typeof parsedCustomData === 'string') {
+                try {
+                    parsedCustomData = JSON.parse(parsedCustomData)
+                } catch {
+                    parsedCustomData = {}
+                }
+            }
 
             return {
-                program:
-                    item.program ||
-                    item.program_id ||
-                    '',
-
-                first_name:
-                    item.first_name ||
-                    '',
-
-                last_name:
-                    item.last_name ||
-                    '',
-
-                email:
-                    item.email ||
-                    '',
-
-                phone:
-                    item.phone ||
-                    '',
-
-                place:
-                    item.place ||
-                    '',
+                program: String(data.program || data.program_id || ''),
+                first_name: data.first_name || '',
+                last_name: data.last_name || '',
+                email: data.email || '',
+                phone: data.phone || '',
+                place: data.place || '',
+                custom_data: parsedCustomData,
             }
         }
 
@@ -202,7 +211,7 @@ const CustomerEdit = () => {
                 { ...tableData, ...filterData },
             ])
 
-            navigate('/programs-participants')
+            navigate(from)
         } catch (error) {
             toast.push(
                 <Notification type="danger">
@@ -226,7 +235,7 @@ const CustomerEdit = () => {
     }
 
     const handleBack = () => {
-        navigate('/programs-participants')
+        navigate(from)
     }
 
     return (
@@ -286,14 +295,14 @@ const CustomerEdit = () => {
                     <ConfirmDialog
                         isOpen={deleteConfirmationOpen}
                         type="danger"
-                        title="Delete Participant"
+                        title={data ? `Delete "${data.participant_name || `${data.first_name || ''} ${data.last_name || ''}`.trim()}"` : 'Delete Participant'}
                         onClose={handleCancel}
                         onRequestClose={handleCancel}
                         onCancel={handleCancel}
                         onConfirm={handleConfirmDelete}
                     >
                         <p>
-                            Are you sure you want to delete this participant?
+                            Are you sure you want to delete "{data ? (data.participant_name || `${data.first_name || ''} ${data.last_name || ''}`.trim()) : ''}"?
                             This action can&apos;t be undone.
                         </p>
                     </ConfirmDialog>

@@ -1,11 +1,15 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import Tooltip from '@/components/ui/Tooltip'
 import DataTable from '@/components/shared/DataTable'
 import useCustomerList from '../hooks/useCustomerList'
 import CustomerListActionTools from '../components/CustomerListActionTools'
 import { useNavigate } from 'react-router-dom'
 import cloneDeep from 'lodash/cloneDeep'
-import { TbEye, TbPencil } from 'react-icons/tb'
+import { TbEye, TbPencil, TbTrash } from 'react-icons/tb'
+import ConfirmDialog from '@/components/shared/ConfirmDialog'
+import toast from '@/components/ui/toast'
+import Notification from '@/components/ui/Notification'
+import { apiDeleteProgramparticipant } from '@/services/CustomersService'
 import type {
     OnSortParam,
     ColumnDef,
@@ -50,7 +54,43 @@ const CustomerListTable = () => {
         setSelectAllCustomer,
         setSelectedCustomer,
         selectedCustomer,
+        mutate,
     } = useCustomerList()
+
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [selectedParticipant, setSelectedParticipant] = useState<Customer | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
+
+    const handleDeleteClick = (customer: Customer) => {
+        setSelectedParticipant(customer)
+        setDeleteDialogOpen(true)
+    }
+
+    const handleDeleteConfirm = async () => {
+        if (!selectedParticipant) return
+        setIsDeleting(true)
+        try {
+            await apiDeleteProgramparticipant(String(selectedParticipant.id))
+            toast.push(
+                <Notification type="success">
+                    Participant deleted successfully!
+                </Notification>,
+                { placement: 'top-center' }
+            )
+            mutate()
+        } catch {
+            toast.push(
+                <Notification type="danger">
+                    Failed to delete participant.
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setIsDeleting(false)
+            setDeleteDialogOpen(false)
+            setSelectedParticipant(null)
+        }
+    }
 
     // =========================
     // FILTER
@@ -214,6 +254,18 @@ const CustomerListTable = () => {
                                 <TbEye />
                             </div>
                         </Tooltip>
+
+                        <Tooltip title="Delete">
+                            <div
+                                className="text-xl cursor-pointer font-semibold text-red-500 hover:text-red-700"
+                                role="button"
+                                onClick={() =>
+                                    handleDeleteClick(props.row.original)
+                                }
+                            >
+                                <TbTrash />
+                            </div>
+                        </Tooltip>
                     </div>
                 ),
             },
@@ -340,6 +392,22 @@ return (
                 handleAllRowSelect
             }
         />
+
+        <ConfirmDialog
+            isOpen={deleteDialogOpen}
+            type="danger"
+            title={selectedParticipant ? `Delete "${selectedParticipant.participant_name || `${selectedParticipant.first_name || ''} ${selectedParticipant.last_name || ''}`.trim()}"` : 'Delete Participant'}
+            onClose={() => { setDeleteDialogOpen(false); setSelectedParticipant(null); }}
+            onRequestClose={() => { setDeleteDialogOpen(false); setSelectedParticipant(null); }}
+            onCancel={() => { setDeleteDialogOpen(false); setSelectedParticipant(null); }}
+            onConfirm={handleDeleteConfirm}
+            confirmButtonProps={{ loading: isDeleting }}
+        >
+            <p>
+                Are you sure you want to delete "{selectedParticipant ? (selectedParticipant.participant_name || `${selectedParticipant.first_name || ''} ${selectedParticipant.last_name || ''}`.trim()) : ''}"?
+                This action cannot be undone.
+            </p>
+        </ConfirmDialog>
     </>
 )
 }

@@ -89,12 +89,14 @@ const getCustomField = (
     return String(value)
 }
 
+import type { Customer } from '../types'
+
 const CustomerListActionTools = () => {
     const navigate = useNavigate()
 
     const { customerList } = useCustomerList()
 
-    const downloadData = customerList.map((item) => {
+    const downloadData = customerList.map((item: Customer) => {
         const { custom_data, ...rest } = item
 
         return {

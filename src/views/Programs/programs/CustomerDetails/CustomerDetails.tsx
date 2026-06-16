@@ -8,7 +8,8 @@ import Dialog from '@/components/ui/Dialog'
 import Input from '@/components/ui/Input'
 import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
-import { TbArrowNarrowLeft, TbEye } from 'react-icons/tb'
+import { TbArrowNarrowLeft, TbEye, TbPencil, TbCloudDownload, TbTrash } from 'react-icons/tb'
+import { CSVLink } from 'react-csv'
 import Tooltip from '@/components/ui/Tooltip'
 import { useParams, useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
@@ -17,10 +18,43 @@ import {
     apiGetProgramparticipantList,
     apiCreateProgramparticipant,
     apiGetParticipantCustomFields,
+    apiDeleteProgramparticipant,
 } from '@/services/CustomersService'
+import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import Select from '@/components/ui/Select'
+import Checkbox from '@/components/ui/Checkbox'
 import isEmpty from 'lodash/isEmpty'
 import type { Customer } from '../ProgramsList/types'
+import type { ParticipantCustomField, ParticipantCustomFieldOption } from '../CustomerForm/types'
+
+type CustomDataValue = string | number | boolean | string[]
+
+type DetailCustomField = Omit<ParticipantCustomField, 'program'> & {
+    program?: string | { id: string | number }
+    program_id?: string | number
+}
+
+type ProgramParticipant = {
+    id: string | number
+    program: string | number
+    program_id?: string | number
+    first_name: string
+    last_name: string
+    participant_name?: string
+    email: string
+    phone: string
+    place: string
+    custom_data: Record<string, CustomDataValue>
+    created_at?: string
+}
+
+type GetProgramParticipantsResponse = {
+    results: ProgramParticipant[]
+}
+
+type CustomFieldsResponse = {
+    results: DetailCustomField[]
+}
 
 const CustomerDetails = () => {
     const { id } = useParams()
@@ -36,24 +70,58 @@ const CustomerDetails = () => {
 
     const { data: participantsData, isLoading: participantsLoading, mutate: mutateParticipants } = useSWR(
         id ? ['/programs/participants', { program: id }] : null,
-        () => apiGetProgramparticipantList<any, any>({ program: id! }),
+        () => apiGetProgramparticipantList<GetProgramParticipantsResponse, { program: string }>({ program: id! }),
         { revalidateOnFocus: false, revalidateIfStale: false },
     )
 
-    const { data: customFieldsResponse, isLoading: customFieldsLoading } = useSWR(
+    const { data: customFieldsResponse } = useSWR(
         id ? ['/programs/participant-custom-fields', { program: id }] : null,
-        () => apiGetParticipantCustomFields<any, any>({ program: id! }),
+        () => apiGetParticipantCustomFields<CustomFieldsResponse, { program: string }>({ program: id! }),
         { revalidateOnFocus: false, revalidateIfStale: false },
     )
 
-    const customFields = (customFieldsResponse?.results ?? customFieldsResponse ?? [])
-        .filter((field: any) => {
+    const customFields = (customFieldsResponse?.results ?? [])
+        .filter((field: DetailCustomField) => {
             const fieldProgId = field.program && typeof field.program === 'object' ? field.program.id : (field.program || field.program_id)
             return String(fieldProgId) === String(id)
         })
 
     const [addDialogOpen, setAddDialogOpen] = useState(false)
     const [isSubmittingParticipant, setIsSubmittingParticipant] = useState(false)
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [selectedParticipant, setSelectedParticipant] = useState<ProgramParticipant | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
+
+    const handleDeleteClick = (participant: ProgramParticipant) => {
+        setSelectedParticipant(participant)
+        setDeleteDialogOpen(true)
+    }
+
+    const handleDeleteConfirm = async () => {
+        if (!selectedParticipant) return
+        setIsDeleting(true)
+        try {
+            await apiDeleteProgramparticipant(String(selectedParticipant.id))
+            toast.push(
+                <Notification type="success">
+                    Participant deleted successfully!
+                </Notification>,
+                { placement: 'top-center' }
+            )
+            mutateParticipants()
+        } catch {
+            toast.push(
+                <Notification type="danger">
+                    Failed to delete participant.
+                </Notification>,
+                { placement: 'top-center' }
+            )
+        } finally {
+            setIsDeleting(false)
+            setDeleteDialogOpen(false)
+            setSelectedParticipant(null)
+        }
+    }
     const [participantForm, setParticipantForm] = useState({
         first_name: '',
         last_name: '',
@@ -61,13 +129,13 @@ const CustomerDetails = () => {
         phone: '',
         place: ''
     })
-    const [customData, setCustomData] = useState<Record<string, any>>({})
+    const [customData, setCustomData] = useState<Record<string, CustomDataValue>>({})
 
     const handleAddParticipantSubmit = async () => {
-        if (!participantForm.first_name || !participantForm.last_name) {
+        if (!participantForm.first_name) {
             toast.push(
                 <Notification type="danger">
-                    First Name and Last Name are required.
+                    Name is required.
                 </Notification>,
                 { placement: 'top-center' }
             )
@@ -93,7 +161,7 @@ const CustomerDetails = () => {
             const payload = {
                 program: id!,
                 first_name: participantForm.first_name,
-                last_name: participantForm.last_name,
+                last_name: '',
                 email: participantForm.email,
                 phone: participantForm.phone,
                 place: participantForm.place,
@@ -111,7 +179,7 @@ const CustomerDetails = () => {
 
             setAddDialogOpen(false)
             mutateParticipants()
-        } catch (error) {
+        } catch {
             toast.push(
                 <Notification type="danger">
                     Failed to add participant.
@@ -123,13 +191,54 @@ const CustomerDetails = () => {
         }
     }
 
-    const participantsResponse = participantsData?.data ?? participantsData ?? {}
-    const allParticipants = participantsResponse?.results ?? []
-    const participantsList = allParticipants.filter((participant: any) => {
+    const allParticipants = participantsData?.results ?? []
+    const participantsList = allParticipants.filter((participant: ProgramParticipant) => {
         const pProgId = participant.program || participant.program_id;
         return String(pProgId) === String(id);
     })
     const totalParticipants = participantsList.length
+
+    const downloadData = participantsList.map((item) => {
+        const fullName = item.participant_name || `${item.first_name || ''} ${item.last_name || ''}`.trim() || '—';
+        
+        // Extract custom_data keys and include them in the row object flatly using custom field labels
+        const flatCustomData: Record<string, string> = {};
+        let customData = item.custom_data;
+        if (typeof customData === 'string') {
+            try {
+                customData = JSON.parse(customData);
+            } catch {
+                customData = {};
+            }
+        }
+        if (customData) {
+            Object.entries(customData).forEach(([key, val]) => {
+                const matchedField = customFields.find(f => f.field_key === key);
+                const label = matchedField ? matchedField.label : key;
+                
+                // Format display value based on field type if necessary
+                let displayVal = val;
+                if (matchedField) {
+                    if (matchedField.field_type === 'select') {
+                        const opt = matchedField.options?.find((o: ParticipantCustomFieldOption) => o.value === val);
+                        if (opt) displayVal = opt.label;
+                    } else if (matchedField.field_type === 'checkbox') {
+                        displayVal = val === true || val === 'true' || val === 1 || val === '1' ? 'Yes' : (val === false || val === 'false' || val === 0 || val === '0' ? 'No' : '—');
+                    }
+                }
+                flatCustomData[label] = String(displayVal ?? '');
+            });
+        }
+
+        return {
+            Name: fullName,
+            Email: item.email || '',
+            Phone: item.phone || '',
+            Place: item.place || '',
+            ...flatCustomData,
+            'Registered Date': item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+        }
+    })
 
     // Paginated calculations
     const startIndex = (currentPage - 1) * pageSize
@@ -275,23 +384,38 @@ const CustomerDetails = () => {
                                                 {totalParticipants} registered
                                             </span>
                                         </div>
-                                        <Button
-                                            size="sm"
-                                            variant="solid"
-                                            onClick={() => {
-                                                setParticipantForm({
-                                                    first_name: '',
-                                                    last_name: '',
-                                                    email: '',
-                                                    phone: '',
-                                                    place: ''
-                                                });
-                                                setCustomData({});
-                                                setAddDialogOpen(true);
-                                            }}
-                                        >
-                                            Add Participant
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            {totalParticipants > 0 && (
+                                                <CSVLink
+                                                    filename={`${data?.name || 'program'}_participants.csv`}
+                                                    data={downloadData}
+                                                >
+                                                    <Button
+                                                        size="sm"
+                                                        icon={<TbCloudDownload className="text-xl" />}
+                                                    >
+                                                        Download
+                                                    </Button>
+                                                </CSVLink>
+                                            )}
+                                            <Button
+                                                size="sm"
+                                                variant="solid"
+                                                onClick={() => {
+                                                    setParticipantForm({
+                                                        first_name: '',
+                                                        last_name: '',
+                                                        email: '',
+                                                        phone: '',
+                                                        place: ''
+                                                    });
+                                                    setCustomData({});
+                                                    setAddDialogOpen(true);
+                                                }}
+                                            >
+                                                Add Participant
+                                            </Button>
+                                        </div>
                                     </div>
 
                                     {/* Divider */}
@@ -315,7 +439,7 @@ const CustomerDetails = () => {
                                                             <th className="pb-3">
                                                                 Place
                                                             </th>
-                                                            {customFields.map((field: any) => (
+                                                            {customFields.map((field: DetailCustomField) => (
                                                                 <th key={field.id || field.field_key} className="pb-3">
                                                                     {field.label}
                                                                 </th>
@@ -329,7 +453,7 @@ const CustomerDetails = () => {
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
-                                                        {paginatedParticipants.map((participant: any) => {
+                                                        {paginatedParticipants.map((participant: ProgramParticipant) => {
                                                             const fullName = participant.participant_name || 
                                                                 `${participant.first_name || ''} ${participant.last_name || ''}`.trim() || 
                                                                 '—';
@@ -348,16 +472,18 @@ const CustomerDetails = () => {
                                                                     <td className="py-4 text-gray-500 dark:text-gray-400">
                                                                         {participant.place || '—'}
                                                                     </td>
-                                                                    {customFields.map((field: any) => {
+                                                                    {customFields.map((field: DetailCustomField) => {
                                                                         const val = participant.custom_data?.[field.field_key]
                                                                         let displayVal = val
                                                                         if (field.field_type === 'select') {
-                                                                            const opt = field.options?.find((o: any) => o.value === val)
+                                                                            const opt = field.options?.find((o: ParticipantCustomFieldOption) => o.value === val)
                                                                             if (opt) displayVal = opt.label
+                                                                        } else if (field.field_type === 'checkbox') {
+                                                                            displayVal = val === true || val === 'true' || val === 1 || val === '1' ? 'Yes' : (val === false || val === 'false' || val === 0 || val === '0' ? 'No' : '—')
                                                                         }
                                                                         return (
                                                                             <td key={field.id || field.field_key} className="py-4 text-gray-500 dark:text-gray-400">
-                                                                                {String(displayVal || '—')}
+                                                                                {String(displayVal ?? '—')}
                                                                             </td>
                                                                         )
                                                                     })}
@@ -368,6 +494,15 @@ const CustomerDetails = () => {
                                                                     </td>
                                                                     <td className="py-4 text-right">
                                                                         <div className="flex justify-end gap-3">
+                                                                            <Tooltip title="Edit">
+                                                                                <div
+                                                                                    className="text-xl cursor-pointer font-semibold"
+                                                                                    role="button"
+                                                                                    onClick={() => navigate(`/program-participants/edit/${participant.id}`, { state: { from: `/programs/${id}` } })}
+                                                                                >
+                                                                                    <TbPencil />
+                                                                                </div>
+                                                                            </Tooltip>
                                                                             <Tooltip title="View">
                                                                                 <div
                                                                                     className="text-xl cursor-pointer font-semibold"
@@ -375,6 +510,15 @@ const CustomerDetails = () => {
                                                                                     onClick={() => navigate(`/program-participants/details/${participant.id}`)}
                                                                                 >
                                                                                     <TbEye />
+                                                                                </div>
+                                                                            </Tooltip>
+                                                                            <Tooltip title="Delete">
+                                                                                <div
+                                                                                    className="text-xl cursor-pointer font-semibold text-red-500 hover:text-red-700"
+                                                                                    role="button"
+                                                                                    onClick={() => handleDeleteClick(participant)}
+                                                                                >
+                                                                                    <TbTrash />
                                                                                 </div>
                                                                             </Tooltip>
                                                                         </div>
@@ -432,23 +576,13 @@ const CustomerDetails = () => {
                         Fill in the details below to register a new participant under this program.
                     </p>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">First Name</label>
-                            <Input
-                                placeholder="Enter first name"
-                                value={participantForm.first_name}
-                                onChange={(e) => setParticipantForm({ ...participantForm, first_name: e.target.value })}
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Last Name</label>
-                            <Input
-                                placeholder="Enter last name"
-                                value={participantForm.last_name}
-                                onChange={(e) => setParticipantForm({ ...participantForm, last_name: e.target.value })}
-                            />
-                        </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Name</label>
+                        <Input
+                            placeholder="Enter name"
+                            value={participantForm.first_name}
+                            onChange={(e) => setParticipantForm({ ...participantForm, first_name: e.target.value })}
+                        />
                     </div>
 
                     <div className="space-y-1">
@@ -479,57 +613,201 @@ const CustomerDetails = () => {
                         />
                     </div>
 
-                    {customFields.map((field: any) => (
-                        <div className="space-y-1" key={field.id || field.field_key}>
+                    {customFields.map((field: DetailCustomField) => {
+                        const labelEl = (
                             <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">
                                 {field.label} {field.is_required && <span className="text-red-500">*</span>}
                             </label>
-                            {field.field_type === 'select' ? (
-                                <Select
-                                    placeholder={field.placeholder || `Select ${field.label}...`}
-                                    options={field.options?.map((opt: any) => ({ label: opt.label, value: opt.value })) || []}
-                                    value={
-                                        field.options
-                                            ?.map((opt: any) => ({ label: opt.label, value: opt.value }))
-                                            .find((opt: any) => opt.value === customData[field.field_key]) || null
-                                    }
-                                    onChange={(opt: any) =>
-                                        setCustomData({
-                                            ...customData,
-                                            [field.field_key]: opt?.value || '',
-                                        })
-                                    }
-                                    isClearable={!field.is_required}
-                                />
-                            ) : (
-                                <Input
-                                    placeholder={field.placeholder || `Enter ${field.label}`}
-                                    value={customData[field.field_key] || ''}
-                                    onChange={(e) =>
-                                        setCustomData({
-                                            ...customData,
-                                            [field.field_key]: e.target.value,
-                                        })
-                                    }
-                                />
-                            )}
-                        </div>
-                    ))}
+                        );
+
+                        let inputEl = null;
+
+                        switch (field.field_type) {
+                            case 'select':
+                                inputEl = (
+                                    <Select
+                                        isClearable={!field.is_required}
+                                        options={field.options?.map((opt: ParticipantCustomFieldOption) => ({ label: opt.label, value: opt.value })) || []}
+                                        placeholder={field.placeholder || `Select ${field.label}...`}
+                                        value={
+                                            field.options
+                                                ?.map((opt: ParticipantCustomFieldOption) => ({ label: opt.label, value: opt.value }))
+                                                .find((opt: { label: string; value: string }) => opt.value === customData[field.field_key]) || null
+                                        }
+                                        onChange={(opt: { label: string; value: string } | null) =>
+                                            setCustomData({
+                                                ...customData,
+                                                [field.field_key]: opt?.value || '',
+                                            })
+                                        }
+                                    />
+                                );
+                                break;
+                            case 'textarea':
+                                inputEl = (
+                                    <Input
+                                        textArea
+                                        placeholder={field.placeholder || `Enter ${field.label}`}
+                                        value={(customData[field.field_key] as string) || ''}
+                                        onChange={(e) =>
+                                            setCustomData({
+                                                ...customData,
+                                                [field.field_key]: e.target.value,
+                                            })
+                                        }
+                                    />
+                                );
+                                break;
+                            case 'checkbox':
+                                if (field.options && field.options.length > 0) {
+                                    inputEl = (
+                                        <div className="flex flex-col gap-2 mt-1">
+                                            {field.options.map((opt: ParticipantCustomFieldOption) => {
+                                                const currentVals = Array.isArray(customData[field.field_key])
+                                                    ? (customData[field.field_key] as string[])
+                                                    : (customData[field.field_key] ? [String(customData[field.field_key])] : []);
+                                                const isChecked = currentVals.includes(opt.value);
+
+                                                return (
+                                                    <Checkbox
+                                                        key={opt.id || opt.value}
+                                                        checked={isChecked}
+                                                        onChange={(checked) => {
+                                                            let nextVals: string[];
+                                                            if (checked) {
+                                                                nextVals = [...currentVals, opt.value];
+                                                            } else {
+                                                                nextVals = currentVals.filter((v: string) => v !== opt.value);
+                                                            }
+                                                            setCustomData({
+                                                                ...customData,
+                                                                [field.field_key]: nextVals,
+                                                            });
+                                                        }}
+                                                    >
+                                                        {opt.label}
+                                                    </Checkbox>
+                                                );
+                                            })}
+                                        </div>
+                                    );
+                                } else {
+                                    inputEl = (
+                                        <div className="flex items-center h-10">
+                                            <Checkbox
+                                                checked={!!customData[field.field_key]}
+                                                onChange={(checked) =>
+                                                    setCustomData({
+                                                        ...customData,
+                                                        [field.field_key]: checked,
+                                                    })
+                                                }
+                                            >
+                                                {field.placeholder || `Yes, ${field.label}`}
+                                            </Checkbox>
+                                        </div>
+                                    );
+                                }
+                                break;
+                            case 'number':
+                                inputEl = (
+                                    <Input
+                                        placeholder={field.placeholder || `Enter ${field.label}`}
+                                        type="number"
+                                        value={(customData[field.field_key] as number | string) || ''}
+                                        onChange={(e) =>
+                                            setCustomData({
+                                                ...customData,
+                                                [field.field_key]: e.target.value,
+                                            })
+                                        }
+                                    />
+                                );
+                                break;
+                            case 'email':
+                                inputEl = (
+                                    <Input
+                                        placeholder={field.placeholder || `Enter ${field.label}`}
+                                        type="email"
+                                        value={(customData[field.field_key] as string) || ''}
+                                        onChange={(e) =>
+                                            setCustomData({
+                                                ...customData,
+                                                [field.field_key]: e.target.value,
+                                            })
+                                        }
+                                    />
+                                );
+                                break;
+                            case 'phone':
+                                inputEl = (
+                                    <Input
+                                        placeholder={field.placeholder || `Enter ${field.label}`}
+                                        type="tel"
+                                        value={(customData[field.field_key] as string) || ''}
+                                        onChange={(e) =>
+                                            setCustomData({
+                                                ...customData,
+                                                [field.field_key]: e.target.value,
+                                            })
+                                        }
+                                    />
+                                );
+                                break;
+                            case 'date':
+                                inputEl = (
+                                    <Input
+                                        placeholder={field.placeholder || `Select ${field.label}`}
+                                        type="date"
+                                        value={(customData[field.field_key] as string) || ''}
+                                        onChange={(e) =>
+                                            setCustomData({
+                                                ...customData,
+                                                [field.field_key]: e.target.value,
+                                            })
+                                        }
+                                    />
+                                );
+                                break;
+                            case 'text':
+                            default:
+                                inputEl = (
+                                    <Input
+                                        placeholder={field.placeholder || `Enter ${field.label}`}
+                                        type="text"
+                                        value={(customData[field.field_key] as string) || ''}
+                                        onChange={(e) =>
+                                            setCustomData({
+                                                ...customData,
+                                                [field.field_key]: e.target.value,
+                                            })
+                                        }
+                                    />
+                                );
+                        }
+
+                        return (
+                            <div key={field.id || field.field_key} className="space-y-1">
+                                {labelEl}
+                                {inputEl}
+                            </div>
+                        );
+                    })}
 
                     <div className="flex justify-end gap-2 mt-6">
                         <Button
+                            disabled={isSubmittingParticipant}
                             size="sm"
                             type="button"
                             onClick={() => setAddDialogOpen(false)}
-                            disabled={isSubmittingParticipant}
                         >
                             Cancel
                         </Button>
-                        <Button
-                            size="sm"
-                            variant="solid"
-                            type="button"
+                         <Button
                             loading={isSubmittingParticipant}
+                            size="sm"
+                            type="button"
+                            variant="solid"
                             onClick={handleAddParticipantSubmit}
                         >
                             Add
@@ -537,6 +815,22 @@ const CustomerDetails = () => {
                     </div>
                 </div>
             </Dialog>
+
+            <ConfirmDialog
+                isOpen={deleteDialogOpen}
+                type="danger"
+                title={selectedParticipant ? `Delete "${selectedParticipant.participant_name || `${selectedParticipant.first_name || ''} ${selectedParticipant.last_name || ''}`.trim()}"` : 'Delete Participant'}
+                onClose={() => { setDeleteDialogOpen(false); setSelectedParticipant(null); }}
+                onRequestClose={() => { setDeleteDialogOpen(false); setSelectedParticipant(null); }}
+                onCancel={() => { setDeleteDialogOpen(false); setSelectedParticipant(null); }}
+                onConfirm={handleDeleteConfirm}
+                confirmButtonProps={{ loading: isDeleting }}
+            >
+                <p>
+                    Are you sure you want to delete "{selectedParticipant ? (selectedParticipant.participant_name || `${selectedParticipant.first_name || ''} ${selectedParticipant.last_name || ''}`.trim()) : ''}"?
+                    This action cannot be undone.
+                </p>
+            </ConfirmDialog>
         </Loading>
     )
 }
