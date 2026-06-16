@@ -25,7 +25,7 @@ const assetsNavigationConfig: NavigationTree[] = [
                 subMenu: [],
             },
             {
-                key: 'assets',
+                key: 'asset',
                 path: '/assets',
                 title: 'Assets',
                 translateKey: 'nav.assets.item2',
