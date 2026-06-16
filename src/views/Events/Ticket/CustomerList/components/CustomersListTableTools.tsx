@@ -3,8 +3,8 @@ import CustomerListSearch from './CustomerListSearch'
 import CustomerTableFilter from './CustomerListTableFilter'
 import cloneDeep from 'lodash/cloneDeep'
 
-const CustomersListTableTools = () => {
-    const { tableData, setTableData } = useTicketList()
+const CustomersListTableTools = ({ eventId }: { eventId?: string }) => {
+    const { tableData, setTableData } = useTicketList(eventId)
 
     const handleInputChange = (val: string) => {
         const newTableData = cloneDeep(tableData)
@@ -22,7 +22,7 @@ const CustomersListTableTools = () => {
     return (
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
             <CustomerListSearch onInputChange={handleInputChange} />
-            <CustomerTableFilter />
+            <CustomerTableFilter eventId={eventId} />
         </div>
     )
 }

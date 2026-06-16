@@ -38,10 +38,10 @@ export default function useTicketList(eventId?: string) {
     // =========================
     const fetcher = () =>
         apiGetTicketList<GetTicketsListResponse, any>({
-            limit: pageSize,
-            offset,
+            limit: eventId ? 1000 : pageSize,
+            offset: eventId ? 0 : offset,
             search: tableData.query || '',
-            ...(eventId ? { event_id: eventId } : {}),
+            ...(eventId ? { event_id: eventId, event: eventId } : {}),
             ...filterData,
         })
 
@@ -60,23 +60,28 @@ export default function useTicketList(eventId?: string) {
     const rawList: Ticket[] = (data?.list ?? data?.results ?? []) as Ticket[]
 
     const ticketList = (Array.isArray(rawList) ? rawList : []).map(
-        (item, index) => ({
+        (item: any, index) => ({
             id: item.id ?? `tmp-${index}`,
 
             participant_name: item.participant_name ?? '',
             token: item.token ?? '',
             status: item.status ?? '',
-            event_id: item.event_id ?? '',
+            event_id: item.event_id ?? item.event ?? '',
             event_title: item.event_title ?? '',
             created_at: item.created_at ?? '',
             updated_at: item.updated_at ?? '',
         })
     )
 
-    const ticketListTotal =
-        data?.count ??
-        data?.total ??
-        0
+    const filteredList = eventId
+        ? ticketList.filter((t) => String(t.event_id) === String(eventId))
+        : ticketList
+
+    const ticketListTotal = eventId ? filteredList.length : (data?.count ?? data?.total ?? 0)
+
+    const paginatedList = eventId
+        ? filteredList.slice(offset, offset + pageSize)
+        : ticketList
 
     // =========================
     // SAFE selection reset
@@ -87,7 +92,7 @@ export default function useTicketList(eventId?: string) {
     }
 
     return {
-        ticketList,
+        ticketList: paginatedList,
         ticketListTotal,
         error,
         isLoading,

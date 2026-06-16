@@ -15,16 +15,15 @@ export default function useCustomerList(eventId?: string) {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
-    // ✅ FIX: proper pagination
     const limit = tableData.pageSize
     const offset = (tableData.pageIndex - 1) * tableData.pageSize
 
     const params = {
-        limit,
-        offset,
+        limit: eventId ? 1000 : limit,
+        offset: eventId ? 0 : offset,
         ordering: '-created_at',
         ...filterData,
-        ...(eventId ? { event_id: eventId } : {}),
+        ...(eventId ? { event_id: eventId, event: eventId } : {}),
     }
 
     const { data, error, isLoading, mutate } = useSWR(
@@ -52,12 +51,21 @@ export default function useCustomerList(eventId?: string) {
         speaker: item.speaker ?? '',
         location: item.location ?? '',
         event_title: item.event_title ?? '',
+        event: item.event ?? '',
     }))
 
-    const customerListTotal = data?.count ?? 0
+    const filteredList = eventId
+        ? customerList.filter((p) => String(p.event) === String(eventId))
+        : customerList
+
+    const customerListTotal = eventId ? filteredList.length : (data?.count ?? 0)
+
+    const paginatedList = eventId
+        ? filteredList.slice(offset, offset + limit)
+        : customerList
 
     return {
-        customerList,
+        customerList: paginatedList,
         customerListTotal,
         error,
         isLoading,

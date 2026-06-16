@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import useCustomerList from '../hooks/useCustomerList'
 import { CSVLink } from 'react-csv'
 
-const CustomerListActionTools = () => {
+const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
 
-    const { customerList } = useCustomerList()
+    const { customerList } = useCustomerList(eventId)
 
     return (
         <div className="flex flex-col md:flex-row gap-3">

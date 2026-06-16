@@ -29,7 +29,7 @@ const ActionColumn = ({
     </div>
 )
 
-const TicketListTable = () => {
+const TicketListTable = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
 
     const {
@@ -41,7 +41,7 @@ const TicketListTable = () => {
         selectedTicket,
         setSelectedTicket,
         setSelectAllTicket,
-    } = useTicketList()
+    } = useTicketList(eventId)
 
     // =========================
     // SAFE DATA
