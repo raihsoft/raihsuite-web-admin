@@ -12,14 +12,14 @@ import useCustomerList from '../hooks/useCustomerList'
 import { apiDeleteParticipant } from '@/services/CustomersService'
 import { TbChecks } from 'react-icons/tb'
 
-const CustomerListSelected = () => {
+const CustomerListSelected = ({ eventId }: { eventId?: string }) => {
     const {
         selectedCustomer,
         customerList,
         mutate,
         customerListTotal,
         setSelectAllCustomer,
-    } = useCustomerList()
+    } = useCustomerList(eventId)
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)

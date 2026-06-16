@@ -9,10 +9,10 @@ import QRScannerModal from '@/components/shared/QRScannerModal'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 
-const CustomerListActionTools = () => {
+const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
     const [showQRScanner, setShowQRScanner] = useState(false)
-    const { ticketList, mutate } = useTicketList()
+    const { ticketList, mutate } = useTicketList(eventId)
     const { scanTicket, isLoading } = useScanTicket()
 
     const handleQRScan = async (qrCode: string) => {

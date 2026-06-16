@@ -77,7 +77,7 @@ const ActionColumn = ({
     )
 }
 
-const CustomerListTable = () => {
+const CustomerListTable = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
 
     const {
@@ -89,7 +89,7 @@ const CustomerListTable = () => {
         setSelectAllCustomer,
         setSelectedCustomer,
         selectedCustomer,
-    } = useCustomerList()
+    } = useCustomerList(eventId)
 
     const handleEdit = (customer: Customer) => {
         navigate(`/session-attendance/edit/${customer.id}`)
