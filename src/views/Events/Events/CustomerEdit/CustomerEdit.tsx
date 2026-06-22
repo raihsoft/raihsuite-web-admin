@@ -7,7 +7,7 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import {
-    apiGetEvents,
+    apiGetEvent,
     apiUpdateEvent,
     apiDeleteEvent,
 } from '@/services/CustomersService'
@@ -39,10 +39,10 @@ const CustomerEdit = () => {
     const [deleteLoading, setDeleteLoading] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    /* ---------------- fetch events ---------------- */
-    const { data: resp, isLoading } = useSWR(
-        code ? ['/events/events', { code }] : null,
-        ([_, params]) => apiGetEvents<any, { code: string }>(params),
+    /* ---------------- fetch event ---------------- */
+    const { data: event, isLoading } = useSWR(
+        code ? ['/events/events', code] : null,
+        () => apiGetEvent<any>(code!),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
@@ -60,14 +60,6 @@ const CustomerEdit = () => {
 
     /* ---------------- populate form when data changes ---------------- */
     useEffect(() => {
-        if (!resp) return
-
-        // Find the event object in API response
-        const event =
-            resp.list?.find((e: any) => e.code === code) ??
-            resp.results?.find((e: any) => e.code === code) ??
-            (resp.code === code ? resp : null)
-
         if (!event) return
 
         reset({
@@ -77,7 +69,7 @@ const CustomerEdit = () => {
             end_date: event.end_date ? new Date(event.end_date) : undefined,
             fee_amount: event.fee_amount ? Number(event.fee_amount) : 0, // ✅ map fee_amount
         })
-    }, [resp, code, reset])
+    }, [event, reset])
 
     /* ---------------- submit ---------------- */
     const onSubmit = async (values: FormValues) => {
@@ -127,7 +119,7 @@ const CustomerEdit = () => {
     }
 
     /* ---------------- no event found ---------------- */
-    if (!isLoading && (!resp || (!resp.list && !resp.results && !resp.code))) {
+    if (!isLoading && !event) {
         return (
             <div className="h-full flex flex-col items-center justify-center">
                 <NoUserFound height={280} width={280} />

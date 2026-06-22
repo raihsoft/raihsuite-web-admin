@@ -17,19 +17,21 @@ const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
 
     const handleQRScan = async (qrCode: string) => {
         try {
-            // Parse the QR code data - it should contain a token field
+            // Parse the QR code data - it should contain token and session fields
             let token = qrCode
+            let session: string | undefined
 
-            // If QR code is JSON, extract the token
+            // If QR code is JSON, extract the token and session
             try {
                 const parsedData = JSON.parse(qrCode)
                 token = parsedData.token || qrCode
+                session = parsedData.session || undefined
             } catch {
                 // If not JSON, use the raw QR code as token
                 token = qrCode
             }
 
-            await scanTicket(token)
+            await scanTicket(token, session)
 
             toast.push(
                 <Notification title="QR Scanned" type="success">
@@ -80,7 +82,7 @@ const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
                 </Button>
                 <Button
                     variant="solid"
-                    icon={<TbUserPlus className="text-xl" />}
+                   
                     onClick={() => navigate('/ticket/create')}
                 >
                     Add new

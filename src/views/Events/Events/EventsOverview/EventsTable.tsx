@@ -59,16 +59,6 @@ const EventsTable = () => {
         setSelectAllCustomer,
     } = useEventsList()
 
-    const filteredAndSortedList = useMemo(() => {
-        const query = (tableData.query as string || '').toLowerCase().trim()
-        if (!query) return eventsList
-
-        return eventsList.filter(
-            (item) =>
-                (item.title || '').toLowerCase().includes(query) ||
-                (item.code || '').toLowerCase().includes(query)
-        )
-    }, [eventsList, tableData.query])
 
     const handleEdit = (event: EventRow) => {
         navigate(`/events/edit/${event.id}`)

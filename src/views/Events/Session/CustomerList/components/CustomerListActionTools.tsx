@@ -25,8 +25,7 @@ const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
             </CSVLink>
             <Button
                 variant="solid"
-                icon={<TbUserPlus className="text-xl" />}
-                onClick={() => navigate('/session/create')}
+                onClick={() => navigate(eventId ? `/session/create?event=${eventId}` : '/session/create')}
             >
                 Add new
             </Button>

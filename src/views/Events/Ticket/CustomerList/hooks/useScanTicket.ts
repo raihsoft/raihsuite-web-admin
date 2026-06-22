@@ -3,6 +3,7 @@ import { apiScanTicket } from '@/services/CustomersService'
 
 interface ScanTicketRequest {
     token: string
+    session?: string
 }
 
 interface ScanTicketResponse {
@@ -17,15 +18,18 @@ export default function useScanTicket() {
     const [error, setError] = useState<string | null>(null)
     const [scanResult, setScanResult] = useState<ScanTicketResponse | null>(null)
 
-    const scanTicket = async (token: string) => {
+    const scanTicket = async (token: string, session?: string) => {
         setIsLoading(true)
         setError(null)
         setScanResult(null)
 
         try {
-            const response = await apiScanTicket<ScanTicketResponse>({
-                token,
-            })
+            const payload: { token: string; session?: string } = { token }
+            if (session) {
+                payload.session = session
+            }
+
+            const response = await apiScanTicket<ScanTicketResponse>(payload)
 
             setScanResult(response)
             return response
