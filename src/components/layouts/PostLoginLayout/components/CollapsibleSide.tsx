@@ -98,7 +98,7 @@ const CollapsibleSide = ({ children }: CommonProps) => {
                                 {smaller.lg && <MobileNav />}
 
                                 <img
-                                    src="https://media.raihsuite.com/RS0001/web/Gemini_Generated_Image_lltgbilltgbilltg%20(1).png"
+                                    src="https://media.raihsuite.com/RS0001/web/Raihsuite-logo.png"
                                     alt="Logo"
                                     className="h-9 w-9 object-contain"
                                 />
