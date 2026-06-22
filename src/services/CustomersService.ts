@@ -817,6 +817,7 @@ export async function apiGetTicketDetails<T>(id: string) {
 // Takes token from QR code to update ticket status
 export async function apiScanTicket<T>(data: {
     token: string
+    session?: string
 }) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/events/tickets/scan/',

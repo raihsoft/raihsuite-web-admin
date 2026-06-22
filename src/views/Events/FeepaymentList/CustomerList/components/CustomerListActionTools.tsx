@@ -25,7 +25,7 @@ const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
             </CSVLink>
             <Button
                 variant="solid"
-                icon={<TbUserPlus className="text-xl" />}
+               
                 onClick={() => navigate('/feepayment/create')}
             >
                 Add new

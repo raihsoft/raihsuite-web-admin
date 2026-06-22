@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import Tooltip from '@/components/ui/Tooltip'
 import DataTable from '@/components/shared/DataTable'
 import useCustomerList from '../hooks/useCustomerList'
-import CustomerListActionTools from '../components/CustomerListActionTools'
+
 import { useNavigate } from 'react-router-dom'
 import cloneDeep from 'lodash/cloneDeep'
 import { TbEye, TbPencil, TbTrash } from 'react-icons/tb'
@@ -442,8 +442,6 @@ const CustomerListTable = () => {
                     of {customerListTotal} entries
                 </div>
 
-                {/* ACTION TOOLS */}
-                <CustomerListActionTools />
             </div>
 
             {/* =========================

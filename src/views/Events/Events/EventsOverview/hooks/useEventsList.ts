@@ -33,7 +33,8 @@ export default function useEventsList() {
         {
             limit,
             offset,
-            ordering: '-created_at', // optional
+            ordering: '-created_at',
+            ...(tableData.query ? { search: tableData.query } : {}),
             ...filterData,
         },
     ] as const

@@ -111,18 +111,17 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                         name="start_datetime"
                         control={control}
                         render={({ field }) => (
-                            <DatePicker
-                                value={field.value ? new Date(field.value) : ''}
+                            <DatePicker.DateTimepicker
+                                amPm={false}
+                                value={field.value ? new Date(field.value) : null}
                                 onChange={(d) => {
                                     if (d) {
-                                        const dateString = d instanceof Date 
-                                            ? d.toISOString().slice(0, 16).replace('T', ' ')
-                                            : String(d)
-                                        field.onChange(dateString)
+                                        field.onChange(d.toISOString())
+                                    } else {
+                                        field.onChange('')
                                     }
                                 }}
                                 inputFormat="YYYY-MM-DD HH:mm"
-                                type="date"
                             />
                         )}
                     />
@@ -137,18 +136,17 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                         name="end_datetime"
                         control={control}
                         render={({ field }) => (
-                            <DatePicker
-                                value={field.value ? new Date(field.value) : ''}
+                            <DatePicker.DateTimepicker
+                                amPm={false}
+                                value={field.value ? new Date(field.value) : null}
                                 onChange={(d) => {
                                     if (d) {
-                                        const dateString = d instanceof Date 
-                                            ? d.toISOString().slice(0, 16).replace('T', ' ')
-                                            : String(d)
-                                        field.onChange(dateString)
+                                        field.onChange(d.toISOString())
+                                    } else {
+                                        field.onChange('')
                                     }
                                 }}
                                 inputFormat="YYYY-MM-DD HH:mm"
-                                type="date"
                             />
                         )}
                     />

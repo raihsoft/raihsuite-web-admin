@@ -35,7 +35,7 @@ const handleConfirmDelete = async () => {
 
     try {
         await Promise.all(
-            selectedCustomer.map((item) => apiDeleteEvent(item.code))
+            selectedCustomer.map((item) => apiDeleteEvent(item.id))
         )
 
         // ✅ Force SWR to re-fetch all keys from the server (hard refresh)

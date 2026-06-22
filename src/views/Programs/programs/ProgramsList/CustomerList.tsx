@@ -13,9 +13,11 @@ const CustomerList = () => {
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                             <h3>Programs</h3>
-                            {/* <CustomerListActionTools /> */}
+                            <div className="flex items-center gap-2">
+                                <CustomersListTableTools />
+                                <CustomerListActionTools />
+                            </div>
                         </div>
-                        <CustomersListTableTools />
                         <CustomerListTable />
                     </div>
                 </AdaptiveCard>

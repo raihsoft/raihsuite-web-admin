@@ -20,6 +20,7 @@ type CustomerFormProps = {
 const validationSchema: ZodType<CustomerFormSchema> = z.object({
     event_id: z.string().optional(),
     participant_id: z.string().optional(),
+    // session_id: z.string().optional(),
 })
 
 const CustomerForm = (props: CustomerFormProps) => {
@@ -40,6 +41,7 @@ const CustomerForm = (props: CustomerFormProps) => {
         defaultValues: defaultValues || {
             event_id: '',
             participant_id: '',
+            // session_id: '',
         },
     })
 

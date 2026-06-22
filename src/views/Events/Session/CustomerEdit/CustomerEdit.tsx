@@ -5,7 +5,7 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import {
-    apiDeleteParticipant,
+    apiDeleteSession,
     apiUpdateSession,
 } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
@@ -62,7 +62,7 @@ const CustomerEdit = () => {
                 </Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/session')
+            navigate(data?.event ? `/events/${data.event}` : '/session')
 
             mutate()
         } catch {
@@ -82,14 +82,14 @@ const CustomerEdit = () => {
         setDeleteLoading(true)
 
         try {
-            await apiDeleteParticipant(id)
+            await apiDeleteSession(id)
             toast.push(
                 <Notification type="success">
-                    Participant deleted!
+                    Session deleted!
                 </Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/session')
+            navigate(data?.event ? `/events/${data.event}` : '/session')
         } finally {
             setDeleteLoading(false)
             setDeleteConfirmationOpen(false)

@@ -71,7 +71,7 @@ const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
                 </Button>
                 <Button
                     variant="solid"
-                    icon={<TbUserPlus className="text-xl" />}
+                   
                     onClick={() => navigate('/sessionAttendance/create')}
                 >
                     Add new

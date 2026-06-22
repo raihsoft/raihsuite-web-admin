@@ -44,7 +44,7 @@ export default function useCustomerList() {
             offset,
             limit,
             ordering: '-created_at',
-
+            ...(tableData.query ? { search: tableData.query } : {}),
             ...filterData,
         },
     ] as const

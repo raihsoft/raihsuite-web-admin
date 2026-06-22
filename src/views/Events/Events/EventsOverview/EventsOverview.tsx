@@ -14,16 +14,14 @@ const EventsOverview = () => {
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                             <h3>Events</h3>
                             <div className="flex items-center gap-2">
+                                <EventsTableTools />
                                 <EventsActionTools />
                             </div>
                         </div>
 
-                        <EventsTableTools />
                         <EventsTable />
-                        
                     </div>
                 </AdaptiveCard>
-                 
             </Container>
             <CustomerListSelected />
         </>
