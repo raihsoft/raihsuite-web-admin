@@ -21,10 +21,7 @@ type CustomerFormProps = {
 
 const validationSchema: ZodType<CustomerFormSchema> = z.object({
     name: z.string().min(1, { message: 'Name required' }),
-    email_link: z
-        .string()
-        .min(1, { message: 'Email required' })
-        .email({ message: 'Invalid email' }),
+    email_link: z.string().optional(),
     designation: z.string().optional(),
     organization: z.string().optional(),
     facebook_link: z.string().optional(),
