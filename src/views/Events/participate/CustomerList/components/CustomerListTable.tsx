@@ -46,7 +46,11 @@ const ParticipantsTable = ({ eventId }: { eventId?: string }) => {
     const data = useMemo(() => customerList, [customerList])
 
     const handleEdit = (row: Customer) => {
-        navigate(`/participants/edit/${row.id}`)
+        if (eventId) {
+            navigate(`/participants/edit/${row.id}?eventId=${eventId}&returnTo=${encodeURIComponent(`/events/${eventId}`)}`)
+        } else {
+            navigate(`/participants/edit/${row.id}`)
+        }
     }
 
     const handleView = (row: Customer) => {

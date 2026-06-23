@@ -11,13 +11,17 @@ import {
 } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import useSWR from 'swr'
 import type { CustomerFormSchema } from '../types'
 
 const CustomerEdit = () => {
     const { id } = useParams()
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+
+    const eventId = searchParams.get('eventId') ?? ''
+    const returnTo = searchParams.get('returnTo') ?? '/participants'
 
     const { data, isLoading, mutate } = useSWR(
         id ? `/participants/${id}` : null,
@@ -69,7 +73,7 @@ const CustomerEdit = () => {
                 { placement: 'top-center' }
             )
 
-            navigate('/participants')
+            navigate(returnTo)
             mutate()
         } catch {
             toast.push(
@@ -96,7 +100,7 @@ const CustomerEdit = () => {
                 </Notification>,
                 { placement: 'top-center' }
             )
-            navigate('/participants')
+            navigate(returnTo)
         } finally {
             setDeleteLoading(false)
             setDeleteConfirmationOpen(false)
@@ -118,6 +122,7 @@ const CustomerEdit = () => {
                     <CustomerForm
                         defaultValues={getDefaultValues()}
                         newCustomer={false}
+                        disableEvent={!!eventId}
                         onFormSubmit={handleFormSubmit}
                     >
                         <Container>

@@ -6,9 +6,11 @@ import { Controller, useWatch } from 'react-hook-form'
 import type { FormSectionBaseProps } from './types'
 import { apiGetEvents, apiParticipantList, apiGetSessionList } from '@/services/CustomersService'
 
-type OverviewSectionProps = FormSectionBaseProps
+type OverviewSectionProps = FormSectionBaseProps & {
+    disableEvent?: boolean
+}
 
-const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
+const OverviewSection = ({ control, errors, disableEvent }: OverviewSectionProps) => {
     const [events, setEvents] = useState<{ value: string; label: string }[]>([])
     const [participants, setParticipants] = useState<{ value: string; label: string }[]>([])
     const [eventsLoading, setEventsLoading] = useState(false)
@@ -156,6 +158,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                                 }
                                 isClearable={true}
                                 isLoading={eventsLoading}
+                                isDisabled={disableEvent}
                             />
                         )}
                     />

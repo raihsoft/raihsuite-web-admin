@@ -82,6 +82,7 @@ const CustomerEdit = () => {
         <>
             <CustomerForm
                 newCustomer
+                disableEvent={!!defaultEventId}
                 defaultValues={{
                     event: defaultEventId,
                     title: '',

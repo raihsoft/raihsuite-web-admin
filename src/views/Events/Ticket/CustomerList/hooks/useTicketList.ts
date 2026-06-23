@@ -19,7 +19,9 @@ export default function useTicketList(eventId?: string) {
     // =========================
     const pageIndex = tableData.pageIndex ?? 1
     const pageSize = tableData.pageSize ?? 10
-    const offset = (pageIndex - 1) * pageSize
+    const isLocalPagination = !!(eventId || tableData.query)
+    const limit = isLocalPagination ? 1000 : pageSize
+    const offset = isLocalPagination ? 0 : (pageIndex - 1) * pageSize
 
     // =========================
     // Stable SWR key
@@ -38,8 +40,8 @@ export default function useTicketList(eventId?: string) {
     // =========================
     const fetcher = () =>
         apiGetTicketList<GetTicketsListResponse, any>({
-            limit: eventId ? 1000 : pageSize,
-            offset: eventId ? 0 : offset,
+            limit,
+            offset,
             search: tableData.query || '',
             ...(eventId ? { event_id: eventId, event: eventId } : {}),
             ...filterData,
@@ -87,10 +89,10 @@ export default function useTicketList(eventId?: string) {
         return true
     })
 
-    const ticketListTotal = eventId ? filteredList.length : (data?.count ?? data?.total ?? 0)
+    const ticketListTotal = isLocalPagination ? filteredList.length : (data?.count ?? data?.total ?? 0)
 
-    const paginatedList = eventId
-        ? filteredList.slice(offset, offset + pageSize)
+    const paginatedList = isLocalPagination
+        ? filteredList.slice((pageIndex - 1) * pageSize, (pageIndex - 1) * pageSize + pageSize)
         : filteredList
 
     // =========================

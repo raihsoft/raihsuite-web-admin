@@ -104,6 +104,7 @@ const CustomerCreate = () => {
         <>
             <CustomerForm
                 newCustomer
+                disableEvent={!!eventId}
                 defaultValues={{
                     firstName: '',
                     lastName: '',

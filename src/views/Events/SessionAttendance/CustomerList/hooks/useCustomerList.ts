@@ -17,8 +17,9 @@ export default function useCustomerList(eventId?: string) {
 
     const pageIndex = tableData.pageIndex ?? 1
     const pageSize = tableData.pageSize ?? 10
-    const limit = pageSize
-    const offset = (pageIndex - 1) * limit
+    const isLocalPagination = !!(eventId || tableData.query)
+    const limit = isLocalPagination ? 1000 : pageSize
+    const offset = isLocalPagination ? 0 : (pageIndex - 1) * pageSize
 
     const swrKey = [
         '/api/events/session-attendance',
@@ -31,8 +32,8 @@ export default function useCustomerList(eventId?: string) {
 
     const fetcher = () =>
         apiGetSessionAttendanceList<any, any>({
-            limit: eventId ? 1000 : limit,
-            offset: eventId ? 0 : offset,
+            limit,
+            offset,
             ordering: '-created_at', // optional but recommended
             search: tableData.query || '',
             ...(eventId ? { event_id: eventId, event: eventId, session__event: eventId } : {}),
@@ -83,11 +84,13 @@ export default function useCustomerList(eventId?: string) {
     }, [customerList, eventId, tableData.query])
 
     // ✅ correct total
-    const customerListTotal = eventId ? filteredList.length : (data?.count ?? 0)
+    const customerListTotal = isLocalPagination ? filteredList.length : (data?.count ?? 0)
 
     const paginatedList = useMemo(() => {
-        return eventId ? filteredList.slice(offset, offset + limit) : customerList
-    }, [filteredList, customerList, eventId, offset, limit])
+        return isLocalPagination 
+            ? filteredList.slice((pageIndex - 1) * pageSize, (pageIndex - 1) * pageSize + pageSize) 
+            : customerList
+    }, [filteredList, customerList, isLocalPagination, pageIndex, pageSize])
 
     return {
         customerList: paginatedList,

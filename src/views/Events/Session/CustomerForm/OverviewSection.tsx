@@ -8,9 +8,11 @@ import type { FormSectionBaseProps } from './types'
 import { apiGetEvents } from '@/services/CustomersService'
 import { DatePicker } from '@/components/ui'
 
-type OverviewSectionProps = FormSectionBaseProps
+type OverviewSectionProps = FormSectionBaseProps & {
+    disableEvent?: boolean
+}
 
-const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
+const OverviewSection = ({ control, errors, disableEvent }: OverviewSectionProps) => {
     const [events, setEvents] = useState<{ value: string; label: string }[]>([])
     const [loading, setLoading] = useState(false)
 
@@ -78,6 +80,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                                 }
                                 isClearable={false}
                                 isLoading={loading}
+                                isDisabled={disableEvent}
                             />
                         )}
                     />

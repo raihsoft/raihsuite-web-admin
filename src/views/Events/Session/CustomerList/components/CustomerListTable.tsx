@@ -97,7 +97,13 @@ const CustomerListTable = ({ eventId }: { eventId?: string }) => {
             id: 'action',
             cell: (props) => (
                 <ActionColumn
-                    onEdit={() => navigate(`/session/edit/${props.row.original.id}`)}
+                    onEdit={() => {
+                        if (eventId) {
+                            navigate(`/session/edit/${props.row.original.id}?event=${eventId}&returnTo=${encodeURIComponent(`/events/${eventId}`)}`)
+                        } else {
+                            navigate(`/session/edit/${props.row.original.id}`)
+                        }
+                    }}
                     onViewDetail={() => navigate(`/session/${props.row.original.id}`)}
                 />
             ),

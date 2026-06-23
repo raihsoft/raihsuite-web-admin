@@ -45,7 +45,18 @@ const OverviewSection = ({ control, errors, programOptions, newCustomer }: any) 
 
             <FormItem label="Phone" errorMessage={errors.phone?.message}>
                 <Controller name="phone" control={control}
-                    render={({ field }) => <Input {...field} placeholder="Enter phone number" />}
+                    render={({ field }) => (
+                        <Input
+                            {...field}
+                            type="tel"
+                            placeholder="Enter phone number"
+                            onChange={(e) => {
+                                const val = e.target.value
+                                const numericVal = val.replace(/\D/g, '')
+                                field.onChange(numericVal)
+                            }}
+                        />
+                    )}
                 />
             </FormItem>
 
