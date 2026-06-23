@@ -9,12 +9,14 @@ import { apiGetEvents } from '@/services/CustomersService'
 
 type OverviewSectionProps = FormSectionBaseProps & {
     serverPhoneError?: string
+    disableEvent?: boolean
 }
 
 const OverviewSection = ({
     control,
     errors,
     serverPhoneError,
+    disableEvent,
 }: OverviewSectionProps) => {
     const [events, setEvents] = useState<{ value: string; label: string }[]>([])
     const [loading, setLoading] = useState(false)
@@ -128,6 +130,11 @@ const OverviewSection = ({
                                 type="tel"
                                 placeholder="Enter phone number"
                                 invalid={isPhoneInvalid}
+                                onChange={(e) => {
+                                    const val = e.target.value
+                                    const numericVal = val.replace(/\D/g, '')
+                                    field.onChange(numericVal)
+                                }}
                             />
                         )}
                     />
@@ -159,6 +166,7 @@ const OverviewSection = ({
                                         ? 'Loading events...'
                                         : 'Select Event'
                                 }
+                                isDisabled={disableEvent}
                             />
                         )}
                     />

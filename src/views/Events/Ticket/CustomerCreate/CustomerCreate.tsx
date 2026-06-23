@@ -7,11 +7,13 @@ import CustomerForm from '../CustomerForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { apiCreateTicket } from '@/services/CustomersService'
 import { TbTrash } from 'react-icons/tb'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import type { CustomerFormSchema } from '../CustomerForm'
 
 const CustomerCreate = () => {
     const navigate = useNavigate()
+    const queryParams = new URLSearchParams(useLocation().search)
+    const defaultEventId = queryParams.get('event') || ''
 
     const [discardConfirmationOpen, setDiscardConfirmationOpen] =
         useState(false)
@@ -35,7 +37,7 @@ const CustomerCreate = () => {
                 <Notification type="success">Ticket created!</Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/ticket')
+            navigate(defaultEventId ? `/events/${defaultEventId}` : '/ticket')
         } catch (err: any) {
             const data = err?.response?.data
             if (data && typeof data === 'object') {
@@ -64,7 +66,7 @@ const CustomerCreate = () => {
             <Notification type="success">Ticket discarded!</Notification>,
             { placement: 'top-center' },
         )
-        navigate('/ticket')
+        navigate(defaultEventId ? `/events/${defaultEventId}` : '/ticket')
     }
 
     const handleDiscard = () => {
@@ -79,8 +81,9 @@ const CustomerCreate = () => {
         <>
             <CustomerForm
                 newCustomer
+                disableEvent={!!defaultEventId}
                 defaultValues={{
-                    event_id: '',
+                    event_id: defaultEventId,
                     participant_id: '',
                 }}
                 onFormSubmit={handleFormSubmit}

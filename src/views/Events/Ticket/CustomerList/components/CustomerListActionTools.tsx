@@ -82,8 +82,7 @@ const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
                 </Button>
                 <Button
                     variant="solid"
-
-                    onClick={() => navigate('/ticket/create')}
+                    onClick={() => navigate(eventId ? `/ticket/create?event=${eventId}` : '/ticket/create')}
                 >
                     Add new
                 </Button>

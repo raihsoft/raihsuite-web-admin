@@ -19,6 +19,7 @@ type CustomerFormProps = {
     ) => Promise<void>
     defaultValues?: Partial<CustomerFormSchema>
     newCustomer?: boolean
+    disableEvent?: boolean
 } & CommonProps
 
 // ✅ UPDATED VALIDATION SCHEMA
@@ -41,6 +42,7 @@ const validationSchema: ZodType<CustomerFormSchema> = z.object({
 const CustomerForm = ({
     onFormSubmit,
     defaultValues,
+    disableEvent,
     children,
 }: CustomerFormProps) => {
     const isRestoringRef = useRef(false)
@@ -136,6 +138,7 @@ const CustomerForm = ({
                     control={control}
                     errors={errors}
                     serverPhoneError={serverPhoneError}
+                    disableEvent={disableEvent}
                 />
             </Container>
 
