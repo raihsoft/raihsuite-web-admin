@@ -54,18 +54,6 @@ const CustomerListTable = ({ eventId }: { eventId?: string }) => {
         setSelectAllCustomer,
     } = useCustomerList(eventId)
 
-    // ✅ Correct filtering (fixed fields)
-    const filteredList = useMemo(() => {
-        const query = (tableData.query as string || '').toLowerCase().trim()
-
-        if (!query) return customerList
-
-        return customerList.filter(item =>
-            (item.title || '').toLowerCase().includes(query) ||
-            (item.event_title || '').toLowerCase().includes(query) ||
-            (item.speaker || '').toLowerCase().includes(query)
-        )
-    }, [customerList, tableData.query])
 
     const columns: ColumnDef<Session>[] = useMemo(() => [
         {
