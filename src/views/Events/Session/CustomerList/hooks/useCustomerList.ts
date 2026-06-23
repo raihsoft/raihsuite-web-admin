@@ -15,27 +15,36 @@ export default function useCustomerList(eventId?: string) {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
-    const limit = tableData.pageSize
-    const offset = (tableData.pageIndex - 1) * tableData.pageSize
+    const pageIndex = tableData.pageIndex ?? 1
+    const pageSize = tableData.pageSize ?? 10
+    const limit = pageSize
+    const offset = (pageIndex - 1) * limit
 
-    const params = {
-        limit: eventId ? 1000 : limit,
-        offset: eventId ? 0 : offset,
-        ordering: '-created_at',
-        ...filterData,
-        ...(eventId ? { event_id: eventId, event: eventId } : {}),
-    }
+    const swrKey = [
+        '/api/events/sessions',
+        pageIndex,
+        pageSize,
+        tableData.query || '',
+        JSON.stringify(filterData || {}),
+        eventId ?? '',
+    ]
+
+    const fetcher = () =>
+        apiGetSessionList<GetCustomersListResponse, any>({
+            limit: eventId ? 1000 : limit,
+            offset: eventId ? 0 : offset,
+            ordering: '-created_at',
+            search: tableData.query || '',
+            ...(eventId ? { event_id: eventId, event: eventId } : {}),
+            ...filterData,
+        })
 
     const { data, error, isLoading, mutate } = useSWR(
-        [
-            '/api/events/sessions',
-            params,
-            eventId ?? null,
-        ],
-        ([_, params]) =>
-            apiGetSessionList<GetCustomersListResponse, TableQueries>(params),
+        swrKey,
+        fetcher,
         {
             revalidateOnFocus: false,
+            keepPreviousData: true,
         },
     )
 

@@ -73,15 +73,25 @@ export default function useTicketList(eventId?: string) {
         })
     )
 
-    const filteredList = eventId
-        ? ticketList.filter((t) => String(t.event_id) === String(eventId))
-        : ticketList
+    const filteredList = ticketList.filter((t) => {
+        if (eventId && String(t.event_id) !== String(eventId)) return false
+
+        const query = (tableData.query || '').toLowerCase().trim()
+        if (query) {
+            return (
+                (t.participant_name || '').toLowerCase().includes(query) ||
+                (t.token || '').toLowerCase().includes(query) ||
+                (t.event_title || '').toLowerCase().includes(query)
+            )
+        }
+        return true
+    })
 
     const ticketListTotal = eventId ? filteredList.length : (data?.count ?? data?.total ?? 0)
 
     const paginatedList = eventId
         ? filteredList.slice(offset, offset + pageSize)
-        : ticketList
+        : filteredList
 
     // =========================
     // SAFE selection reset

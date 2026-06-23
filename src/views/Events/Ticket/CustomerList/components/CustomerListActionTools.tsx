@@ -82,7 +82,7 @@ const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
                 </Button>
                 <Button
                     variant="solid"
-                   
+
                     onClick={() => navigate('/ticket/create')}
                 >
                     Add new

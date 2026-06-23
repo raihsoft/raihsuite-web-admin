@@ -15,29 +15,36 @@ export default function useCustomerList(eventId?: string) {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
-    const limit = tableData.pageSize
-    const offset = (tableData.pageIndex - 1) * tableData.pageSize
-
-    const params = {
-        limit: eventId ? 1000 : limit,
-        offset: eventId ? 0 : offset,
-        ordering: '-created_at', // optional but recommended
-        ...filterData,
-        ...(eventId ? { event_id: eventId, event: eventId, session__event: eventId } : {}),
-    }
+    const pageIndex = tableData.pageIndex ?? 1
+    const pageSize = tableData.pageSize ?? 10
+    const limit = pageSize
+    const offset = (pageIndex - 1) * limit
 
     const swrKey = [
         '/api/events/session-attendance',
-        params,
-        eventId ?? null,
-    ] as const
+        pageIndex,
+        pageSize,
+        tableData.query || '',
+        JSON.stringify(filterData || {}),
+        eventId ?? '',
+    ]
+
+    const fetcher = () =>
+        apiGetSessionAttendanceList<any, any>({
+            limit: eventId ? 1000 : limit,
+            offset: eventId ? 0 : offset,
+            ordering: '-created_at', // optional but recommended
+            search: tableData.query || '',
+            ...(eventId ? { event_id: eventId, event: eventId, session__event: eventId } : {}),
+            ...filterData,
+        })
 
     const { data, error, isLoading, mutate } = useSWR(
         swrKey,
-        ([_, params]) =>
-            apiGetSessionAttendanceList<any, any>(params),
+        fetcher,
         {
             revalidateOnFocus: false,
+            keepPreviousData: true,
         },
     )
 
@@ -61,10 +68,19 @@ export default function useCustomerList(eventId?: string) {
     }, [rawList])
 
     const filteredList = useMemo(() => {
-        return eventId
-            ? customerList.filter((p) => String(p.event) === String(eventId))
-            : customerList
-    }, [customerList, eventId])
+        return customerList.filter((p) => {
+            if (eventId && String(p.event) !== String(eventId)) return false
+
+            const query = (tableData.query || '').toLowerCase().trim()
+            if (query) {
+                return (
+                    (p.session_title || '').toLowerCase().includes(query) ||
+                    (p.participant_name || '').toLowerCase().includes(query)
+                )
+            }
+            return true
+        })
+    }, [customerList, eventId, tableData.query])
 
     // ✅ correct total
     const customerListTotal = eventId ? filteredList.length : (data?.count ?? 0)
