@@ -37,7 +37,6 @@ export default function useCustomerList() {
             offset,
             limit,
             ordering: '-created_at',
-            search: tableData.query || '',
             ...filterData,
         })
 
