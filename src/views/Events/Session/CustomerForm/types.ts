@@ -1,4 +1,4 @@
-import type { Control, FieldErrors } from 'react-hook-form'
+import type { Control, FieldErrors, UseFormSetValue, UseFormGetValues } from 'react-hook-form'
 
 export type OverviewFields = {
     event_title: string
@@ -16,4 +16,6 @@ export type CustomerFormSchema = OverviewFields
 export type FormSectionBaseProps = {
     control: Control<CustomerFormSchema>
     errors: FieldErrors<CustomerFormSchema>
+    setValue?: UseFormSetValue<CustomerFormSchema>
+    getValues?: UseFormGetValues<CustomerFormSchema>
 }
