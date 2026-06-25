@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Container from '@/components/shared/Container'
 import Button from '@/components/ui/Button'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import CustomerForm from '../CustomerForm'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import {apiCreateProgram } from '@/services/CustomersService'
-import { TbTrash } from 'react-icons/tb'
+import { apiCreateProgram, apiCreateParticipantCustomField } from '@/services/CustomersService'
 import { useNavigate } from 'react-router-dom'
+import type { CustomerFormSchema, ParticipantCustomField } from '../CustomerForm/types'
 
-type ProgramOption = {
-    label: string
-    value: string
+type FormValues = CustomerFormSchema & {
+    customFields?: ParticipantCustomField[]
 }
 
 const CustomerCreate = () => {
@@ -26,7 +25,7 @@ const CustomerCreate = () => {
     // =========================
     // SUBMIT
     // =========================
-    const handleFormSubmit = async (values: any) => {
+    const handleFormSubmit = async (values: FormValues) => {
         setIsSubmitting(true)
 
         try {
@@ -40,7 +39,24 @@ const CustomerCreate = () => {
 
             // console.log('🚀 FINAL PAYLOAD:', payload)
 
-            await apiCreateProgram(payload)
+            const res = await apiCreateProgram<{ id: string }, Record<string, unknown>>(payload)
+            const programId = res?.id
+
+            if (programId && values.customFields && values.customFields.length > 0) {
+                for (const field of values.customFields) {
+                    await apiCreateParticipantCustomField({
+                        program: programId,
+                        label: field.label,
+                        field_key: field.field_key,
+                        field_type: field.field_type,
+                        is_required: field.is_required,
+                        placeholder: field.placeholder || '',
+                        order: field.order,
+                        is_active: field.is_active ?? true,
+                        options: ['select', 'checkbox'].includes(field.field_type) ? (field.options || []) : [],
+                    })
+                }
+            }
 
             toast.push(
                 <Notification type="success">
@@ -50,7 +66,7 @@ const CustomerCreate = () => {
             )
 
             navigate('/programs')
-        } catch (error) {
+        } catch {
             // console.log('❌ CREATE ERROR:', error)
 
             toast.push(

@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import type { TableQueries } from '@/@types/common'
 
-export default function useCustomerList() {
+export default function useCustomerList(eventId?: string) {
     const {
         tableData,
         filterData,
@@ -15,26 +15,37 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
-    // ✅ FIX: convert pagination
-    const limit = tableData.pageSize
-    const offset = (tableData.pageIndex - 1) * tableData.pageSize
+    const pageIndex = tableData.pageIndex ?? 1
+    const pageSize = tableData.pageSize ?? 10
+    const isLocalPagination = !!(eventId || tableData.query)
+    const limit = isLocalPagination ? 1000 : pageSize
+    const offset = isLocalPagination ? 0 : (pageIndex - 1) * pageSize
 
     const swrKey = [
         '/api/events/session-attendance',
-        {
+        pageIndex,
+        pageSize,
+        tableData.query || '',
+        JSON.stringify(filterData || {}),
+        eventId ?? '',
+    ]
+
+    const fetcher = () =>
+        apiGetSessionAttendanceList<any, any>({
             limit,
             offset,
             ordering: '-created_at', // optional but recommended
+            search: tableData.query || '',
+            ...(eventId ? { event_id: eventId, event: eventId, session__event: eventId } : {}),
             ...filterData,
-        },
-    ] as const
+        })
 
     const { data, error, isLoading, mutate } = useSWR(
         swrKey,
-        ([_, params]) =>
-            apiGetSessionAttendanceList<any, any>(params),
+        fetcher,
         {
             revalidateOnFocus: false,
+            keepPreviousData: true,
         },
     )
 
@@ -53,14 +64,36 @@ export default function useCustomerList() {
                 item.referenced_by ??
                 item.referencedBy ??
                 '',
+            event: item.event ?? item.event_id ?? item.session_event ?? '',
         }))
     }, [rawList])
 
+    const filteredList = useMemo(() => {
+        return customerList.filter((p) => {
+            if (eventId && String(p.event) !== String(eventId)) return false
+
+            const query = (tableData.query || '').toLowerCase().trim()
+            if (query) {
+                return (
+                    (p.session_title || '').toLowerCase().includes(query) ||
+                    (p.participant_name || '').toLowerCase().includes(query)
+                )
+            }
+            return true
+        })
+    }, [customerList, eventId, tableData.query])
+
     // ✅ correct total
-    const customerListTotal = data?.count ?? 0
+    const customerListTotal = isLocalPagination ? filteredList.length : (data?.count ?? 0)
+
+    const paginatedList = useMemo(() => {
+        return isLocalPagination 
+            ? filteredList.slice((pageIndex - 1) * pageSize, (pageIndex - 1) * pageSize + pageSize) 
+            : customerList
+    }, [filteredList, customerList, isLocalPagination, pageIndex, pageSize])
 
     return {
-        customerList,
+        customerList: paginatedList,
         customerListTotal,
         error,
         isLoading,

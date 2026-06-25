@@ -30,10 +30,10 @@ export default function useCustomerList() {
     // BACKEND PAGINATION
     // =========================
     const offset =
-        (tableData.pageIndex - 1) *
-        tableData.pageSize
+        ((tableData.pageIndex ?? 1) - 1) *
+        (tableData.pageSize ?? 10)
 
-    const limit = tableData.pageSize
+    const limit = tableData.pageSize ?? 10
 
     // =========================
     // SWR KEY
@@ -44,7 +44,7 @@ export default function useCustomerList() {
             offset,
             limit,
             ordering: '-created_at',
-
+            ...(tableData.query ? { search: tableData.query } : {}),
             ...filterData,
         },
     ] as const
@@ -92,7 +92,7 @@ export default function useCustomerList() {
     // SAFE RESPONSE
     // =========================
     const apiResponse =
-        data?.data ?? data
+        (data as any)?.data ?? data
 
     const results =
         apiResponse?.results ?? []
@@ -150,6 +150,15 @@ export default function useCustomerList() {
 
                 is_active:
                     customer.is_active,
+
+                participant_count:
+                    customer.participant_count,
+
+                participants_count:
+                    customer.participants_count,
+
+                participants:
+                    customer.participants,
             }),
         )
     }, [results, error])
@@ -173,14 +182,16 @@ export default function useCustomerList() {
     // AUTO FIX EMPTY PAGE
     // =========================
     useEffect(() => {
+        const pageSize = tableData.pageSize ?? 10
+        const pageIndex = tableData.pageIndex ?? 1
         const maxPage = Math.ceil(
             customerListTotal /
-                tableData.pageSize,
+            pageSize,
         )
 
         if (
-            tableData.pageIndex >
-                maxPage &&
+            pageIndex >
+            maxPage &&
             maxPage > 0
         ) {
             setTableData({

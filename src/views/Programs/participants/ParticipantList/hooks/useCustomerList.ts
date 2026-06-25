@@ -2,7 +2,7 @@ import { useMemo, useRef, useEffect } from 'react'
 import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import type { TableQueries } from '@/@types/common'
-import type { GetCustomersListResponse } from '../types'
+import type { GetCustomersListResponse, Customer } from '../types'
 import { apiGetProgramparticipantList } from '@/services/CustomersService'
 
 export default function useCustomerList() {
@@ -25,10 +25,10 @@ export default function useCustomerList() {
     // PAGINATION
     // =========================
     const offset =
-        (tableData.pageIndex - 1) *
-        tableData.pageSize
+        ((tableData.pageIndex ?? 1) - 1) *
+        (tableData.pageSize ?? 10)
 
-    const limit = tableData.pageSize
+    const limit = tableData.pageSize ?? 10
 
     // =========================
     // SWR KEY
@@ -72,11 +72,8 @@ export default function useCustomerList() {
         console.log('PARTICIPANT ERROR:', error)
     }, [data, error])
 
-    // =========================
-    // SAFE RESPONSE
-    // =========================
     const apiResponse =
-        data?.data ?? data ?? {}
+        data ?? ({} as Partial<GetCustomersListResponse>)
 
     const results =
         apiResponse?.results ?? []
@@ -134,7 +131,7 @@ export default function useCustomerList() {
     // =========================
     // MAP PARTICIPANTS
     // =========================
-    const customerList = useMemo(() => {
+    const customerList = useMemo<Customer[]>(() => {
         if (
             error?.response?.status === 404
         ) {
@@ -206,29 +203,26 @@ export default function useCustomerList() {
     // FIX EMPTY PAGE AFTER DELETE
     // =========================
     useEffect(() => {
+        const pageSize = tableData.pageSize ?? 10
+        const pageIndex = tableData.pageIndex ?? 1
         const maxPage = Math.ceil(
             customerListTotal /
-                tableData.pageSize
+                pageSize
         )
 
         if (
-            tableData.pageIndex >
+            pageIndex >
                 maxPage &&
             maxPage > 0
         ) {
-            setTableData(
-                (
-                    prev: TableQueries
-                ) => ({
-                    ...prev,
-                    pageIndex: maxPage,
-                })
-            )
+            setTableData({
+                ...tableData,
+                pageIndex: maxPage,
+            })
         }
     }, [
         customerListTotal,
-        tableData.pageIndex,
-        tableData.pageSize,
+        tableData,
         setTableData,
     ])
 
@@ -246,16 +240,12 @@ export default function useCustomerList() {
             prevFilterRef.current =
                 filterData
 
-            setTableData(
-                (
-                    prev: TableQueries
-                ) => ({
-                    ...prev,
-                    pageIndex: 1,
-                })
-            )
+            setTableData({
+                ...tableData,
+                pageIndex: 1,
+            })
         }
-    }, [filterData, setTableData])
+    }, [filterData, tableData, setTableData])
 
     // =========================
     // RETURN

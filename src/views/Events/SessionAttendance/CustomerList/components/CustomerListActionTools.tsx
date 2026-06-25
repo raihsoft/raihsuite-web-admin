@@ -9,12 +9,12 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import { apiCheckInParticipant, apiGetParticipant } from '@/services/CustomersService'
 
-const CustomerListActionTools = () => {
+const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
     const [showQRScanner, setShowQRScanner] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
-    const { customerList } = useCustomerList()
+    const { customerList } = useCustomerList(eventId)
 
     const handleQRScan = async (qrCode: string) => {
         setIsLoading(true)
@@ -71,7 +71,7 @@ const CustomerListActionTools = () => {
                 </Button>
                 <Button
                     variant="solid"
-                    icon={<TbUserPlus className="text-xl" />}
+                   
                     onClick={() => navigate('/sessionAttendance/create')}
                 >
                     Add new

@@ -57,6 +57,43 @@ const EventsRoute: Routes = [
             footer: false,
         },
     },
+    {
+    key: 'eventParticipants',
+    path: '/events/:id/participants',
+    component: lazy(() => import('@/views/Events/participate/CustomerList')),
+    authority: [],
+    meta: {
+        header: {
+            title: 'Participants',
+            contained: true,
+        },
+        footer: false,
+    },
+},
+  {
+        key: 'events.session',
+        path: '/session',
+        component: lazy(() => import('@/views/Events/Session/CustomerList')),
+        authority: [],
+    },
+{
+        key: 'events.attendance',
+        path: '/sessionAttendance',
+        component: lazy(() => import('@/views/Events/SessionAttendance/CustomerList')),
+        authority: [],
+    },
+ {
+        key: 'events.feepayment',
+        path: '/feepayment',
+        component: lazy(() => import('@/views/Events/FeepaymentList/CustomerList')),
+        authority: [],
+    },
+{
+    key: 'eventTickets',
+    path: '/events/:id/tickets',
+    component: lazy(() => import('@/views/Events/Ticket/CustomerList')),
+    authority: [],
+},
 ]
 
 export default  EventsRoute

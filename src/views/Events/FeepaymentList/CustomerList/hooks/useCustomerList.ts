@@ -3,7 +3,7 @@ import useSWR from 'swr'
 import { useCustomerListStore } from '../store/customerListStore'
 import type { GetCustomersListResponse } from '../types'
 
-export default function useCustomerList() {
+export default function useCustomerList(eventId?: string) {
     const {
         tableData,
         filterData,
@@ -30,6 +30,7 @@ export default function useCustomerList() {
         pageSize,
         tableData.query || '',
         JSON.stringify(filterData || {}),
+        eventId ?? '',
     ]
 
     // =========================
@@ -37,9 +38,10 @@ export default function useCustomerList() {
     // =========================
     const fetcher = () =>
         apiGetFeePaymentList<GetCustomersListResponse, any>({
-            limit: pageSize,
-            offset,
+            limit: eventId ? 1000 : pageSize,
+            offset: eventId ? 0 : offset,
             search: tableData.query || '',
+            ...(eventId ? { event_id: eventId, event: eventId } : {}),
             ...filterData,
         })
 
@@ -58,19 +60,25 @@ export default function useCustomerList() {
     const rawList: any[] = data?.results ?? data?.list ?? []
 
     const customerList = (Array.isArray(rawList) ? rawList : []).map(
-        (item, index) => ({
+        (item: any, index) => ({
             id: item.id ?? item.pk ?? `tmp-${index}`,
 
             participant_name: item.participant_name ?? '',
             fee_amount: Number(item.fee_amount ?? 0),
             payment_type: item.payment_type ?? '',
+            event: item.event ?? item.event_id ?? item.participant_event ?? item.participant_event_id ?? '',
         })
     )
 
-    const customerListTotal =
-        data?.count ??
-        data?.total ??
-        0
+    const filteredList = eventId
+        ? customerList.filter((p) => !p.event || String(p.event) === String(eventId))
+        : customerList
+
+    const customerListTotal = eventId ? filteredList.length : (data?.count ?? data?.total ?? 0)
+
+    const paginatedList = eventId
+        ? filteredList.slice(offset, offset + pageSize)
+        : customerList
 
     // =========================
     // Selection reset helper
@@ -99,7 +107,7 @@ export default function useCustomerList() {
     }
 
     return {
-        customerList,
+        customerList: paginatedList,
         customerListTotal,
         error,
         isLoading,

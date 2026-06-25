@@ -8,11 +8,13 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import sleep from '@/utils/sleep'
 import { apiCreateParticipant, apiCreateSession } from '@/services/CustomersService'
 import { TbTrash } from 'react-icons/tb'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import type { CustomerFormSchema } from '../CustomerForm'
 
 const CustomerEdit = () => {
     const navigate = useNavigate()
+    const queryParams = new URLSearchParams(useLocation().search)
+    const defaultEventId = queryParams.get('event') || ''
 
     const [discardConfirmationOpen, setDiscardConfirmationOpen] =
         useState(false)
@@ -23,7 +25,6 @@ const CustomerEdit = () => {
     try {
         const payload = {
             event: values.event,
-            // event_title: values.event_title,
             title: values.title,
             start_datetime: values.start_datetime,
             end_datetime: values.end_datetime,
@@ -38,7 +39,7 @@ const CustomerEdit = () => {
             <Notification type="success">Session created!</Notification>,
             { placement: 'top-center' },
         )
-        navigate('/session')
+        navigate(defaultEventId ? `/events/${defaultEventId}` : '/session')
     } catch (err: any) {
         const data = err?.response?.data
         if (data && typeof data === 'object') {
@@ -55,19 +56,18 @@ const CustomerEdit = () => {
                 { placement: 'top-center' },
             )
         }
-        // console.error(err)
     } finally {
         setIsSubmiting(false)
     }
 }
 
     const handleConfirmDiscard = () => {
-        setDiscardConfirmationOpen(true)
+        setDiscardConfirmationOpen(false)
         toast.push(
-            <Notification type="success">Customer discardd!</Notification>,
+            <Notification type="success">Changes discarded!</Notification>,
             { placement: 'top-center' },
         )
-        navigate('/participants')
+        navigate(defaultEventId ? `/events/${defaultEventId}` : '/session')
     }
 
     const handleDiscard = () => {
@@ -82,9 +82,9 @@ const CustomerEdit = () => {
         <>
             <CustomerForm
                 newCustomer
+                disableEvent={!!defaultEventId}
                 defaultValues={{
-                    event: '',
-                    // event_title: '',
+                    event: defaultEventId,
                     title: '',
                     start_datetime: '',
                     end_datetime: '',
@@ -92,7 +92,6 @@ const CustomerEdit = () => {
                     speaker: '',
                     location: '',
                 }}
-
                 onFormSubmit={handleFormSubmit}
             >
                 <Container>

@@ -11,6 +11,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import useCustomerList from '../hooks/useCustomerList'
 import { TbChecks } from 'react-icons/tb'
 import { apiDeleteProgramparticipant } from '@/services/CustomersService'
+import type { Customer } from '../types'
 
 const CustomerListSelected = () => {
     const {
@@ -20,6 +21,7 @@ const CustomerListSelected = () => {
         customerListTotal,
         tableData,
         setSelectAllCustomer,
+        setTableData,
     } = useCustomerList()
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] =
@@ -54,16 +56,17 @@ const CustomerListSelected = () => {
 
             // DELETE API CALLS
             await Promise.all(
-                selectedCustomer.map((item) =>
-                    apiDeleteProgramparticipant(
-                        item.id
-                    )
-                )
+                selectedCustomer.map((item) => {
+                    if (item.id) {
+                        return apiDeleteProgramparticipant(String(item.id))
+                    }
+                    return Promise.resolve()
+                })
             )
 
             // REMOVE FROM CURRENT PAGE
             const updatedList = customerList.filter(
-                (customer) =>
+                (customer: Customer) =>
                     !selectedCustomer.some(
                         (selected) =>
                             selected.id === customer.id
@@ -91,15 +94,17 @@ const CustomerListSelected = () => {
             // FIX EMPTY PAGE ISSUE
             // =========================
             const totalPages = Math.ceil(
-                updatedTotal / tableData.pageSize
+                updatedTotal / (tableData.pageSize ?? 10)
             )
 
             if (
                 updatedList.length === 0 &&
-                tableData.pageIndex > 1
+                (tableData.pageIndex ?? 1) > 1
             ) {
-                tableData.pageIndex =
-                    totalPages || 1
+                setTableData({
+                    ...tableData,
+                    pageIndex: totalPages || 1,
+                })
             }
 
             toast.push(

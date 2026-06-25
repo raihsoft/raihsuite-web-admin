@@ -24,7 +24,7 @@ const ActionColumn = ({ onView }: { onView: () => void }) => (
     </div>
 )
 
-const FeePaymentListTable = () => {
+const FeePaymentListTable = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
 
     const {
@@ -33,7 +33,7 @@ const FeePaymentListTable = () => {
         tableData,
         isLoading,
         setTableData,
-    } = useCustomerList()
+    } = useCustomerList(eventId)
 
     // =========================
     // IMPORTANT: NO FILTERING

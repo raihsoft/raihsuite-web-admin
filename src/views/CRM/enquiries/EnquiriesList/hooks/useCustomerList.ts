@@ -19,40 +19,47 @@ export default function useCustomerList() {
     const originalTotalRef = useRef(0)
 
     // 🔥 OFFSET FIX
-    const offset = (tableData.pageIndex - 1) * tableData.pageSize
-    const limit = tableData.pageSize
+    const pageIndex = tableData.pageIndex ?? 1
+    const pageSize = tableData.pageSize ?? 10
+    const limit = tableData.query ? 1000 : pageSize
+    const offset = tableData.query ? 0 : (pageIndex - 1) * pageSize
 
     const swrKey = [
         '/api/enquiries',
-        {
+        pageIndex,
+        pageSize,
+        tableData.query || '',
+        JSON.stringify(filterData || {}),
+    ] as const
+
+    const fetcher = () =>
+        apiGetEnquiries<GetCustomersListResponse, any>({
             offset,
             limit,
             ordering: '-created_at',
             ...filterData,
-        },
-    ] as const
+        })
 
     const { data, error, isLoading, mutate } = useSWR(
         swrKey,
-        ([, params]) =>
-            apiGetEnquiries<GetCustomersListResponse, any>(params),
+        fetcher,
         {
             revalidateOnFocus: false,
             shouldRetryOnError: false,
+            keepPreviousData: true,
         }
-        
     )
-    
-    useEffect(() => {
-    if (!data?.results) return
 
-    console.log("========== API DEBUG ==========")
-    console.log("PAGE:", tableData.pageIndex)
-    console.log(
-        "created_at list:",
-        data.results.map((i: any) => i.created_at)
-    )
-}, [data, tableData.pageIndex])
+    useEffect(() => {
+        if (!data?.results) return
+
+        console.log("========== API DEBUG ==========")
+        console.log("PAGE:", tableData.pageIndex)
+        console.log(
+            "created_at list:",
+            data.results.map((i: any) => i.created_at)
+        )
+    }, [data, tableData.pageIndex])
 
     const apiTotal =
         data?.count ?? data?.total ?? data?.total_count ?? 0
@@ -64,29 +71,49 @@ export default function useCustomerList() {
     }, [apiTotal])
 
 
-const customerList = useMemo(() => {
-    if (error?.response?.status === 404) return []
+    const mappedList = useMemo(() => {
+        if (error?.response?.status === 404) return []
 
-    return (
-        data?.results?.map((customer: any, index: number) => ({
-            id: customer.id ?? index,
-            name: customer.name,
-            email: customer.email,
-            mobile: customer.mobile,
-            created_at: customer.created_at,
-            message: customer.message,
-            status: 'active',
-            totalSpending: 0,
-        })) ?? []
-    )
-}, [data?.results, error])
+        return (
+            data?.results?.map((customer: any, index: number) => ({
+                id: customer.id ?? index,
+                name: customer.name ?? '',
+                email: customer.email ?? '',
+                mobile: customer.mobile ?? '',
+                created_at: customer.created_at,
+                message: customer.message ?? '',
+                status: 'active',
+                totalSpending: 0,
+            })) ?? []
+        )
+    }, [data?.results, error])
+
+    const filteredList = useMemo(() => {
+        const query = (tableData.query || '').toLowerCase().trim()
+        if (!query) return mappedList
+
+        return mappedList.filter(customer =>
+            (customer.name || '').toLowerCase().includes(query) ||
+            (customer.email || '').toLowerCase().includes(query) ||
+            (customer.mobile || '').toLowerCase().includes(query) ||
+            (customer.message || '').toLowerCase().includes(query)
+        )
+    }, [mappedList, tableData.query])
 
     const customerListTotal = useMemo(() => {
         if (error?.response?.status === 404) {
             return originalTotalRef.current
         }
-        return apiTotal
-    }, [apiTotal, error])
+        return tableData.query ? filteredList.length : apiTotal
+    }, [apiTotal, error, tableData.query, filteredList.length])
+
+    const paginatedList = useMemo(() => {
+        if (tableData.query) {
+            const queryOffset = (pageIndex - 1) * pageSize
+            return filteredList.slice(queryOffset, queryOffset + pageSize)
+        }
+        return filteredList
+    }, [filteredList, tableData.query, pageIndex, pageSize])
 
     // 🔥 SAFE PAGE FIX (NO 403, NO EMPTY PAGE LOOP)
     useEffect(() => {
@@ -115,7 +142,7 @@ const customerList = useMemo(() => {
     }, [filterData, setTableData])
 
     return {
-        customerList,
+        customerList: paginatedList,
         customerListTotal,
         error,
         isLoading,

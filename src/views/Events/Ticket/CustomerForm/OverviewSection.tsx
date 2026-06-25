@@ -2,17 +2,26 @@ import { useEffect, useState } from 'react'
 import Card from '@/components/ui/Card'
 import Select from '@/components/ui/Select'
 import { FormItem } from '@/components/ui/Form'
-import { Controller } from 'react-hook-form'
+import { Controller, useWatch } from 'react-hook-form'
 import type { FormSectionBaseProps } from './types'
-import { apiGetEvents, apiParticipantList } from '@/services/CustomersService'
+import { apiGetEvents, apiParticipantList, apiGetSessionList } from '@/services/CustomersService'
 
-type OverviewSectionProps = FormSectionBaseProps
+type OverviewSectionProps = FormSectionBaseProps & {
+    disableEvent?: boolean
+}
 
-const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
+const OverviewSection = ({ control, errors, disableEvent }: OverviewSectionProps) => {
     const [events, setEvents] = useState<{ value: string; label: string }[]>([])
     const [participants, setParticipants] = useState<{ value: string; label: string }[]>([])
     const [eventsLoading, setEventsLoading] = useState(false)
     const [participantsLoading, setParticipantsLoading] = useState(false)
+    const [sessions, setSessions] = useState<any[]>([])
+    const [sessionsLoading, setSessionsLoading] = useState(false)
+
+    const event_id = useWatch({
+        control,
+        name: 'event_id'
+    })
 
     useEffect(() => {
         let mounted = true
@@ -54,8 +63,8 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
 
                 const options = (list || []).map((p: any) => ({
                     value: p.id ?? p.pk ?? String(p.value ?? ''),
-                    label: p.first_name && p.last_name 
-                        ? `${p.first_name} ${p.last_name}` 
+                    label: p.first_name && p.last_name
+                        ? `${p.first_name} ${p.last_name}`
                         : p.name ?? p.email ?? p.participant_name ?? 'Unnamed Participant',
                 }))
 
@@ -72,6 +81,50 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
             mounted = false
         }
     }, [])
+
+    useEffect(() => {
+        let mounted = true
+
+        const fetchSessions = async () => {
+            setSessionsLoading(true)
+
+            try {
+                const data = await apiGetSessionList<any, {}>({})
+                const list = data?.results ?? data ?? []
+
+                if (mounted) {
+                    setSessions(list)
+                }
+            } catch (err) {
+                console.error(err)
+            } finally {
+                if (mounted) {
+                    setSessionsLoading(false)
+                }
+            }
+        }
+
+        fetchSessions()
+
+        return () => {
+            mounted = false
+        }
+    }, [])
+
+    // const sessionOptions = sessions
+    //     .filter(
+    //         (session: any) =>
+    //             String(session.event) === String(event_id) ||
+    //             String(session.event_id) === String(event_id)
+    //     )
+    //     .map((session: any) => ({
+    //         value: session.id,
+    //         label:
+    //             session.title ||
+    //             session.session_title ||
+    //             session.name ||
+    //             'Unnamed Session',
+    //     }))
 
     return (
         <Card>
@@ -92,8 +145,8 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                                     eventsLoading
                                         ? 'Loading events...'
                                         : events.length === 0
-                                          ? 'No events available'
-                                          : 'Select Event'
+                                            ? 'No events available'
+                                            : 'Select Event'
                                 }
                                 value={
                                     events.find(
@@ -105,6 +158,7 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                                 }
                                 isClearable={true}
                                 isLoading={eventsLoading}
+                                isDisabled={disableEvent}
                             />
                         )}
                     />
@@ -125,8 +179,8 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                                     participantsLoading
                                         ? 'Loading participants...'
                                         : participants.length === 0
-                                          ? 'No participants available'
-                                          : 'Select Participant'
+                                            ? 'No participants available'
+                                            : 'Select Participant'
                                 }
                                 value={
                                     participants.find(
@@ -142,6 +196,35 @@ const OverviewSection = ({ control, errors }: OverviewSectionProps) => {
                         )}
                     />
                 </FormItem>
+                {/* <FormItem label="Session">
+    <Controller
+        name="session_id"
+        control={control}
+        render={({ field }) => (
+            <Select
+                options={sessionOptions}
+                placeholder={
+                    sessionsLoading
+                        ? 'Loading sessions...'
+                        : !event_id
+                          ? 'Select Event First'
+                          : 'Select Session'
+                }
+                value={
+                    sessionOptions.find(
+                        (option) => option.value === field.value
+                    ) || null
+                }
+                onChange={(option) =>
+                    field.onChange(option?.value || '')
+                }
+                isClearable
+                isLoading={sessionsLoading}
+                isDisabled={!event_id}
+            />
+        )}
+    />
+</FormItem> */}
             </div>
         </Card>
     )

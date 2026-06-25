@@ -5,18 +5,22 @@ import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import {
-    apiDeleteParticipant,
+    apiDeleteSession,
     apiUpdateSession,
 } from '@/services/CustomersService'
 import CustomerForm from '../CustomerForm'
 import { TbTrash, TbArrowNarrowLeft } from 'react-icons/tb'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import useSWR from 'swr'
 import type { CustomerFormSchema } from '../types'
 
 const CustomerEdit = () => {
     const { id } = useParams()
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+
+    const eventId = searchParams.get('event') ?? ''
+    const returnTo = searchParams.get('returnTo') ?? (data?.event ? `/events/${data.event}` : '/session')
 
     const { data, isLoading, mutate } = useSWR(
         id ? `/session/${id}` : null,
@@ -62,7 +66,7 @@ const CustomerEdit = () => {
                 </Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/session')
+            navigate(returnTo)
 
             mutate()
         } catch {
@@ -82,14 +86,14 @@ const CustomerEdit = () => {
         setDeleteLoading(true)
 
         try {
-            await apiDeleteParticipant(id)
+            await apiDeleteSession(id)
             toast.push(
                 <Notification type="success">
-                    Participant deleted!
+                    Session deleted!
                 </Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/session')
+            navigate(returnTo)
         } finally {
             setDeleteLoading(false)
             setDeleteConfirmationOpen(false)
@@ -111,6 +115,7 @@ const CustomerEdit = () => {
                     <CustomerForm
                         defaultValues={getDefaultValues()}
                         newCustomer={false}
+                        disableEvent={!!eventId}
                         onFormSubmit={handleFormSubmit}
                     >
                         <Container>

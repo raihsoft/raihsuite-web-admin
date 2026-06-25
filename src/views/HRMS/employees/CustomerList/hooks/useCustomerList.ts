@@ -18,17 +18,19 @@ export default function useCustomerList() {
 
     const pageIndex = tableData.pageIndex ?? 1
     const pageSize = tableData.pageSize ?? 10
-    const offset = (pageIndex - 1) * pageSize
+
+    // Load all up to 1000 when searching, otherwise paginate
+    const limit = tableData.query ? 1000 : pageSize
+    const offset = tableData.query ? 0 : (pageIndex - 1) * pageSize
 
     const params = {
-        limit: pageSize,
+        limit,
         offset,
-        search: tableData.query || '',
         ...filterData,
     }
 
     const { data, error, isLoading, mutate } = useSWR(
-        ['/api/employees', pageIndex, pageSize, tableData.query, filterData],
+        ['/api/employees', pageIndex, pageSize, tableData.query, JSON.stringify(filterData || {})],
         () =>
             apiGetEmployeeList<GetCustomersListResponse, TableQueries>(params),
         { revalidateOnFocus: false }
@@ -50,9 +52,33 @@ export default function useCustomerList() {
         [data]
     )
 
+    const filteredList = useMemo(() => {
+        const query = (tableData.query || '').toLowerCase().trim()
+        if (!query) return customerList
+
+        return customerList.filter(c =>
+            (c.name || '').toLowerCase().includes(query) ||
+            (c.email || '').toLowerCase().includes(query) ||
+            (c.designation || '').toLowerCase().includes(query) ||
+            (c.organization || '').toLowerCase().includes(query)
+        )
+    }, [customerList, tableData.query])
+
+    const customerListTotal = useMemo(() => {
+        return tableData.query ? filteredList.length : (data?.count ?? 0)
+    }, [data?.count, tableData.query, filteredList.length])
+
+    const paginatedList = useMemo(() => {
+        if (tableData.query) {
+            const queryOffset = (pageIndex - 1) * pageSize
+            return filteredList.slice(queryOffset, queryOffset + pageSize)
+        }
+        return filteredList
+    }, [filteredList, tableData.query, pageIndex, pageSize])
+
     return {
-        customerList,
-        customerListTotal: data?.count ?? 0,
+        customerList: paginatedList,
+        customerListTotal,
         error,
         isLoading,
 

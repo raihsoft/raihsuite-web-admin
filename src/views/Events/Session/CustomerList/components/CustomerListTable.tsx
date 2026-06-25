@@ -40,7 +40,7 @@ const ActionColumn = ({
     </div>
 )
 
-const CustomerListTable = () => {
+const CustomerListTable = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
 
     const {
@@ -52,20 +52,8 @@ const CustomerListTable = () => {
         selectedCustomer,
         setSelectedCustomer,
         setSelectAllCustomer,
-    } = useCustomerList()
+    } = useCustomerList(eventId)
 
-    // ✅ Correct filtering (fixed fields)
-    const filteredList = useMemo(() => {
-        const query = (tableData.query as string || '').toLowerCase().trim()
-
-        if (!query) return customerList
-
-        return customerList.filter(item =>
-            (item.title || '').toLowerCase().includes(query) ||
-            (item.event_title || '').toLowerCase().includes(query) ||
-            (item.speaker || '').toLowerCase().includes(query)
-        )
-    }, [customerList, tableData.query])
 
     const columns: ColumnDef<Session>[] = useMemo(() => [
         {
@@ -109,7 +97,13 @@ const CustomerListTable = () => {
             id: 'action',
             cell: (props) => (
                 <ActionColumn
-                    onEdit={() => navigate(`/session/edit/${props.row.original.id}`)}
+                    onEdit={() => {
+                        if (eventId) {
+                            navigate(`/session/edit/${props.row.original.id}?event=${eventId}&returnTo=${encodeURIComponent(`/events/${eventId}`)}`)
+                        } else {
+                            navigate(`/session/edit/${props.row.original.id}`)
+                        }
+                    }}
                     onViewDetail={() => navigate(`/session/${props.row.original.id}`)}
                 />
             ),

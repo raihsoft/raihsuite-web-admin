@@ -14,6 +14,7 @@ type EventRow = {
     start_date?: string
     end_date?: string
     fee_amount?: string | number // string from backend
+    id: string // assuming each event has a unique ID
 }
 
 const ActionColumn = ({
@@ -58,23 +59,13 @@ const EventsTable = () => {
         setSelectAllCustomer,
     } = useEventsList()
 
-    const filteredAndSortedList = useMemo(() => {
-        const query = (tableData.query as string || '').toLowerCase().trim()
-        if (!query) return eventsList
-
-        return eventsList.filter(
-            (item) =>
-                (item.title || '').toLowerCase().includes(query) ||
-                (item.code || '').toLowerCase().includes(query)
-        )
-    }, [eventsList, tableData.query])
 
     const handleEdit = (event: EventRow) => {
-        navigate(`/events/edit/${event.code}`)
+        navigate(`/events/edit/${event.id}`)
     }
 
     const handleViewDetails = (event: EventRow) => {
-        navigate(`/events/${event.code}`)
+        navigate(`/events/${event.id}`)
     }
 
     const columns: ColumnDef<EventRow>[] = useMemo(

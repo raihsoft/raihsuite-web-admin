@@ -1,9 +1,10 @@
 import Card from '@/components/ui/Card'
 import Loading from '@/components/shared/Loading'
 import Button from '@/components/ui/Button'
+import Select from '@/components/ui/Select'
 import useSWR from 'swr'
 import { useParams, useNavigate } from 'react-router-dom'
-import { apiGetTicketDetails } from '@/services/CustomersService'
+import { apiGetTicketDetails, apiGetSessionList } from '@/services/CustomersService'
 import { TbArrowNarrowLeft, TbDownload, TbTicket, TbCalendar, TbUser, TbHash, TbClock, TbAB, TbActivity, TbAdCircle, TbAdjustmentsCode } from 'react-icons/tb'
 import { useRef, useEffect, useState } from 'react'
 // @ts-ignore
@@ -18,11 +19,20 @@ type Ticket = {
     quantity?: number
     status?: string
     event_id?: string
+    event?: string
     event_title?: string
     created_at?: string
     updated_at?: string
     participant_name?: string
     token?: string
+    session?: string
+    session_id?: string
+    session_title?: string
+}
+
+type SessionOption = {
+    value: string
+    label: string
 }
 
 const statusColors: Record<string, { bg: string; text: string; dot: string }> = {
@@ -37,6 +47,9 @@ const TicketDetails = () => {
     const navigate = useNavigate()
     const qrCanvasRef = useRef<HTMLCanvasElement>(null)
     const [qrGenerated, setQrGenerated] = useState(false)
+    const [selectedSession, setSelectedSession] = useState<string>('')
+    const [sessionOptions, setSessionOptions] = useState<SessionOption[]>([])
+    const [sessionsLoading, setSessionsLoading] = useState(false)
 
     const { data, isLoading, error } = useSWR<Ticket>(
         id ? `/events/tickets/${id}` : null,
@@ -46,17 +59,72 @@ const TicketDetails = () => {
 
     const handleBack = () => navigate(-1)
 
+    // Fetch sessions for the event when ticket data is available
     useEffect(() => {
-        if (qrCanvasRef.current && data?.token) {
-            QRCode.toCanvas(qrCanvasRef.current, data.token, {
+        let mounted = true
+        const eventId = data?.event_id || data?.event
+
+        if (!eventId) return
+
+        const fetchSessions = async () => {
+            setSessionsLoading(true)
+            try {
+                const response = await apiGetSessionList<any, {}>({})
+                const list = response?.results ?? response ?? []
+
+                const filtered = (list || [])
+                    .filter((session: any) =>
+                        String(session.event) === String(eventId) ||
+                        String(session.event_id) === String(eventId)
+                    )
+                    .map((session: any) => ({
+                        value: String(session.id),
+                        label:
+                            session.title ||
+                            session.session_title ||
+                            session.name ||
+                            'Unnamed Session',
+                    }))
+
+                if (mounted) {
+                    setSessionOptions(filtered)
+                    // If ticket already has a session, pre-select it
+                    const existingSession = data?.session_id || data?.session
+                    if (existingSession && filtered.some((s: SessionOption) => s.value === String(existingSession))) {
+                        setSelectedSession(String(existingSession))
+                    }
+                }
+            } catch (err) {
+                // console.error('Failed to load sessions', err)
+            } finally {
+                if (mounted) setSessionsLoading(false)
+            }
+        }
+
+        fetchSessions()
+        return () => {
+            mounted = false
+        }
+    }, [data?.event_id, data?.event, data?.session_id, data?.session])
+
+    // Generate QR code with token and session
+    useEffect(() => {
+        if (qrCanvasRef.current && data?.token && selectedSession) {
+            const qrData = JSON.stringify({
+                token: data.token,
+                session: selectedSession,
+            })
+            QRCode.toCanvas(qrCanvasRef.current, qrData, {
                 width: 220,
                 margin: 1,
                 color: { dark: '#1a1a2e', light: '#ffffff' },
             })
                 .then(() => setQrGenerated(true))
                 // .catch(console.error)
+        } else {
+            setQrGenerated(false)
         }
-    }, [data?.token])
+    }, [data?.token, selectedSession])
 
     const handleDownloadTicket = () => {
         if (!qrCanvasRef.current || !data) return
@@ -148,11 +216,14 @@ const TicketDetails = () => {
         ctx.setLineDash([])
         ctx.beginPath(); ctx.moveTo(padL + 6, 115); ctx.lineTo(divX - 20, 115); ctx.stroke()
 
+        // Find selected session label
+        const sessionLabel = sessionOptions.find(s => s.value === selectedSession)?.label || ''
+
         // Meta fields
         const metaItems = [
             { icon: '●', label: 'STATUS', val: (data?.status || 'active').toUpperCase() },
             { icon: '◆', label: 'TOKEN',  val: data?.token ? data.token.substring(0, 18) + '…' : '—' },
-            { icon: '▲', label: 'DATE',   val: data?.created_at ? new Date(data.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' },
+            { icon: '▲', label: 'SESSION', val: sessionLabel || '—' },
         ]
 
         metaItems.forEach((item, i) => {
@@ -178,7 +249,7 @@ const TicketDetails = () => {
         /* ── Download ── */
         const link = document.createElement('a')
         link.href = ticketCanvas.toDataURL('image/png')
-        link.download = `ticket-${data?.token || 'ticket'}.png`
+        link.download = `ticket-${data?.token || 'ticket'}-session-${selectedSession}.png`
         link.click()
     }
 
@@ -251,26 +322,58 @@ const TicketDetails = () => {
                     <Card className="rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden h-full">
                         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                             <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200 tracking-wide uppercase">
-                                QR Code
+                                Generate Ticket
                             </h2>
                         </div>
                         <div className="p-6 flex flex-col items-center gap-5">
+                            {/* Session Selector */}
+                            <div className="w-full">
+                                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 block">
+                                    Select Session
+                                </label>
+                                <Select
+                                    options={sessionOptions}
+                                    placeholder={
+                                        sessionsLoading
+                                            ? 'Loading sessions...'
+                                            : sessionOptions.length === 0
+                                              ? 'No sessions available'
+                                              : 'Select a session'
+                                    }
+                                    value={
+                                        sessionOptions.find(
+                                            (option) => option.value === selectedSession
+                                        ) || null
+                                    }
+                                    onChange={(option: SessionOption | null) => {
+                                        setSelectedSession(option?.value || '')
+                                        setQrGenerated(false)
+                                    }}
+                                    isClearable
+                                    isLoading={sessionsLoading}
+                                    isDisabled={sessionsLoading || sessionOptions.length === 0}
+                                />
+                            </div>
+
+                            {/* QR Code Display */}
                             <div className="bg-white rounded-2xl p-4 shadow-inner border border-gray-100">
-                                {ticket.token ? (
+                                {ticket.token && selectedSession ? (
                                     <canvas
                                         ref={qrCanvasRef}
                                         style={{ display: 'block', width: 200, height: 200 }}
                                     />
                                 ) : (
-                                    <div className="w-[200px] h-[200px] flex items-center justify-center text-gray-300 text-sm">
-                                        No token
+                                    <div className="w-[200px] h-[200px] flex items-center justify-center text-gray-300 text-sm text-center px-4">
+                                        {!ticket.token
+                                            ? 'No token available'
+                                            : 'Select a session to generate QR code'}
                                     </div>
                                 )}
                             </div>
 
-                            {ticket.token && (
+                            {ticket.token && selectedSession && (
                                 <p className="text-xs font-mono text-gray-400 text-center break-all px-2">
-                                    {ticket.token}
+                                    {ticket.token} | Session: {sessionOptions.find(s => s.value === selectedSession)?.label || selectedSession}
                                 </p>
                             )}
 

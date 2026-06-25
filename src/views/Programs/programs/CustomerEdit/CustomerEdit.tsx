@@ -9,11 +9,15 @@ import {
     apiUpdateProgram,
     apiDeleteProgram,
     apiGetProgramById,
+    apiGetParticipantCustomFields,
+    apiCreateParticipantCustomField,
+    apiUpdateParticipantCustomField,
+    apiDeleteParticipantCustomField,
 } from '@/services/CustomersService'
 
 import CustomerForm from '../CustomerForm'
 
-import { mutate } from 'swr'
+import useSWR, { mutate } from 'swr'
 
 import { useCustomerListStore } from '../ProgramsList/store/customerListStore'
 
@@ -29,10 +33,22 @@ import {
     useNavigate,
 } from 'react-router-dom'
 
-import useSWR from 'swr'
-
 import type { CustomerFormSchema } from '../CustomerForm'
 import type { Customer } from '../ProgramsList/types'
+import type { ParticipantCustomField } from '../CustomerForm/types'
+
+type EditCustomField = Omit<ParticipantCustomField, 'program'> & {
+    program?: string | { id: string | number }
+    program_id?: string | number
+}
+
+type CustomFieldsResponse = {
+    results: EditCustomField[]
+}
+
+type FormValues = CustomerFormSchema & {
+    customFields: ParticipantCustomField[]
+}
 
 const CustomerEdit = () => {
     const { id } = useParams()
@@ -43,16 +59,29 @@ const CustomerEdit = () => {
     // GET PROGRAM
     // =========================
     const { data, isLoading } = useSWR(
-        ['/api/programs', id as string],
-        ([_, idParam]) =>
-            apiGetProgramById<Customer>(
-                idParam as string,
-            ),
+        id ? ['/programs/programs', id] : null,
+        () => apiGetProgramById<Customer>(id!),
         {
             revalidateOnFocus: false,
             revalidateIfStale: false,
         },
     )
+
+    const { data: customFieldsResponse, isLoading: customFieldsLoading, mutate: mutateCustomFields } = useSWR(
+        id ? ['/programs/participant-custom-fields', { program: id }] : null,
+        () => apiGetParticipantCustomFields<CustomFieldsResponse, { program: string }>({ program: id! }),
+        {
+            revalidateOnFocus: false,
+            revalidateIfStale: false,
+        },
+    )
+
+    const initialCustomFields = (customFieldsResponse?.results ?? [])
+        .filter((field: EditCustomField) => {
+            const fieldProgId = field.program && typeof field.program === 'object' ? field.program.id : (field.program || field.program_id)
+            return String(fieldProgId) === String(id)
+        })
+    const isDataLoading = isLoading || customFieldsLoading
 
     // =========================
     // STATE
@@ -75,7 +104,7 @@ const CustomerEdit = () => {
     // UPDATE PROGRAM
     // =========================
     const handleFormSubmit = async (
-        values: CustomerFormSchema,
+        values: FormValues,
     ) => {
         if (!id) return
 
@@ -92,6 +121,49 @@ const CustomerEdit = () => {
 
             await apiUpdateProgram(id, payload)
 
+            // Sync Custom Fields
+            const fieldsToDelete = initialCustomFields.filter(
+                (oldField: EditCustomField) => !values.customFields.some((newField: ParticipantCustomField) => newField.id === oldField.id)
+            )
+            const fieldsToCreate = values.customFields.filter(
+                (newField: ParticipantCustomField) => !newField.id
+            )
+            const fieldsToUpdate = values.customFields.filter(
+                (newField: ParticipantCustomField) => newField.id
+            )
+
+            for (const field of fieldsToDelete) {
+                if (field.id) {
+                    await apiDeleteParticipantCustomField(field.id)
+                }
+            }
+
+            for (const field of fieldsToCreate) {
+                await apiCreateParticipantCustomField({
+                    program: id,
+                    label: field.label,
+                    field_key: field.field_key,
+                    field_type: field.field_type,
+                    is_required: field.is_required,
+                    placeholder: field.placeholder || '',
+                    order: field.order,
+                    is_active: field.is_active ?? true,
+                    options: ['select', 'checkbox'].includes(field.field_type) ? (field.options || []) : [],
+                })
+            }
+
+            for (const field of fieldsToUpdate) {
+                await apiUpdateParticipantCustomField(field.id!, {
+                    label: field.label,
+                    field_type: field.field_type,
+                    is_required: field.is_required,
+                    placeholder: field.placeholder || '',
+                    order: field.order,
+                    is_active: field.is_active ?? true,
+                    options: ['select', 'checkbox'].includes(field.field_type) ? (field.options || []) : [],
+                })
+            }
+
             toast.push(
                 <Notification type="success">
                     Program updated successfully!
@@ -105,9 +177,10 @@ const CustomerEdit = () => {
                 '/api/programs',
                 { ...tableData, ...filterData },
             ])
+            await mutateCustomFields()
 
             navigate('/programs')
-        } catch (error) {
+        } catch {
             toast.push(
                 <Notification type="danger">
                     Update failed!
@@ -127,16 +200,14 @@ const CustomerEdit = () => {
     const getDefaultValues =
         (): CustomerFormSchema => {
             if (data) {
-                const item: any = data
-
                 return {
-                    name: item.name || '',
-                    code: item.code || '',
+                    name: data.name || '',
+                    code: data.code || '',
                     description:
-                        item.description || '',
+                        data.description || '',
                     start_date:
-                        item.start_date || '',
-                    end_date: item.end_date || '',
+                        data.start_date || '',
+                    end_date: data.end_date || '',
                 }
             }
 
@@ -173,7 +244,7 @@ const CustomerEdit = () => {
             ])
 
             navigate('/programs')
-        } catch (error) {
+        } catch {
             toast.push(
                 <Notification type="danger">
                     Delete failed!
@@ -207,7 +278,20 @@ const CustomerEdit = () => {
     // =========================
     return (
         <>
-            {!isLoading && !data && (
+            {isDataLoading && (
+                <div className="h-full flex flex-col items-center justify-center">
+                    <NoUserFound
+                        height={280}
+                        width={280}
+                    />
+
+                    <h3 className="mt-8">
+                        Loading...
+                    </h3>
+                </div>
+            )}
+
+            {!isDataLoading && !data && (
                 <div className="h-full flex flex-col items-center justify-center">
                     <NoUserFound
                         height={280}
@@ -220,12 +304,13 @@ const CustomerEdit = () => {
                 </div>
             )}
 
-            {!isLoading && data && (
+            {!isDataLoading && data && (
                 <>
                     <CustomerForm
                         defaultValues={
                             getDefaultValues()
                         }
+                        defaultCustomFields={initialCustomFields}
                         newCustomer={false}
                         onFormSubmit={
                             handleFormSubmit
@@ -282,7 +367,7 @@ const CustomerEdit = () => {
                             deleteConfirmationOpen
                         }
                         type="danger"
-                        title="Delete Program"
+                        title={data ? `Delete "${data.name}"` : 'Delete Program'}
                         onClose={handleCancel}
                         onRequestClose={
                             handleCancel
@@ -293,10 +378,8 @@ const CustomerEdit = () => {
                         }
                     >
                         <p>
-                            Are you sure you want
-                            to delete this
-                            program? This action
-                            can&apos;t be undone.
+                            Are you sure you want to delete "{data?.name}"?
+                            This action can&apos;t be undone.
                         </p>
                     </ConfirmDialog>
                 </>

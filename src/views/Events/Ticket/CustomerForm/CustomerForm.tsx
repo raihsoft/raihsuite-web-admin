@@ -15,11 +15,13 @@ type CustomerFormProps = {
     onFormSubmit: (values: CustomerFormSchema) => void
     defaultValues?: Partial<CustomerFormSchema>
     newCustomer?: boolean
+    disableEvent?: boolean
 } & CommonProps
 
 const validationSchema: ZodType<CustomerFormSchema> = z.object({
     event_id: z.string().optional(),
     participant_id: z.string().optional(),
+    // session_id: z.string().optional(),
 })
 
 const CustomerForm = (props: CustomerFormProps) => {
@@ -27,6 +29,7 @@ const CustomerForm = (props: CustomerFormProps) => {
         onFormSubmit,
         defaultValues,
         newCustomer = false,
+        disableEvent,
         children,
     } = props
 
@@ -40,6 +43,7 @@ const CustomerForm = (props: CustomerFormProps) => {
         defaultValues: defaultValues || {
             event_id: '',
             participant_id: '',
+            // session_id: '',
         },
     })
 
@@ -58,7 +62,7 @@ const CustomerForm = (props: CustomerFormProps) => {
             <Container>
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex flex-col gap-4 flex-auto">
-                        <OverviewSection control={control} errors={errors} />
+                        <OverviewSection control={control} errors={errors} disableEvent={disableEvent} />
                     </div>
                 </div>
             </Container>

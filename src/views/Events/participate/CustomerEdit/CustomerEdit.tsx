@@ -69,7 +69,7 @@ const CustomerEdit = () => {
                 { placement: 'top-center' }
             )
 
-            navigate('/participants')
+            // navigate('/participants')
             mutate()
         } catch {
             toast.push(

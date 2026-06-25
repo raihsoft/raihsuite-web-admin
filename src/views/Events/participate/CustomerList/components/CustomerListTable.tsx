@@ -29,7 +29,7 @@ const ActionColumn = ({
     </div>
 )
 
-const ParticipantsTable = () => {
+const ParticipantsTable = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
 
     const {
@@ -37,49 +37,25 @@ const ParticipantsTable = () => {
         customerListTotal,
         tableData,
         isLoading,
-        setSelectedCustomer,
         setSelectAllCustomer,
         selectedCustomer,
         setTableData,
-    } = useCustomerList()
+    } = useCustomerList(eventId) // 👈 IMPORTANT FIX
 
-    // =========================
-    // SAFE DATA (server only)
-    // =========================
     const data = useMemo(() => customerList, [customerList])
 
-    // =========================
-    // Edit / View
-    // =========================
     const handleEdit = (row: Customer) => {
-        navigate(`/participants/edit/${row.id}`)
+        if (eventId) {
+            navigate(`/participants/edit/${row.id}?eventId=${eventId}&returnTo=${encodeURIComponent(`/events/${eventId}`)}`)
+        } else {
+            navigate(`/participants/edit/${row.id}`)
+        }
     }
 
     const handleView = (row: Customer) => {
         navigate(`/participants/${row.id}`)
     }
 
-    // =========================
-    // SELECT ALL (SAFE)
-    // =========================
-    const handleAllRowSelect = (checked: boolean, rows: Row<Customer>[]) => {
-        if (!Array.isArray(rows)) return
-
-        if (checked) {
-            const safeRows = rows
-                .map(r => r?.original)
-                .filter(Boolean)
-                .filter(r => r.id)
-
-            setSelectAllCustomer(safeRows as any)
-        } else {
-            setSelectAllCustomer([])
-        }
-    }
-
-    // =========================
-    // Columns
-    // =========================
     const columns: ColumnDef<Customer>[] = useMemo(
         () => [
             { header: 'First Name', accessorKey: 'firstName' },
@@ -92,37 +68,11 @@ const ParticipantsTable = () => {
                 header: 'Event',
                 accessorKey: 'event_title',
                 cell: (props) => (
-                    <span
-                        className="cursor-pointer font-semibold"
-                        onClick={() =>
-                            navigate(`/events/${props.row.original.code}`)
-                        }
-                    >
+                    <span className="font-semibold">
                         {props.row.original.event_title}
                     </span>
                 ),
             },
-
-            // {
-            //     header: 'Fee',
-            //     accessorKey: 'fee_amount',
-            //     cell: (props) =>
-            //         Number(props.row.original.fee_amount || 0).toFixed(2),
-            // },
-
-            // {
-            //     header: 'Paid',
-            //     accessorKey: 'amount_paid',
-            //     cell: (props) =>
-            //         Number(props.row.original.amount_paid || 0).toFixed(2),
-            // },
-
-            // {
-            //     header: 'Balance',
-            //     accessorKey: 'balance_due',
-            //     cell: (props) =>
-            //         Number(props.row.original.balance_due || 0).toFixed(2),
-            // },
 
             {
                 header: 'Action',
@@ -135,29 +85,10 @@ const ParticipantsTable = () => {
                 ),
             },
         ],
-        [navigate]
+        []
     )
 
-    
-
-return (
-    <>
-        <div className="mb-4 text-sm text-gray-500">
-            Showing{' '}
-            {customerListTotal === 0
-                ? 0
-                : ((tableData.pageIndex as number) - 1) *
-                      (tableData.pageSize as number) +
-                  1}{' '}
-            to{' '}
-            {Math.min(
-                (tableData.pageIndex as number) *
-                    (tableData.pageSize as number),
-                customerListTotal
-            )}{' '}
-            of {customerListTotal} entries
-        </div>
-
+    return (
         <CommonTable
             data={data}
             total={customerListTotal}
@@ -165,20 +96,11 @@ return (
             tableData={tableData}
             setTableData={setTableData}
             selectedItems={selectedCustomer}
-            setSelectedItems={setSelectedCustomer}
+            setSelectedItems={setSelectAllCustomer}
             columns={columns}
-            selectable={true}
-            checkboxChecked={(row) =>
-                selectedCustomer.some(
-                    (s) => s.id === row.id
-                )
-            }
-            pageSizes={[10, 20, 50, 100]}
+            selectable
         />
-    </>
-)
-
-
+    )
 }
 
 export default ParticipantsTable

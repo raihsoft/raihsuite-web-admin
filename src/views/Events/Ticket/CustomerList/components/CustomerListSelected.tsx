@@ -11,14 +11,14 @@ import useTicketList from '../hooks/useTicketList'
 import { apiDeleteTicket } from '@/services/CustomersService'
 import { TbChecks } from 'react-icons/tb'
 
-const CustomerListSelected = () => {
+const CustomerListSelected = ({ eventId }: { eventId?: string }) => {
     const {
         selectedTicket,
         ticketList,
         mutate,
         ticketListTotal,
         setSelectAllTicket,
-    } = useTicketList()
+    } = useTicketList(eventId)
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)

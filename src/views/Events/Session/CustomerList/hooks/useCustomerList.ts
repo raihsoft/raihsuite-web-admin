@@ -4,7 +4,7 @@ import { useCustomerListStore } from '../store/customerListStore'
 import type { GetCustomersListResponse } from '../types'
 import type { TableQueries } from '@/@types/common'
 
-export default function useCustomerList() {
+export default function useCustomerList(eventId?: string) {
     const {
         tableData,
         filterData,
@@ -15,24 +15,36 @@ export default function useCustomerList() {
         setFilterData,
     } = useCustomerListStore((state) => state)
 
-    // ✅ FIX: proper pagination
-    const limit = tableData.pageSize
-    const offset = (tableData.pageIndex - 1) * tableData.pageSize
+    const pageIndex = tableData.pageIndex ?? 1
+    const pageSize = tableData.pageSize ?? 10
+    const limit = pageSize
+    const offset = (pageIndex - 1) * limit
+
+    const swrKey = [
+        '/api/events/sessions',
+        pageIndex,
+        pageSize,
+        tableData.query || '',
+        JSON.stringify(filterData || {}),
+        eventId ?? '',
+    ]
+
+    const fetcher = () =>
+        apiGetSessionList<GetCustomersListResponse, any>({
+            limit: eventId ? 1000 : limit,
+            offset: eventId ? 0 : offset,
+            ordering: '-created_at',
+            search: tableData.query || '',
+            ...(eventId ? { event_id: eventId, event: eventId } : {}),
+            ...filterData,
+        })
 
     const { data, error, isLoading, mutate } = useSWR(
-        [
-            '/api/events/sessions',
-            {
-                limit,
-                offset,
-                ordering: '-created_at',
-                ...filterData,
-            },
-        ],
-        ([_, params]) =>
-            apiGetSessionList<GetCustomersListResponse, TableQueries>(params),
+        swrKey,
+        fetcher,
         {
             revalidateOnFocus: false,
+            keepPreviousData: true,
         },
     )
 
@@ -48,12 +60,21 @@ export default function useCustomerList() {
         speaker: item.speaker ?? '',
         location: item.location ?? '',
         event_title: item.event_title ?? '',
+        event: item.event ?? '',
     }))
 
-    const customerListTotal = data?.count ?? 0
+    const filteredList = eventId
+        ? customerList.filter((p) => String(p.event) === String(eventId))
+        : customerList
+
+    const customerListTotal = eventId ? filteredList.length : (data?.count ?? 0)
+
+    const paginatedList = eventId
+        ? filteredList.slice(offset, offset + limit)
+        : customerList
 
     return {
-        customerList,
+        customerList: paginatedList,
         customerListTotal,
         error,
         isLoading,

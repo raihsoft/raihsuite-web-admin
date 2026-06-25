@@ -20,6 +20,7 @@ const CustomerListSelected = () => {
         customerListTotal,
         tableData,
         setSelectAllCustomer,
+        setTableData,
     } = useCustomerList()
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] =
@@ -55,13 +56,13 @@ const CustomerListSelected = () => {
             // DELETE API CALLS
             await Promise.all(
                 selectedCustomer.map((item) =>
-                    apiDeleteProgram(item.id)
+                    apiDeleteProgram(String(item.id))
                 )
             )
 
             // REMOVE FROM CURRENT PAGE
             const updatedList = customerList.filter(
-                (customer) =>
+                (customer: any) =>
                     !selectedCustomer.some(
                         (selected) =>
                             selected.id === customer.id
@@ -88,17 +89,21 @@ const CustomerListSelected = () => {
             // =========================
             // FIX EMPTY PAGE ISSUE
             // =========================
+            const pageSize = tableData.pageSize || 10
+            const pageIndex = tableData.pageIndex || 1
             const totalPages = Math.ceil(
-                updatedTotal / tableData.pageSize
+                updatedTotal / pageSize
             )
 
             // if current page becomes empty
             if (
                 updatedList.length === 0 &&
-                tableData.pageIndex > 1
+                pageIndex > 1
             ) {
-                tableData.pageIndex =
-                    totalPages || 1
+                setTableData({
+                    ...tableData,
+                    pageIndex: totalPages || 1,
+                })
             }
 
             toast.push(

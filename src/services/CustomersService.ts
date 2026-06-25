@@ -817,6 +817,7 @@ export async function apiGetTicketDetails<T>(id: string) {
 // Takes token from QR code to update ticket status
 export async function apiScanTicket<T>(data: {
     token: string
+    session?: string
 }) {
     return ApiService.fetchDataWithAxios<T>({
         url: '/events/tickets/scan/',
@@ -838,14 +839,10 @@ export async function apiGetProgramList<T, U extends Record<string, unknown>>(
     })
 }
 
-export async function apiGetProgramById<T, U extends Record<string, unknown>>(
-    id: string,
-    data: U
-) {
+export async function apiGetProgramById<T>(id: string) {
     return ApiService.fetchDataWithAxios<T>({
         url: `/programs/programs/${id}/`,
-        method: 'patch',
-        data,
+        method: 'get',
     })
 }
 
@@ -923,4 +920,42 @@ export async function apiDeleteProgramparticipant(id: string) {
     url: `/programs/participants/${id}/`,
     method: 'delete',
   })
+}
+
+export async function apiGetParticipantCustomFields<T, U extends Record<string, unknown>>(
+    params: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/programs/participant-custom-fields/',
+        method: 'get',
+        params,
+    })
+}
+
+export async function apiCreateParticipantCustomField<T, U extends Record<string, unknown>>(
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: '/programs/participant-custom-fields/',
+        method: 'post',
+        data,
+    })
+}
+
+export async function apiUpdateParticipantCustomField<T, U extends Record<string, unknown>>(
+    id: string,
+    data: U,
+) {
+    return ApiService.fetchDataWithAxios<T>({
+        url: `/programs/participant-custom-fields/${id}/`,
+        method: 'patch',
+        data,
+    })
+}
+
+export async function apiDeleteParticipantCustomField(id: string) {
+    return ApiService.fetchDataWithAxios({
+        url: `/programs/participant-custom-fields/${id}/`,
+        method: 'delete',
+    })
 }

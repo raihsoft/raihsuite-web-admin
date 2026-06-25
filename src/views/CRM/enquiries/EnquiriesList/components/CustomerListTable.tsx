@@ -10,6 +10,7 @@ import { TbEye } from 'react-icons/tb'
 import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
 import type { TableQueries } from '@/@types/common'
+import customerListSearch from './CustomerListSearch'
 
 const truncateText = (text: string, maxLength = 40) => {
     if (!text) return ''
@@ -58,23 +59,6 @@ const CustomerListTable = () => {
         selectedCustomer,
     } = useCustomerList()
 
-    // ✅ Latest first sorting + search filter - only applied to current page data from API
-const filteredAndSortedList = useMemo(() => {
-    const query = (tableData.query as string || '').toLowerCase().trim()
-
-    // ❌ DO NOT SORT HERE (backend already sends newest first)
-    let list = [...customerList]
-
-    // only filter
-    if (!query) return list
-
-    return list.filter(customer =>
-        customer.name?.toLowerCase().includes(query)
-    )
-}, [customerList, tableData.query])
-
-    // ✅ Get the final data to display - use filtered/sorted list for current page
-    const displayData = filteredAndSortedList
 
     const handleViewDetails = (customer: Customer) => {
         navigate(`/enquiries/${customer.id}`)

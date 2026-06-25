@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import useCustomerList from '../hooks/useCustomerList'
 import { CSVLink } from 'react-csv'
 
-const CustomerListActionTools = () => {
+const CustomerListActionTools = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
 
-    const { customerList } = useCustomerList()
+    const { customerList } = useCustomerList(eventId)
 
     return (
         <div className="flex flex-col md:flex-row gap-3">
@@ -25,8 +25,7 @@ const CustomerListActionTools = () => {
             </CSVLink>
             <Button
                 variant="solid"
-                icon={<TbUserPlus className="text-xl" />}
-                onClick={() => navigate('/session/create')}
+                onClick={() => navigate(eventId ? `/session/create?event=${eventId}` : '/session/create')}
             >
                 Add new
             </Button>

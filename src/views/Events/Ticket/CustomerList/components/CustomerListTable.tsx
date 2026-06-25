@@ -29,7 +29,7 @@ const ActionColumn = ({
     </div>
 )
 
-const TicketListTable = () => {
+const TicketListTable = ({ eventId }: { eventId?: string }) => {
     const navigate = useNavigate()
 
     const {
@@ -41,7 +41,7 @@ const TicketListTable = () => {
         selectedTicket,
         setSelectedTicket,
         setSelectAllTicket,
-    } = useTicketList()
+    } = useTicketList(eventId)
 
     // =========================
     // SAFE DATA
@@ -74,9 +74,13 @@ const TicketListTable = () => {
                 id: 'action',
                 cell: (props) => (
                     <ActionColumn
-                        onEdit={() =>
-                            navigate(`/ticket/edit/${props.row.original.id}`)
-                        }
+                        onEdit={() => {
+                            if (eventId) {
+                                navigate(`/ticket/edit/${props.row.original.id}?event=${eventId}&returnTo=${encodeURIComponent(`/events/${eventId}`)}`)
+                            } else {
+                                navigate(`/ticket/edit/${props.row.original.id}`)
+                            }
+                        }}
                         onViewDetail={() =>
                             navigate(`/ticket/${props.row.original.id}`)
                         }
