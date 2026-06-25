@@ -32,7 +32,6 @@ const CustomerListTable = () => {
         tableData,
         isLoading,
         selectedCustomer,
-        setSelectedCustomer,
         setSelectAllCustomer,
         setTableData,
     } = useCustomerList()
@@ -118,7 +117,7 @@ return (
             tableData={tableData}
             setTableData={setTableData}
             selectedItems={selectedCustomer}
-            setSelectedItems={setSelectedCustomer}
+            setSelectedItems={setSelectAllCustomer}
             columns={columns}
             selectable={true}
             checkboxChecked={(row) =>

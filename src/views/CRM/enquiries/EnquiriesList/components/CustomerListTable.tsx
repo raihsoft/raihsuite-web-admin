@@ -10,6 +10,7 @@ import { TbEye } from 'react-icons/tb'
 import type { OnSortParam, ColumnDef, Row } from '@/components/shared/DataTable'
 import type { Customer } from '../types'
 import type { TableQueries } from '@/@types/common'
+import customerListSearch from './CustomerListSearch'
 
 const truncateText = (text: string, maxLength = 40) => {
     if (!text) return ''
