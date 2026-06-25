@@ -37,7 +37,6 @@ const ParticipantsTable = ({ eventId }: { eventId?: string }) => {
         customerListTotal,
         tableData,
         isLoading,
-        setSelectedCustomer,
         setSelectAllCustomer,
         selectedCustomer,
         setTableData,
@@ -97,7 +96,7 @@ const ParticipantsTable = ({ eventId }: { eventId?: string }) => {
             tableData={tableData}
             setTableData={setTableData}
             selectedItems={selectedCustomer}
-            setSelectedItems={setSelectedCustomer}
+            setSelectedItems={setSelectAllCustomer}
             columns={columns}
             selectable
         />

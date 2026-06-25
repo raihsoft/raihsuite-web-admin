@@ -64,7 +64,7 @@ const CustomerEdit = () => {
                 </Notification>,
                 { placement: 'top-center' },
             )
-            navigate('/session')
+            // navigate('/session')
 
             mutate()
         } catch {

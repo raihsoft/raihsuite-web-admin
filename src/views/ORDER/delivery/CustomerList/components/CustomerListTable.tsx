@@ -82,8 +82,8 @@ const CustomerListTable = () => {
         customerListTotal,
         tableData,
         isLoading,
+        setTableData,
         setSelectAllCustomer,
-        setSelectedCustomer,
         selectedCustomer,
     } = useCustomerList()
 
@@ -185,8 +185,9 @@ const CustomerListTable = () => {
             total={customerListTotal}
             loading={isLoading}
             tableData={tableData}
+            setTableData={setTableData}
             selectedItems={selectedCustomer}
-            setSelectedItems={setSelectedCustomer}
+            setSelectedItems={setSelectAllCustomer}
             columns={columns}
         />
     )
